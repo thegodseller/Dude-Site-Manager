@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe Playback</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+    <style>
+        .timeline-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip" onclick="history.back()" style="cursor: pointer;">
+            <span class="material-icons-round">arrow_back</span>
+            <span style="margin-left:8px">Back</span>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--secondary);">history</span>
+        </div>
+    </header>
+
+    <h1 class="gradient-text" style="font-size: 1.8rem; margin-bottom: 16px;">CCTV Playback</h1>
+
+    <!-- Placeholder Content -->
+    <div class="timeline-container">
+        <span class="material-icons-round" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;">construction</span>
+        <h3 style="color: var(--text-primary); margin-bottom: 8px;">System Upgrade</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            The Neural Playback Interface is currently being upgraded for enhanced retention and faster retrieval.
+        </p>
+        <br>
+        <button class="btn-primary" onclick="liff.closeWindow()">Close Window</button>
+    </div>
+
+    <script src="assets/js/dude_auth_guard.js"></script>
+    <script>
+        // 🇹🇭 ตรวจสอบสิทธิ์ก่อนแสดงผล
+        verifyAccess('vision');
+    </script>
+    <script src="assets/js/dude_liff_2026.js"></script>
+</body>
+</html>

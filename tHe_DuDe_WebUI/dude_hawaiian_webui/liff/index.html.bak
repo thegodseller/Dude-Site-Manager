@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DuDe — LIFF</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root {
+      --bg:#0b1020;
+      --bg-2:#0f1530;
+      --panel:hsla(240,25%,12%,.6);
+      --stroke:hsla(260,70%,70%,.25);
+      --brand:#8b5cf6;
+      --brand-2:#7c3aed;
+      --text:#e8e8f3;
+      --muted:#9aa3b2;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans Thai",sans-serif;
+      color:#fff;
+      background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+      display:grid;place-items:center;
+      overflow-x:hidden;
+      padding:24px;
+      min-height: 100vh;
+    }
+    .card{
+      width:min(960px,96vw);
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:16px;
+      box-shadow:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      padding:28px;
+      transition:all .3s ease;
+    }
+    .card:hover{
+      background:rgba(255,255,255,0.1);
+      transform:translateY(-4px);
+      border-color:rgba(255,255,255,0.2);
+    }
+    .title{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin-bottom:16px}
+    .title h1{margin:0;font-size:clamp(26px,4vw,34px);font-weight:800}
+    .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.35)}
+    .subtitle{margin:4px 0 24px;color:var(--muted);font-size:14px}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+    .section-title{margin-top:40px;margin-bottom:16px;font-size:18px;font-weight:700;color:#e2e8f0;border-top:1px solid rgba(255,255,255,0.05);padding-top:24px}
+    .api-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .api-card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#94a3b8}
+    .api-status{padding:2px 8px;border-radius:4px;background:rgba(34,197,94,0.1);color:#4ade80;font-size:11px;font-weight:600}
+    @media (max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:520px){.grid{grid-template-columns:1fr}}
+    .tile{
+      position:relative;isolation:isolate;aspect-ratio:4/2.6;
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:16px;padding:18px;display:grid;align-content:end;gap:10px;
+      text-decoration:none;color:#fff;overflow:hidden;
+      transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease, background .2s ease;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .tile:hover{
+       transform:translateY(-2px);
+       background:rgba(255,255,255,0.15);
+       border-color:rgba(255,255,255,0.25);
+       box-shadow:0 10px 25px rgba(0,0,0,.25);
+    }
+    .tile:hover{transform:translateY(-2px);border-color:rgba(139,92,246,.65);box-shadow:0 10px 25px rgba(0,0,0,.35)}
+    .tile h3{margin:0;font-weight:700}
+    .tile p{margin:0;font-size:13px;color:var(--muted)}
+    .icon{position:absolute;inset:0 auto auto 0;width:120px;height:120px;opacity:.25;transform:translate(-18%,-18%);z-index:-1;pointer-events:none;filter:drop-shadow(0 6px 20px rgba(0,0,0,.45))}
+    .actions{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap}
+    .btn{border-radius:999px;border:1px solid rgba(148,163,184,.28);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));color:var(--text);padding:10px 16px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s ease,border-color .15s ease}
+    .btn:hover{transform:translateY(-1px);border-color:rgba(139,92,246,.65)}
+    .btn.primary{background:linear-gradient(180deg,var(--brand) 0%,var(--brand-2) 100%);border:1px solid rgba(139,92,246,.9)}
+    .foot{margin-top:14px;color:var(--muted);font-size:12px}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:#cbd5e1}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="heading">
+    <div class="title">
+      <h1 id="heading">Services Hub</h1>
+      <div id="user-profile" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+        <img id="profile-pic" style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(139,92,246,.65);display:none;" alt="Profile">
+        <span id="profile-name" style="font-size:14px;color:#c4b5fd;"></span>
+      </div>
+    </div>
+    <p class="subtitle">Access your connected applications</p>
+
+    <section class="grid" aria-label="เมนูบริการ">
+      <a class="tile" href="/liff/rag_upload.html" rel="noopener">
+        <svg class="icon" viewBox="0 0 128 128" aria-hidden="true">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs>
+          <rect x="18" y="22" rx="10" ry="10" width="92" height="84" fill="url(#g1)"/>
+          <path d="M64 84V46m0 0l-12 12m12-12l12 12" stroke="#0b1020" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <h3>อัปโหลดความรู้ (RAG)</h3>
+        <p>เพิ่มไฟล์เอกสารให้เอเจนต์เข้าใจ</p>
+      </a>
+
+      <a class="tile" href="https://notes.thegodseller.com" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 128 128" aria-hidden="true">
+          <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+          <circle cx="64" cy="64" r="44" fill="url(#g2)"/>
+          <path d="M40 66l16 12 32-28" stroke="#0b1020" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <h3>Blinko Notes</h3>
+        <p>AI-enhanced note taking</p>
+      </a>
+
+      <a class="tile" href="https://booking.thegodseller.com" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 128 128" aria-hidden="true">
+          <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+          <rect x="24" y="30" width="80" height="64" rx="12" ry="12" fill="url(#g3)"/>
+          <path d="M40 48h48M40 64h48M40 80h28" stroke="#0b1020" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+        <h3>QloApps Booking</h3>
+        <p>Reservation management</p>
+      </a>
+
+      <a class="tile" href="https://health.thegodseller.com" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 128 128" aria-hidden="true">
+          <defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#60a5fa"/></linearGradient></defs>
+          <rect x="22" y="30" width="84" height="68" rx="16" ry="16" fill="url(#g4)"/>
+          <path d="M48 68h8v-8h16v8h8v16h-8v8H56v-8h-8z" fill="#0b1020"/>
+        </svg>
+        <h3>MediKeep Health</h3>
+        <p>Personal health record</p>
+      </a>
+      <a class="tile" href="https://iot.thegodseller.com" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 128 128" aria-hidden="true">
+          <defs><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs>
+          <rect x="22" y="30" width="84" height="68" rx="12" ry="12" fill="url(#g5)"/>
+          <path d="M64 64m-16 0a16 16 0 1 0 32 0a16 16 0 1 0 -32 0" stroke="#0b1020" stroke-width="8" fill="none"/>
+        </svg>
+        <h3>Aegis Protocol</h3>
+        <p>IoT CCTV Gateway</p>
+      </a>
+    </section>
+
+    <h3 class="section-title">API Endpoints</h3>
+    <div class="api-grid">
+      <div class="api-card">
+        <span>MCP</span>
+        <span class="api-status">Active</span>
+      </div>
+      <div class="api-card">
+        <span>MediKeep API</span>
+        <span class="api-status">Active</span>
+      </div>
+      <div class="api-card">
+        <span>Blinko API</span>
+        <span class="api-status">Active</span>
+      </div>
+      <div class="api-card">
+        <span>QloApps API</span>
+        <span class="api-status">Active</span>
+      </div>
+    </div>
+
+
+
+    <p class="foot">v2025.11 · DuDe Hawaiian WebUI — <span class="kbd">/liff/index.html</span></p>
+  </main>
+
+  <script>
+    const LIFF_ID="2008020536-b0ePOONI";
+    async function boot(){
+      try{
+        await liff.init({ liffId: LIFF_ID });
+        if(!liff.isLoggedIn()) liff.login();
+        const profile = await liff.getProfile();
+        
+        // Show profile picture and name
+        const picEl = document.getElementById('profile-pic');
+        const nameEl = document.getElementById('profile-name');
+        if(profile.pictureUrl){
+          picEl.src = profile.pictureUrl;
+          picEl.style.display = 'block';
+        }
+        nameEl.textContent = profile.displayName;
+        
+        // Store user ID for session
+        sessionStorage.setItem('dude_line_user_id', profile.userId);
+      }catch(e){
+        console.error(e);
+      }
+    }
+    boot();
+  </script>
+</body>
+</html>

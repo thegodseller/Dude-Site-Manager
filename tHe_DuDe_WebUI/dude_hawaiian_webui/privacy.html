@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - The Godseller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #bc13fe;
+            --neon-cyan: #00f3ff;
+            --neon-teal: #00ffaa;
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body { 
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif; 
+            background-color: #020617;
+            color: #f8fafc;
+        }
+        h1, h2, h3, .font-tech { font-family: 'Orbitron', sans-serif; }
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .dropdown:hover .dropdown-menu { display: block; }
+        .text-gold { color: #D4AF37; }
+        .border-gold { border-color: #D4AF37; }
+    </style>
+</head>
+<body class="overflow-x-hidden min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-20 h-20 rounded-full border-2 border-[#D4AF37] overflow-hidden">
+                    <img src="assets/logo.png" class="w-full h-full object-cover">
+                </div>
+                <a href="index.html" class="text-xl font-bold font-tech tracking-wider text-[#D4AF37]">The Godseller</a>
+            </div>
+            
+            <div class="hidden lg:flex space-x-8 font-semibold text-xs tracking-[0.2em] uppercase text-slate-400">
+                <a href="index.html" class="hover:text-white transition">Home</a>
+                <div class="relative dropdown">
+                    <button class="hover:text-white transition flex items-center">Services <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                    <div class="absolute hidden dropdown-menu pt-4 w-56">
+                        <div class="glass border-t-2 border-[#D4AF37] rounded-b-xl py-2">
+                            <a href="index.html#dude" class="block px-4 py-2 hover:bg-white/5 transition">DuDe HawaiaN</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-white/5 transition">Dude Vision</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-white/5 transition">Dude POS</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-white/5 transition">Dude Room Service</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-white/5 transition">Dude Drive</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-white/5 transition">Themis Verdict</a>
+                        </div>
+                    </div>
+                </div>
+                <a href="pricing.html" class="hover:text-white transition">Pricing</a>
+                <a href="privacy.html" class="text-white">Privacy</a>
+                <a href="#" class="hover:text-white transition">Download</a>
+                <a href="how-to-use.html" class="hover:text-white transition">How to use</a>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button class="bg-[#D4AF37] text-black px-5 py-1.5 rounded-sm font-bold text-[10px] tracking-widest uppercase hover:bg-yellow-500 transition">EN</button>
+                <a href="https://ui.thegodseller.com" class="border border-white/20 px-5 py-1.5 rounded-sm font-bold text-[10px] tracking-widest uppercase hover:bg-white hover:text-black transition hidden lg:block">Log In</a>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full glass border-t border-white/10 p-6 flex flex-col space-y-4 lg:hidden z-40 bg-[#020617]/90">
+            <a href="index.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Home</a>
+             <div class="text-slate-400 py-2 border-b border-white/5">
+                <span class="block mb-2 text-xs uppercase tracking-widest text-[#D4AF37]">Services</span>
+                <div class="pl-4 border-l border-[#D4AF37] space-y-2">
+                    <a href="index.html#dude" class="block hover:text-white">DuDe HawaiaN</a>
+                    <a href="#" class="block hover:text-white">Dude Vision</a>
+                    <a href="#" class="block hover:text-white">Dude POS</a>
+                    <a href="#" class="block hover:text-white">Dude Room Service</a>
+                    <a href="#" class="block hover:text-white">Dude Drive</a>
+                </div>
+            </div>
+            <a href="pricing.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Pricing</a>
+            <a href="privacy.html" class="text-white block py-2 border-b border-white/5 border-l-4 pl-2 border-l-[#D4AF37]">Privacy</a>
+            <a href="#" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Download</a>
+            <a href="how-to-use.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">How to use</a>
+            <a href="https://ui.thegodseller.com" class="text-[#D4AF37] font-bold block py-2 mt-2">Log In</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-6 py-20 max-w-4xl">
+        <div class="glass p-12 rounded-3xl border-t-4 border-[#D4AF37]">
+            
+            <!-- THAI VERSION -->
+            <section class="mb-20">
+                <h1 class="text-3xl md:text-4xl font-bold mb-2 text-white">นโยบายความเป็นส่วนตัว (Privacy Policy)</h1>
+                <p class="text-slate-400 text-sm mb-8 tracking-widest uppercase">อัปเดตล่าสุด: กุมภาพันธ์ 2026</p>
+
+                <p class="mb-8 text-slate-300 leading-relaxed text-lg">
+                    ยินดีต้อนรับสู่ <span class="text-gold font-bold">The Godseller</span> ผู้ให้บริการโซลูชัน AI และ Smart Home แบบ "Local-first" เราให้ความสำคัญสูงสุดกับความเป็นส่วนตัวของคุณ เพราะเราเชื่อว่า <span class="italic text-white">"ข้อมูลของคุณ คือสมบัติของคุณ" (Your Data is Your Property)</span>
+                </p>
+                <p class="mb-12 text-slate-300 leading-relaxed">
+                    นโยบายฉบับนี้อธิบายว่าเรารวบรวม ใช้ และปกป้องข้อมูลของคุณอย่างไร เมื่อคุณใช้งานผลิตภัณฑ์ DuDe Hawaiian, Dude Vision, Themis Verdict, และบริการอื่นๆ ของเรา
+                </p>
+
+                <div class="space-y-12">
+                    <!-- Item 1 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">🏠</span> 1. ปรัชญาของเรา (Local-First Philosophy)
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p>สิ่งที่ทำให้ The Godseller แตกต่างจากอุปกรณ์ Smart Home ทั่วไปคือ:</p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">การประมวลผลที่ต้นทาง:</strong> ระบบ AI, การจดจำใบหน้า (Face Recognition) และข้อมูลกล้องวงจรปิด จะถูกประมวลผลบนเซิร์ฟเวอร์ส่วนตัวของคุณ (Local Server/Edge Device) ภายในบ้านหรือบริษัทของคุณเท่านั้น</li>
+                                <li><strong class="text-white">ไม่ส่งข้อมูลออกนอกบ้าน:</strong> เราไม่มีนโยบายดึงข้อมูลวิดีโอ เสียง หรือข้อมูลสุขภาพของคุณขึ้นสู่ Cloud ของเรา เว้นแต่คุณจะเป็นผู้ตั้งค่าการเชื่อมต่อด้วยตนเอง (เช่น การส่งแจ้งเตือนผ่าน LINE)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">📋</span> 2. ข้อมูลที่เราเก็บรวบรวม
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p>เราเก็บรวบรวมข้อมูลเพียงเท่าที่จำเป็นสำหรับการให้บริการและการสนับสนุนเท่านั้น:</p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">ข้อมูลการติดต่อ:</strong> ชื่อ, อีเมล, เบอร์โทรศัพท์ (เมื่อคุณสั่งซื้อสินค้าหรือลงทะเบียนรับประกัน)</li>
+                                <li><strong class="text-white">ข้อมูลทางเทคนิค:</strong> หมายเลข IP Address, รหัสอุปกรณ์ (Device ID) เพื่อการตรวจสอบสิทธิ์การใช้งาน (License Validation) และการอัปเดตซอฟต์แวร์</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">🚫</span> 3. ข้อมูลที่เรา "ไม่" เก็บรวบรวม (และเราภูมิใจมาก)
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">ภาพจากกล้องวงจรปิด:</strong> เราไม่สามารถเข้าถึงภาพสดหรือย้อนหลังของคุณได้</li>
+                                <li><strong class="text-white">บทสนทนากับ AI:</strong> ประวัติการคุยของคุณกับ Dude จะถูกเก็บไว้ใน Database เครื่องของคุณเอง</li>
+                                <li><strong class="text-white">ข้อมูลสุขภาพ:</strong> ข้อมูลจาก MediKeep เก็บในเครื่องของคุณ 100%</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">📢</span> 4. การเปิดเผยข้อมูล
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p>เราจะไม่ขาย, ให้เช่า, หรือเปิดเผยข้อมูลส่วนบุคคลของคุณแก่บุคคลที่สาม ยกเว้น:</p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li>ผู้ให้บริการโครงสร้างพื้นฐานที่จำเป็น (เช่น Cloudflare สำหรับระบบ Tunneling) ซึ่งข้อมูลจะถูกเข้ารหัส (Encrypted) ตลอดเส้นทาง</li>
+                                <li>เมื่อมีคำสั่งจากเจ้าหน้าที่รัฐตามกฎหมาย (ซึ่งเราจะเปิดเผยได้เฉพาะข้อมูลการลงทะเบียนที่เรามีเท่านั้น ส่วนข้อมูลในบ้านคุณ เราเข้าไม่ถึง)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 5 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">🔒</span> 5. ความปลอดภัย (Security)
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p>เราใช้มาตรฐานความปลอดภัยระดับสูงในการออกแบบซอฟต์แวร์:</p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">Local Encryption:</strong> ฐานข้อมูลในเครื่องของคุณรองรับการเข้ารหัส</li>
+                                <li><strong class="text-white">Secure Tunnel:</strong> การเชื่อมต่อจากภายนอกผ่าน Cloudflare Tunnel ที่มีการเข้ารหัส SSL/TLS เสมอ</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 6: Themis Verdict -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">⚖️</span> 6. Themis Verdict (แอปพลิเคชันตัดสินใจด้วย AI)
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p><strong class="text-white">Package Name:</strong> <code class="bg-white/10 px-2 py-1 rounded text-gold">com.thegodseller.themisverdict</code></p>
+                            
+                            <p><strong class="text-white">สถาปัตยกรรม 4-Brain (Local-Only Processing):</strong></p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">Hermes (Negotiator)</strong> - พอร์ต 11112: ประมวลผลการกำหนดเส้นทางและเจรจาภายในเซิร์ฟเวอร์ของคุณ</li>
+                                <li><strong class="text-white">Athena (Librarian)</strong> - พอร์ต 11113: ค้นคว้าความรู้และวิเคราะห์เปรียบเทียบภายใน Local Network</li>
+                                <li><strong class="text-white">Mnemosyne (Memory)</strong> - พอร์ต 13332: บันทึกประวัติการตัดสินใจลงใน Vector Database ของคุณเอง</li>
+                                <li><strong class="text-white">Manus Reasoning</strong>: ระบบอนุมานตรรกะขั้นสูงที่ทำงานบนอุปกรณ์ของคุณ</li>
+                            </ul>
+                            
+                            <p><strong class="text-white">ความมุ่งมั่นด้านความเป็นส่วนตัว:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li>ข้อมูลการตัดสินใจและการวิเคราะห์ทั้งหมดถูกประมวลผลผ่าน <span class="highlight">Local API</span> บนเซิร์ฟเวอร์ของคุณเท่านั้น</li>
+                                <li>ไม่มีการส่งข้อมูลไปยังเซิร์ฟเวอร์ภายนอกหรือ Cloud ของบุคคลที่สาม</li>
+                                <li>ประวัติการตัดสินใจ (Decision History) ถูกเก็บใน Mnemosyne (Memory Service) ที่คุณควบคุม</li>
+                                <li>เราไม่สามารถเข้าถึง อ่าน หรือแชร์ข้อมูลการตัดสินใจของคุณได้</li>
+                            </ul>
+                            
+                            <p class="text-sm text-slate-400 mt-4 bg-white/5 p-4 rounded-lg border border-white/10">
+                                <strong>การยินยอม:</strong> เมื่อใช้งาน Themis Verdict คุณยินยอมให้แอปพลิเคชันเชื่อมต่อกับ Local APIs บนเครือข่ายภายในของคุณ (192.168.1.x) เท่านั้น 
+                                ไม่มีการเชื่อมต่ออินเทอร์เน็ตภายนอกสำหรับการประมวลผลข้อมูลส่วนตัว
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Item 7 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">📋</span> 7. สิทธิ์ของคุณ (PDPA)
+                        </h2>
+                        <div class="pl-14 text-slate-300">
+                            <p>คุณมีสิทธิ์ขอเข้าถึง, แก้ไข, หรือลบข้อมูลส่วนบุคคลที่เราเก็บไว้ (เช่น บัญชีผู้ใช้หน้าเว็บ) ได้ตลอดเวลา โดยติดต่อเราที่ช่องทางด้านล่าง</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10">
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="mr-3 text-2xl">📩</span> ติดต่อเรา
+                        </h2>
+                        <div class="pl-10 text-slate-300 space-y-2">
+                            <p>หากมีข้อสงสัยเกี่ยวกับความเป็นส่วนตัว ติดต่อเจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคล (DPO) ของเราได้ที่:</p>
+                            <p><strong class="text-white">อีเมล:</strong> <a href="mailto:chanukrit@thegodseller.com" class="text-cyan-400 hover:text-cyan-300 transition">chanukrit@thegodseller.com</a></p>
+                            <p><strong class="text-white">เว็บไซต์:</strong> <a href="https://thegodseller.com" class="text-cyan-400 hover:text-cyan-300 transition">https://thegodseller.com</a></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="border-t border-white/10 my-16"></div>
+
+            <!-- ENGLISH VERSION -->
+            <section class="opacity-80">
+                <h1 class="text-3xl md:text-4xl font-bold mb-2 text-white">Privacy Policy</h1>
+                <p class="text-slate-500 text-sm mb-8 tracking-widest uppercase">Last Updated: February 2026</p>
+
+                <p class="mb-4 text-slate-300 leading-relaxed text-lg">
+                     Welcome to <span class="text-gold font-bold">The Godseller</span>. We are pioneers of "Local-first" AI & Smart Home solutions. We take your privacy seriously because we believe <span class="italic text-white">Your Data belongs to You.</span>
+                </p>
+
+                <div class="space-y-12 mt-10">
+                    <!-- Item 1 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">🏠</span> 1. Our "Local-First" Promise
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p>Unlike traditional smart devices, The Godseller products process data at the Edge (on your own local server).</p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">AI Processing:</strong> Voice, text, and computer vision tasks are computed locally on your hardware.</li>
+                                <li><strong class="text-white">Zero-Eavesdropping:</strong> We do not upload your camera feeds, voice recordings, or health metrics to our cloud servers.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">📋</span> 2. Information We Collect
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p>We collect only the minimum data required to provide our services:</p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">Contact Info:</strong> Name, Email, Phone number (for warranty and support).</li>
+                                <li><strong class="text-white">Technical Data:</strong> IP Address, Device ID (for software licensing and OTA updates).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">🚫</span> 3. Data We Do NOT Touch
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">Your CCTV Footage:</strong> Stays on your hard drive.</li>
+                                <li><strong class="text-white">Your AI Conversations:</strong> Stored in your local database.</li>
+                                <li><strong class="text-white">Your Health Records:</strong> Managed locally by MediKeep.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                     <!-- Item 4: Themis Verdict -->
+                     <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">⚖️</span> 4. Themis Verdict (AI Judgment App)
+                        </h2>
+                        <div class="pl-14 space-y-4 text-slate-300">
+                            <p><strong class="text-white">Package Name:</strong> <code class="bg-white/10 px-2 py-1 rounded text-gold">com.thegodseller.themisverdict</code></p>
+                            
+                            <p><strong class="text-white">4-Brain Architecture (Local-Only Processing):</strong></p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li><strong class="text-white">Hermes (Negotiator)</strong> - Port 11112: Local intent routing and negotiation processing</li>
+                                <li><strong class="text-white">Athena (Librarian)</strong> - Port 11113: Local knowledge retrieval and comparative analysis</li>
+                                <li><strong class="text-white">Mnemosyne (Memory)</strong> - Port 13332: Decision history stored in your Vector Database</li>
+                                <li><strong class="text-white">Manus Reasoning</strong>: Advanced multi-step logical inference running on your device</li>
+                            </ul>
+                            
+                            <p><strong class="text-white">Privacy Commitment:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2 marker:text-gold">
+                                <li>All decision data and analysis are processed via <span class="highlight">Local API</span> on your server only</li>
+                                <li>No data is sent to external servers or third-party clouds</li>
+                                <li>Decision history is stored in Mnemosyne (Memory Service) under your control</li>
+                                <li>We cannot access, read, or share your decision data</li>
+                            </ul>
+                            
+                            <p class="text-sm text-slate-400 mt-4 bg-white/5 p-4 rounded-lg border border-white/10">
+                                <strong>Consent:</strong> By using Themis Verdict, you consent to the app connecting to Local APIs on your internal network (192.168.1.x) only. 
+                                No external internet connection is used for processing personal data.
+                            </p>
+                        </div>
+                    </div>
+
+                     <!-- Item 5 -->
+                     <div>
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="bg-[#D4AF37]/20 p-2 rounded-lg mr-3 text-2xl">🔒</span> 5. Security
+                        </h2>
+                        <div class="pl-14 text-slate-300">
+                            <p>We utilize industry-standard security measures, including SSL/TLS encryption for all data transmission via Cloudflare Tunnels, ensuring your local connection remains private and secure.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="bg-white/5 p-8 rounded-2xl border border-white/10">
+                        <h2 class="text-xl font-bold text-gold mb-4 flex items-center">
+                            <span class="mr-3 text-2xl">📩</span> 5. Contact Us
+                        </h2>
+                        <div class="pl-10 text-slate-300 space-y-2">
+                            <p>For any privacy concerns, please contact us at:</p>
+                            <p><strong class="text-white">Email:</strong> <a href="mailto:chanukrit@thegodseller.com" class="text-cyan-400 hover:text-cyan-300 transition">chanukrit@thegodseller.com</a></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-20 border-t border-white/5 bg-slate-950/20">
+        <div class="container mx-auto px-6 text-center">
+            <!-- DBD Verified Badge -->
+            <div id="dbd-badge" class="flex justify-center py-6 mb-8">
+                <a href='https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' target="_blank">
+                    <img src='https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' alt="DBD Registered" />
+                </a>
+            </div>
+
+            <h2 class="text-2xl font-tech italic text-[#D4AF37] mb-4">The Godseller</h2>
+            <p class="text-xs text-slate-500 tracking-widest uppercase mb-10 font-bold tracking-tighter italic">Born to be a seller in AD.1977</p>
+            <div class="flex justify-center space-x-12 text-[10px] font-bold tracking-[0.3em] uppercase text-slate-400 flex-wrap gap-y-4">
+                <a href="privacy.html" class="text-white">Privacy</a>
+                <a href="refund.html" class="hover:text-white transition">Terms & Refund</a>
+                <a href="mailto:chanukrit@thegodseller.com" class="hover:text-white transition">Complaint Channel</a>
+                <a href="mailto:chanukrit@thegodseller.com" class="hover:text-white transition">Contact</a>
+            </div>
+            <!-- App Identification -->
+            <div class="mt-16 pt-8 border-t border-white/10 text-[10px] text-slate-600">
+                <p class="mb-2"><strong>Registered Applications:</strong></p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <span>DuDe Hawaiian</span>
+                    <span>•</span>
+                    <span>Dude Vision</span>
+                    <span>•</span>
+                    <span>Themis Verdict <code class="bg-white/5 px-1 rounded">com.thegodseller.themisverdict</code></span>
+                </div>
+                <p class="mt-4 text-[8px] text-slate-700 tracking-widest">© 2026 THE GOD SELLER CORP. UNITING INTELLIGENCE.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        if (btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>จดด่วน</title>
+  <style>
+    body{font-family:system-ui;margin:0;padding:16px;background:#0b1020;color:#eaf2ff}
+    textarea{width:100%;min-height:140px;padding:10px;border-radius:10px;border:1px solid #2b3b6b;background:#121a33;color:#eaf2ff}
+    button{width:100%;margin-top:12px;padding:10px;border-radius:10px;border:1px solid #2b3b6b;background:#56c7ff;color:#00111f;font-weight:700}
+  </style>
+</head>
+<body>
+  <h2>จดด่วน</h2>
+  <textarea id="text" placeholder="เขียนโน้ตสั้น ๆ ที่อยากจำ"></textarea>
+  <button onclick="save()">บันทึก</button>
+  <pre id="out" style="white-space:pre-wrap"></pre>
+
+  <script>
+    const SAVE_URL = "/mcp/memory/save";
+    async function save(){
+      const userId = sessionStorage.getItem('dude_line_user_id') || 'anonymous';
+      const body = { user_id: userId, text: document.querySelector('#text').value };
+      const res = await fetch(SAVE_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+      const data = await res.json().catch(()=>({ok:false}));
+      document.querySelector('#out').textContent = JSON.stringify(data,null,2);
+    }
+  </script>
+</body>
+</html>

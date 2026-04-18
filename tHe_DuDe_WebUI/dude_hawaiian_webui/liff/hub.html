@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DuDe Service Hub</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: #0f172a; /* Slate 900 */
+      color: white;
+      overflow-x: hidden;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+    .status-offline { background-color: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    
+    .loader {
+      border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      border-top: 3px solid #3b82f6;
+      width: 24px;
+      height: 24px;
+      -webkit-animation: spin 1s linear infinite;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="flex flex-col items-center min-h-screen p-4 bg-[url('https://ui.thegodseller.com/assets/bg_pattern.png')] bg-cover bg-center bg-no-repeat bg-fixed bg-slate-900/90 bg-blend-overlay">
+
+  <!-- Header -->
+  <div class="text-center mt-8 mb-8 animate__animated animate__fadeInDown">
+    <div class="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-2 border-white/20 shadow-xl relative group">
+        <img id="profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" class="w-full h-full object-cover">
+    </div>
+    <h1 class="text-2xl font-bold text-white mb-1">
+      <span id="user-name">Loading...</span>
+    </h1>
+    <div class="flex items-center justify-center space-x-2">
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest">DuDe Service Hub</p>
+        <span id="role-badge" class="hidden text-[8px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded border border-red-500/30">OWNER</span>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div id="loading" class="flex flex-col items-center mt-20">
+    <div class="loader mb-2"></div>
+    <p class="text-xs text-slate-500">Initializing Line Experience...</p>
+  </div>
+
+  <!-- Service Grid -->
+  <div id="service-grid" class="hidden w-full max-w-md grid grid-cols-2 gap-4 animate__animated animate__fadeInUp mb-20">
+    
+    <!-- 1. Vision -->
+    <a href="https://ui.thegodseller.com/liff/vision.html" class="service-card glass p-4 rounded-xl flex flex-col items-center text-center hover:bg-white/10 transition group" data-service="vision">
+      <div class="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <span class="text-2xl">👁️</span>
+      </div>
+      <h3 class="font-bold text-sm mb-1">DuDe Vision</h3>
+      <div class="text-[10px] text-slate-400 flex items-center gap-1">
+         <span class="status-dot status-online"></span> AI CCTV
+      </div>
+    </a>
+
+    <!-- 2. POS -->
+    <a href="https://ui.thegodseller.com/liff/pos.html" class="service-card glass p-4 rounded-xl flex flex-col items-center text-center hover:bg-white/10 transition group" data-service="pos">
+      <div class="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <span class="text-2xl">🛒</span>
+      </div>
+      <h3 class="font-bold text-sm mb-1">DuDe POS</h3>
+      <div class="text-[10px] text-slate-400 flex items-center gap-1">
+         <span class="status-dot status-online"></span> Store Mgr
+      </div>
+    </a>
+
+    <!-- 3. Room Service -->
+    <a href="https://ui.thegodseller.com/liff/room_service.html" class="service-card glass p-4 rounded-xl flex flex-col items-center text-center hover:bg-white/10 transition group" data-service="room">
+      <div class="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <span class="text-2xl">🛎️</span>
+      </div>
+      <h3 class="font-bold text-sm mb-1">Room Service</h3>
+      <div class="text-[10px] text-slate-400 flex items-center gap-1">
+         <span class="status-dot status-online"></span> Concierge
+      </div>
+    </a>
+
+    <!-- 4. Drive -->
+    <a href="https://ui.thegodseller.com/liff/drive.html" class="service-card glass p-4 rounded-xl flex flex-col items-center text-center hover:bg-white/10 transition group" data-service="drive">
+      <div class="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <span class="text-2xl">☁️</span>
+      </div>
+      <h3 class="font-bold text-sm mb-1">DuDe Drive</h3>
+      <div class="text-[10px] text-slate-400 flex items-center gap-1">
+         <span class="status-dot status-online"></span> Cloud NAS
+      </div>
+    </a>
+
+    <!-- 5. DuDe Apps -->
+    <a href="https://ui.thegodseller.com" class="service-card glass p-4 rounded-xl flex flex-col items-center text-center hover:bg-white/10 transition group" data-service="apps">
+      <div class="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <span class="text-2xl">📱</span>
+      </div>
+      <h3 class="font-bold text-sm mb-1">DuDe Apps</h3>
+      <div class="text-[10px] text-slate-400 flex items-center gap-1">
+         <span class="status-dot status-online"></span> Portals
+      </div>
+    </a>
+
+    <!-- 6. Auto Care -->
+    <div onclick="openAutoCare()" class="service-card glass p-4 rounded-xl flex flex-col items-center text-center hover:bg-white/10 transition group cursor-pointer" data-service="autocare">
+      <div class="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition">
+        <span class="text-2xl">🚗</span>
+      </div>
+      <h3 class="font-bold text-sm mb-1">Auto Care</h3>
+      <div class="text-[10px] text-slate-400 flex items-center gap-1">
+         <span class="status-dot status-online"></span> Car Status
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Auto Care Modal -->
+  <div id="autocare-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeAutoCare()"></div>
+      <div class="absolute inset-x-4 bottom-4 top-20 glass rounded-2xl p-6 flex flex-col animate__animated animate__slideInUp">
+          <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+              <div>
+                  <h2 class="text-xl font-bold">Aran Prom Auto Care</h2>
+                  <p class="text-xs text-slate-400">Status Tracking System</p>
+              </div>
+              <button onclick="closeAutoCare()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20">✕</button>
+          </div>
+          <div class="flex-1 flex flex-col items-center justify-center overflow-y-auto" id="autocare-body">
+              <div class="loader"></div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-auto py-8 text-center opacity-30">
+    <img src="https://ui.thegodseller.com/assets/logo_text.png" class="h-4 mx-auto mb-2 grayscale">
+    <p class="text-[8px] tracking-widest text-slate-500">POWERED BY THE GOD SELLER</p>
+  </div>
+
+  <script>
+    const LIFF_ID = '2008020536-b0ePOONl'; 
+    const OWNER_ID = 'U0e2a8df076837b627c93862127461aec'; // From docker-compose
+    const API_BASE = '/autocare-api';
+
+    let profile = null;
+    let isOwner = false;
+    let activeJob = null;
+
+    async function main() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        if (!liff.isLoggedIn()) { liff.login(); return; }
+        
+        profile = await liff.getProfile();
+        isOwner = profile.userId === OWNER_ID;
+
+        // Update Header
+        document.getElementById('user-name').innerText = profile.displayName;
+        if(profile.pictureUrl) document.getElementById('profile-img').src = profile.pictureUrl;
+        if(isOwner) document.getElementById('role-badge').classList.remove('hidden');
+
+        // Fetch Subscriptions (Real API)
+        try {
+            const subResp = await fetch('/api/services/my'); 
+            if (subResp.ok) {
+                const enabledServices = await subResp.json();
+                applySubscriptions(enabledServices);
+            }
+        } catch (e) {
+            console.warn('Subscription fetch failed, showing all services.');
+        }
+
+        // UI Ready
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('service-grid').classList.remove('hidden');
+        document.getElementById('service-grid').classList.add('grid');
+        
+      } catch (err) {
+        console.error('Init failed', err);
+        document.getElementById('loading').innerHTML = `<p class="text-red-500 text-xs">Offline: ${err.message}</p>`;
+      }
+    }
+
+    function applySubscriptions(enabledKeys) {
+        const mapping = {
+            'vision': 'aegis',
+            'pos': 'qloapps',
+            'room': 'room',
+            'drive': 'drive',
+            'apps': 'apps',
+            'autocare': 'autocare'
+        };
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            const uiKey = card.getAttribute('data-service');
+            const backendKey = mapping[uiKey];
+            
+            if (backendKey && !enabledKeys.includes(backendKey) && !isOwner) {
+                card.classList.add('opacity-40', 'grayscale', 'pointer-events-none');
+                const badge = card.querySelector('.text-[10px]');
+                if(badge) badge.innerHTML = '<span class="status-dot bg-slate-600"></span> Locked';
+            }
+        });
+    }
+
+    function openAutoCare() {
+      document.getElementById('autocare-modal').classList.remove('hidden');
+      renderAutoCare();
+    }
+
+    function closeAutoCare() {
+      document.getElementById('autocare-modal').classList.add('hidden');
+    }
+
+    async function renderAutoCare() {
+      const body = document.getElementById('autocare-body');
+      body.innerHTML = '<div class="loader"></div>';
+
+      try {
+        if (isOwner) {
+          // Owner View: Monitor active jobs
+          const resp = await fetch(`${API_BASE}/jobs/monitor`);
+          const jobs = await resp.json();
+          renderOwnerView(body, jobs);
+        } else {
+          // Customer View: Track personal jobs
+          const resp = await fetch(`${API_BASE}/jobs/track/${profile.userId}`);
+          const jobs = await resp.json();
+          renderCustomerView(body, jobs[0] || null);
+        }
+      } catch (e) {
+          body.innerHTML = `<p class="text-red-400 text-sm">Cannot connect to AutoCare API</p>`;
+      }
+    }
+
+    function renderCustomerView(container, job) {
+      if (!job) {
+        container.innerHTML = `
+          <span class="text-5xl mb-4">🏠</span>
+          <h3 class="text-lg font-bold">ไม่พบข้อมูลใบแจ้งซ่อม</h3>
+          <p class="text-xs text-slate-400 mt-2">กรุณาติดต่อเคาน์เตอร์เพื่อรับบริการครับ</p>
+        `;
+        return;
+      }
+
+      const statusConfig = {
+        'DONE': { icon: '✅', color: 'text-green-500', label: 'รถเสร็จเรียบร้อย', sub: 'พร้อมส่งมอบครับ' },
+        'IN_PROGRESS': { icon: '🔧', color: 'text-blue-400', label: 'กำลังซ่อมบำรุง', sub: 'อยู่ในขั้นตอนการทำงาน' },
+        'WAITING_PARTS': { icon: '📦', color: 'text-yellow-500', label: 'รออะไหล่', sub: 'กำลังดำเนินการจัดหาอะไหล่' },
+        'PENDING': { icon: '⏳', color: 'text-slate-400', label: 'รอรับบริการ', sub: 'ลำดับคิวถัดไปครับ' }
+      }[job.status] || { icon: '?', color: 'text-white', label: job.status, sub: '' };
+
+      container.innerHTML = `
+        <div class="w-32 h-32 bg-white/5 rounded-full flex items-center justify-center mb-6 animate__animated animate__pulse animate__infinite">
+          <span class="text-6xl">${statusConfig.icon}</span>
+        </div>
+        <div class="text-center">
+          <h3 class="text-2xl font-bold ${statusConfig.color} mb-1">${statusConfig.label}</h3>
+          <p class="text-slate-400 text-sm mb-8">${statusConfig.sub}</p>
+        </div>
+        <div class="w-full space-y-3 bg-white/5 p-4 rounded-xl border border-white/10">
+           <div class="flex justify-between text-xs"><span class="text-slate-500">Service:</span> <span>${job.service_requested || '-'}</span></div>
+           <div class="flex justify-between text-xs"><span class="text-slate-500">Created:</span> <span>${new Date(job.created_at).toLocaleDateString()}</span></div>
+        </div>
+        <button onclick="renderAutoCare()" class="mt-8 w-full py-4 bg-blue-600 rounded-xl font-bold hover:bg-blue-500 transition">อัพเดทสถานะล่าสุด</button>
+      `;
+    }
+
+    function renderOwnerView(container, jobs) {
+      if (jobs.length === 0) {
+        container.innerHTML = `<p class="text-slate-400">ยังไม่มีงานที่กำลังดำเนินการ</p>`;
+        return;
+      }
+
+      let html = `<div class="w-full space-y-4">`;
+      jobs.forEach(job => {
+        html += `
+          <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <span class="text-[10px] text-slate-500">JOB #${job.id}</span>
+                <h4 class="font-bold text-sm text-blue-400">${job.customer?.name || 'Customer'}</h4>
+              </div>
+              <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded">${job.status}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="updateJobStatus(${job.id}, 'IN_PROGRESS')" class="py-2 bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/30">กำลังซ่อม</button>
+              <button onclick="updateJobStatus(${job.id}, 'DONE')" class="py-2 bg-green-500/20 text-green-400 text-xs rounded border border-green-500/30">เสร็จแล้ว</button>
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    async function updateJobStatus(jobId, status) {
+      try {
+        await fetch(`${API_BASE}/jobs/${jobId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: status })
+        });
+        renderAutoCare();
+      } catch (e) { alert('Update failed'); }
+    }
+
+    main();
+  </script>
+</body>
+</html>

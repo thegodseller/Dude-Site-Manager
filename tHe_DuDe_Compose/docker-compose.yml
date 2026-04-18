@@ -1,0 +1,269 @@
+services:
+  # ==========================================
+  # 🗄️ Step 1: Infrastructure (Database Layer)
+  # ==========================================
+  db_postgres:
+    image: postgres:15-alpine
+    container_name: db_postgres
+    restart: always
+    env_file: .env
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "12221:5432"
+    networks:
+      - dude_net
+
+  db_redis:
+    image: redis:alpine
+    container_name: db_redis
+    restart: always
+    ports:
+      - "13331:6379"
+    networks:
+      - dude_net
+
+  db_qdrant:
+    image: qdrant/qdrant:latest
+    container_name: db_qdrant
+    restart: always
+    ports:
+      - "12222:6333"
+      - "12223:6334"
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+    networks:
+      - dude_net
+
+  # 🦙 OpenVINO-Accelerated Ollama (Dual-Engine)
+  ollama_ov:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama_ov
+    container_name: ollama_ov
+    restart: always
+    environment:
+      - GODEBUG=cgocheck=0
+      - OLLAMA_HOST=0.0.0.0:11434
+    devices:
+      - /dev/dri:/dev/dri  # 🚀 iGPU Passthrough
+    volumes:
+      - ./data/ollama:/root/.ollama
+    ports:
+      - "11435:11434"
+    networks:
+      - dude_net
+
+  # ==========================================
+  # 🧠 Step 2: Support Services (Memory & Dashboard)
+  # ==========================================
+  db_mem0:
+    build:
+      context: ../tHe_DuDe_Service/db_mem0
+      dockerfile: Dockerfile
+    container_name: db_mem0
+    restart: always
+    env_file: .env
+    environment:
+      - QDRANT_HOST=db_qdrant
+      - OLLAMA_URL=http://ollama_ov:11434
+      - OLLAMA_HOST=http://ollama_ov:11434
+      - OLLAMA_BASE_URL=http://ollama_ov:11434
+    depends_on:
+      - db_qdrant
+      - db_postgres
+      - ollama_ov
+    ports:
+      - "13332:8080"
+    networks:
+      - dude_net
+
+  blinko:
+    image: blinkospace/blinko:latest
+    container_name: blinko
+    restart: always
+    environment:
+      - DATABASE_URL=${BLINKO_DATABASE_URL}
+      - BLINKO_PUBLIC_URL=http://blinko:1111
+    env_file: .env
+    ports:
+      - "15555:1111"
+    volumes:
+      - ./data/blinko:/app/data
+    networks:
+      - dude_net
+
+
+  # ==========================================
+  # 🤖 Step 3: AI Agent Layer
+  # ==========================================
+  ag_boss:
+    build:
+      context: ../tHe_DuDe_Service
+      dockerfile: agents/ag_boss/Dockerfile
+    container_name: ag_boss
+    restart: always
+    env_file: .env
+    environment:
+      - OLLAMA_URL=http://ollama_ov:11434
+      - OLLAMA_BASE_URL=http://ollama_ov:11434
+      - QDRANT_HOST=db_qdrant
+      - QDRANT_PORT=6333
+      - BLINKO_BASE_URL=http://blinko:1111
+      - AG_BUTLER_URL=http://ag_butler:8000
+      - AG_WATCHER_URL=http://ag_watcher:8000
+    depends_on:
+      - db_postgres
+      - db_mem0
+    ports:
+      - "11111:8000"
+    volumes:
+      - ../tHe_DuDe_Service/agents/ag_boss/app:/app/app
+      - ../tHe_DuDe_Service/skills:/app/skills
+    networks:
+      - dude_net
+
+  ag_negotiator:
+    build:
+      context: ../tHe_DuDe_Service/agents/ag_negotiator
+      dockerfile: Dockerfile
+    container_name: ag_negotiator
+    restart: always
+    env_file: .env
+    environment:
+      - OLLAMA_URL=http://ollama_ov:11434
+      - OLLAMA_BASE_URL=http://ollama_ov:11434
+      - AG_BOSS_URL=http://ag_boss:8000
+    ports:
+      - "11112:8000"
+    volumes:
+      - ../tHe_DuDe_Service/agents/ag_negotiator/app:/app/app
+    depends_on:
+      - ag_boss
+    networks:
+      - dude_net
+      - dude_dmz
+
+  ag_watcher:
+    build:
+      context: ../tHe_DuDe_Service/agents/ag_watcher
+      dockerfile: Dockerfile
+    container_name: ag_watcher
+    restart: always
+    env_file: .env
+    environment:
+      - OLLAMA_URL=http://ollama_ov:11434
+      - OLLAMA_BASE_URL=http://ollama_ov:11434
+    depends_on:
+      - ag_boss
+    ports:
+      - "11115:8000"
+    volumes:
+      - ../tHe_DuDe_Service/agents/ag_watcher/app:/app/app
+    networks:
+      - dude_net
+
+  ag_librarian:
+    build:
+      context: ../tHe_DuDe_Service/agents/ag_librarian
+      dockerfile: Dockerfile
+    container_name: ag_librarian
+    restart: always
+    env_file: .env
+    environment:
+      - OLLAMA_URL=http://ollama_ov:11434
+      - OLLAMA_BASE_URL=http://ollama_ov:11434
+      - OBSIDIAN_VAULT_PATH=/app/obsidian_vault
+      - KNOWLEDGE_COLLECTION=dude_knowledge_base_nomic
+      - CHAT_MODEL=scb10x/typhoon2.5-qwen3-4b:latest
+      - EMBEDDING_MODEL=bge-m3:latest
+      - VECTOR_SIZE=1024
+      - BLINKO_BASE_URL=http://blinko:1111
+      - QDRANT_URL=http://db_qdrant:6333
+    volumes:
+      # 🚀 REPLACE with your actual vault path if different
+      - /home/thegodseller/DuDe_Hawaiian/tHe_DuDe_Service/obsidian_vault:/app/obsidian_vault:ro
+    depends_on:
+      - blinko
+      - db_qdrant
+    ports:
+      - "11113:8000"
+    networks:
+      - dude_net
+
+  ag_adventure:
+    build:
+      context: ../tHe_DuDe_Service/agents/ag_adventure
+      dockerfile: Dockerfile
+    container_name: ag_adventure
+    restart: always
+    env_file: .env
+    environment:
+      - OLLAMA_URL=http://ollama_ov:11434
+      - OLLAMA_BASE_URL=http://ollama_ov:11434
+    depends_on:
+      - ag_boss
+    ports:
+      - "11114:8000"
+    networks:
+      - dude_net
+      - dude_dmz
+
+  ag_butler:
+    build:
+      context: ../tHe_DuDe_Service/agents/ag_butler
+      dockerfile: Dockerfile
+    container_name: ag_butler
+    restart: always
+    env_file: .env
+    environment:
+      - BLINKO_BASE_URL=http://blinko:1111
+    depends_on:
+      - ag_boss
+    ports:
+      - "11116:8000"
+    networks:
+      - dude_net
+
+  # ==========================================
+  # 🛠️ Step 4: Management & Workers
+  # ==========================================
+  dude_web_control:
+    build:
+      context: ../tHe_DuDe_Service/dude_web_control
+      dockerfile: Dockerfile
+    container_name: dude_web_control
+    restart: always
+    env_file: .env
+    environment:
+      - AG_BOSS_URL=http://ag_boss:8000
+      - AG_NEGOTIATOR_URL=http://ag_negotiator:8000
+      - AG_WATCHER_URL=http://ag_watcher:8000
+      - AG_BUTLER_URL=http://ag_butler:8000
+      - AG_LIBRARIAN_URL=http://ag_librarian:8000
+      - AG_ADVENTURE_URL=http://ag_adventure:8000
+      - BLINKO_BASE_URL=http://blinko:1111
+      - QDRANT_URL=http://db_qdrant:6333
+      - MEM0_API_URL=http://db_mem0:8080/health
+    ports:
+      - "11118:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - dude_net
+
+  dude_scheduler:
+    image: alpine:latest
+    container_name: dude_scheduler
+    restart: always
+    volumes:
+      - ./scripts/cron_jobs.sh:/etc/periodic/daily/dude_daily
+    command: ["crond", "-f"]
+    networks:
+      - dude_net
+
+networks:
+  dude_net:
+    driver: bridge
+  dude_dmz:
+    driver: bridge

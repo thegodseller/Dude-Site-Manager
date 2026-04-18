@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dude Room Service - Smart Hotel Solution | The God Seller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-gold: #d4af37;
+            --glass-bg: rgba(10, 10, 20, 0.85);
+        }
+        body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; background-color: #050510; color: #f8fafc; }
+        h1, h2, h3, .font-tech { font-family: 'Orbitron', sans-serif; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid rgba(212, 175, 55, 0.2); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 py-4 px-6 border-b border-[#D4AF37]/30">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full border border-[#D4AF37] overflow-hidden">
+                    <img src="assets/logo.png" class="w-full h-full object-cover">
+                </div>
+                <a href="index.html" class="text-lg font-bold font-tech tracking-wider text-white hover:text-[#D4AF37] transition">The Godseller</a>
+            </div>
+            <div class="hidden lg:flex space-x-8 font-semibold text-xs tracking-widest uppercase text-slate-400">
+                <a href="index.html" class="hover:text-white">Home</a>
+                <a href="vision.html" class="hover:text-white">Vision</a>
+                <a href="pos.html" class="hover:text-white">POS</a>
+                <span class="text-[#D4AF37] font-bold">Room Service</span>
+                <a href="drive.html" class="hover:text-white">Drive</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full glass border-t border-white/10 p-6 flex flex-col space-y-4 lg:hidden z-40 bg-[#020617]/90">
+             <a href="index.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Home</a>
+             <a href="vision.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Vision</a>
+             <a href="pos.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">POS</a>
+             <a href="room_service.html" class="text-white block py-2 border-b border-white/5 border-l-4 pl-2 border-l-[#D4AF37]">Room Service</a>
+             <a href="drive.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Drive</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="relative py-28 text-center">
+        <div class="container mx-auto px-6 relative z-10">
+            <h1 class="text-5xl lg:text-7xl font-bold mb-6 font-tech uppercase tracking-tighter text-[#D4AF37]">
+                5-Star Service <br><span class="text-white">On Screen</span>
+            </h1>
+            <p class="text-lg text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+                เปลี่ยนห้องพักธรรมดาให้เป็น Smart Room ด้วย 
+                <span class="text-[#D4AF37] font-bold">Android TV Box</span> 
+                สั่งอาหาร จองบริการ และเช็คเอาท์ ง่ายเพียงปลายนิ้ว
+            </p>
+            
+            <!-- TV Mockup Image -->
+            <div class="relative max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.15)] border border-[#D4AF37]/20">
+                <img src="assets/room_service_tv.jpg" class="w-full object-cover">
+            </div>
+        </div>
+    </header>
+
+    <!-- Services Grid -->
+    <section class="py-24 bg-[#0a0a14]">
+        <div class="container mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- 1 -->
+            <div class="glass p-6 rounded-lg text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-4 text-black font-bold text-xl">🍽️</div>
+                <h3 class="font-bold text-white mb-2">Order Food</h3>
+                <p class="text-xs text-slate-400">เมนูอาหารดิจิทัล สั่งตรงถึงครัว</p>
+            </div>
+            <!-- 2 -->
+            <div class="glass p-6 rounded-lg text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-4 text-black font-bold text-xl">🧺</div>
+                <h3 class="font-bold text-white mb-2">Laundry</h3>
+                <p class="text-xs text-slate-400">แจ้งส่งซักรีด พร้อมระบุเวลารับ</p>
+            </div>
+            <!-- 3 -->
+            <div class="glass p-6 rounded-lg text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-4 text-black font-bold text-xl">🛵</div>
+                <h3 class="font-bold text-white mb-2">Call Rider</h3>
+                <p class="text-xs text-slate-400">เรียกรถมารับหน้าล็อบบี้ทันที</p>
+            </div>
+            <!-- 4 -->
+            <div class="glass p-6 rounded-lg text-center hover:-translate-y-2 transition duration-300">
+                <div class="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-4 text-black font-bold text-xl">🚪</div>
+                <h3 class="font-bold text-white mb-2">Fast Checkout</h3>
+                <p class="text-xs text-slate-400">เช็คเอาท์ก่อนเวลา ไม่ต้องรอคิว</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-xs text-slate-600 bg-black">
+        © 2026 Dude Room Service. Powered by The God Seller.
+    </footer>
+    <!-- Mobile Menu Script -->
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        if (btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

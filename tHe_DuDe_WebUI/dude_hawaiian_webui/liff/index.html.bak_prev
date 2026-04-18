@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe Portal 2026</title>
+    
+    <!-- Premium Styles -->
+    <link rel="stylesheet" href="assets/css/dude_liff_luxury_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-text">DUDE AI</div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <!-- Header -->
+    <header class="animate-on-load delay-1">
+        <div class="profile-chip">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User" class="profile-img" id="user-img">
+            <div class="user-info">
+                <div class="greeting">System Online</div>
+                <div class="username" id="user-name">Initializing...</div>
+            </div>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color: #0f0; font-size: 18px;">bolt</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero animate-on-load delay-2">
+        <h1>DUDE<br><span>AI HUB</span></h1>
+        <p>Architecting the Future</p>
+    </section>
+
+    <!-- Service Grid -->
+    <main class="service-grid animate-on-load delay-3">
+        
+        <!-- DuDe Vision (Premium Feature) -->
+        <div class="card-wrapper large">
+            <div class="service-card" data-service="vision" data-url="vision.html">
+                <div class="icon-box">
+                    <span class="material-icons-round">visibility</span>
+                </div>
+                <div>
+                    <div class="card-title">Project Aegis</div>
+                    <div class="card-desc">Advanced Surveillance & Analytics</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe Drive -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="drive" data-url="drive.html">
+                <div class="icon-box">
+                    <span class="material-icons-round">cloud_queue</span>
+                </div>
+                <div>
+                    <div class="card-title">Neural Drive</div>
+                    <div class="card-desc">Secure Storage</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe Memory (Note) -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="note" data-url="note.html">
+                <div class="icon-box">
+                    <span class="material-icons-round">memory</span>
+                </div>
+                <div>
+                    <div class="card-title">Synapse Note</div>
+                    <div class="card-desc">AI Memory Bank</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe RAG -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="rag" data-url="rag_upload.html">
+                <div class="icon-box">
+                    <span class="material-icons-round">library_books</span>
+                </div>
+                <div>
+                    <div class="card-title">Knowledge Core</div>
+                    <div class="card-desc">RAG Database</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe Room Service -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="room" data-url="room_service.html">
+                <div class="icon-box">
+                    <span class="material-icons-round">concierge</span>
+                </div>
+                <div>
+                    <div class="card-title">Hospitality</div>
+                    <div class="card-desc">Smart Service</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="assets/js/dude_liff_luxury.js"></script>
+</body>
+</html>

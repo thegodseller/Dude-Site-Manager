@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe Note - Reminders</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+    <style>
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus { border-color: var(--primary); }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .form-row input[type="datetime-local"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .secondary-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            width: 100%;
+            margin-top: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip" onclick="history.back()" style="cursor: pointer;">
+            <span class="material-icons-round">arrow_back</span>
+            <span style="margin-left:8px">Back</span>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--accent);">edit_note</span>
+        </div>
+    </header>
+
+    <h1 class="gradient-text" style="font-size: 1.8rem; margin-bottom: 8px;">DuDe Note</h1>
+    <p style="color: var(--text-muted); margin-bottom: 32px;">Save thoughts and set reminders.</p>
+
+    <!-- Note Form -->
+    <div class="control-group">
+        <textarea id="note-text" placeholder="What's on your mind? e.g. Buy groceries..."></textarea>
+        
+        <div class="control-header">Set Reminder (Optional)</div>
+        <div class="form-row">
+            <span class="material-icons-round" style="color: var(--secondary); font-size: 1.2rem;">notifications_active</span>
+            <input type="datetime-local" id="reminder-time">
+        </div>
+
+        <button class="btn-upgrade" onclick="saveNote()">
+            Save Note & Set Alert
+        </button>
+
+        <a href="https://notes.thegodseller.com" class="secondary-btn">
+            <span class="material-icons-round">open_in_new</span>
+            Open Blinko Advanced Notes
+        </a>
+    </div>
+
+    <!-- Feedback toast -->
+    <div id="toast" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 12px 24px; border-radius: 50px; display: none; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+        Note saved successfully!
+    </div>
+
+    <script src="assets/js/dude_auth_guard.js"></script>
+    <script>
+        verifyAccess('note');
+    </script>
+    <script src="assets/js/dude_liff_2026.js"></script>
+    <script>
+        async function saveNote() {
+            const text = document.getElementById('note-text').value;
+            const time = document.getElementById('reminder-time').value;
+            
+            if (!text) return alert("Please type something first!");
+
+            const userId = sessionStorage.getItem('dude_line_user_id') || 'anonymous';
+            
+            // Mocking the call to Bot/Memory Service
+            console.log("Saving Note:", { userId, text, reminder: time });
+            
+            // Visual Feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = "Saving...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                document.getElementById('note-text').value = '';
+                document.getElementById('reminder-time').value = '';
+                
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 3000);
+            }, 1000);
+            
+            // In a real scenario, you'd send this to the bot to create a cron job or similar
+            // liff.sendMessages([{ type: 'text', text: `Bot: Remind me "${text}" at ${time}` }])
+        }
+    </script>
+</body>
+</html>

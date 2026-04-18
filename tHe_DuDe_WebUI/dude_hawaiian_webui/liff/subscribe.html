@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Upgrade Plans - DuDe AI</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <style>
+        .plan-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .plan-card.popular {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+            transform: scale(1.02);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .plan-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        
+        .plan-price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+
+        .feature-list {
+            text-align: left;
+            margin-bottom: 24px;
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .feature-item.disabled { color: var(--text-muted); opacity: 0.5; }
+        .feature-item.disabled .material-icons-round { color: var(--text-muted); }
+
+        .check-icon { color: var(--secondary); font-size: 1.2rem; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip" onclick="history.back()" style="cursor: pointer;">
+            <span class="material-icons-round">arrow_back</span>
+            <span style="margin-left:8px">Cancel</span>
+        </div>
+    </header>
+
+    <h1 class="gradient-text" style="font-size: 1.8rem; margin-bottom: 8px; text-align: center;">Upgrade Your DuDe</h1>
+    <p style="color: var(--text-muted); text-align: center; margin-bottom: 40px;">Select a plan to unlock all premium AI features.</p>
+
+    <!-- Plan 1: Basic (Current for mocks) -->
+    <div class="plan-card">
+        <div class="plan-title">Vision + Drive</div>
+        <div class="plan-price">฿ 290<span>/mo</span></div>
+        <ul class="feature-list">
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> 1 AI Camera Stream</li>
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> 100GB DuDe Drive</li>
+            <li class="feature-item disabled"><span class="material-icons-round">cancel</span> DuDe Note Alerts</li>
+            <li class="feature-item disabled"><span class="material-icons-round">cancel</span> DuDe RAG Brain</li>
+            <li class="feature-item disabled"><span class="material-icons-round">cancel</span> Room Service Dashboard</li>
+        </ul>
+        <button class="btn-upgrade" style="background: rgba(255,255,255,0.1); box-shadow: none;" disabled>Current Plan</button>
+    </div>
+
+    <!-- Plan 2: Pro (Business) -->
+    <div class="plan-card popular">
+        <div class="popular-badge">Most Popular</div>
+        <div class="plan-title">AI Business Hub</div>
+        <div class="plan-price">฿ 990<span>/mo</span></div>
+        <ul class="feature-list">
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> 3 AI Camera Streams</li>
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> 500GB DuDe Drive</li>
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> DuDe Note & Bot Alerts</li>
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> DuDe RAG Knowledge</li>
+            <li class="feature-item disabled"><span class="material-icons-round">cancel</span> Room Service Dashboard</li>
+        </ul>
+        <button class="btn-upgrade">Upgrade to Pro</button>
+    </div>
+
+    <!-- Plan 3: Enterprise -->
+    <div class="plan-card">
+        <div class="plan-title">Resort Master</div>
+        <div class="plan-price">฿ 2,490<span>/mo</span></div>
+        <ul class="feature-list">
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> Unlimited AI Cameras</li>
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> 2TB DuDe Drive</li>
+            <li class="feature-item"><span class="material-icons-round check-icon">check_circle</span> Full RAG & Note Integration</li>
+            <li class="feature-item"><span class="material-icons-round check-icon" style="color:var(--accent)">verified</span> Room Service Multi-Resort</li>
+        </ul>
+        <button class="btn-upgrade" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%); box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);">Contact Sales</button>
+    </div>
+
+</body>
+</html>

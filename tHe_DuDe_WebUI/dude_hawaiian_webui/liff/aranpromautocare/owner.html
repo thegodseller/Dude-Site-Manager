@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เจ้าของร้าน - Arany AutoCare</title>
+  <link rel="stylesheet" href="assets/autocare.css">
+</head>
+<body>
+  <div class="container owner-dashboard">
+    <header>
+      <div class="logo">🔧</div>
+      <h1>Arany AutoCare</h1>
+      <p class="subtitle">Owner Dashboard</p>
+    </header>
+    
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="ค้นหา ทะเบียน/ชื่อลูกค้า...">
+      <button class="btn-search" id="searchBtn">🔍</button>
+    </div>
+    
+    <!-- Filter -->
+    <div class="filter-bar">
+      <select id="statusFilter">
+        <option value="">ทุกสถานะ</option>
+        <option value="received">รอรับ</option>
+        <option value="diagnosing">ตรวจสอบ</option>
+        <option value="quoted">เสนอราคา</option>
+        <option value="approved">อนุมัติแล้ว</option>
+        <option value="in_progress">กำลังซ่อม</option>
+        <option value="waiting_parts">รออะไหล่</option>
+        <option value="ready">พร้อมรับ</option>
+      </select>
+      <button class="btn-refresh" id="refreshBtn">↻ รีเฟรช</button>
+    </div>
+    
+    <!-- Requests List -->
+    <div id="requestsList" class="owner-requests-list">
+      <p class="loading">กำลังโหลด...</p>
+    </div>
+    
+    <!-- Modal: Update Status -->
+    <div class="modal" id="statusModal" style="display:none;">
+      <div class="modal-content">
+        <h3>อัปเดตสถานะ</h3>
+        <div class="request-info" id="modalRequestInfo"></div>
+        <div class="form-group">
+          <label>สถานะใหม่</label>
+          <select id="newStatus">
+            <option value="received">รอรับ</option>
+            <option value="diagnosing">ตรวจสอบ</option>
+            <option value="quoted">เสนอราคาแล้ว</option>
+            <option value="approved">อนุมัติ</option>
+            <option value="in_progress">กำลังซ่อม</option>
+            <option value="waiting_parts">รออะไหล่</option>
+            <option value="ready">พร้อมรับ</option>
+            <option value="delivered">ส่งมอบแล้ว</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancelStatus">ยกเลิก</button>
+          <button class="btn-primary" id="saveStatus">บันทึก</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal: Quote -->
+    <div class="modal" id="quoteModal" style="display:none;">
+      <div class="modal-content modal-wide">
+        <h3>ทำใบเสนอราคา</h3>
+        <div id="quoteItems">
+          <div class="quote-item">
+            <input type="text" class="item-name" placeholder="ชื่อรายการ">
+            <input type="number" class="item-cost" placeholder="ต้นทุน">
+            <input type="number" class="item-price" placeholder="ราคาขาย">
+            <input type="number" class="item-qty" value="1" min="1">
+          </div>
+        </div>
+        <button class="btn-small" id="addQuoteItem">+ เพิ่มรายการ</button>
+        <div class="quote-summary">
+          <div>ต้นทุนรวม: <span id="totalCost">0</span> บาท</div>
+          <div>ราคาขาย: <span id="totalPrice">0</span> บาท</div>
+          <div class="profit">กำไร: <span id="totalProfit">0</span> บาท</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancelQuote">ยกเลิก</button>
+          <button class="btn-primary" id="sendQuote">ส่งใบเสนอราคา</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal: Payment -->
+    <div class="modal" id="paymentModal" style="display:none;">
+      <div class="modal-content">
+        <h3>รับชำระเงิน</h3>
+        <div class="request-info" id="paymentInfo"></div>
+        <div class="form-group">
+          <label>วิธีชำระ</label>
+          <select id="paymentMethod">
+            <option value="cash">เงินสด</option>
+            <option value="transfer">โอนเงิน</option>
+            <option value="card">บัตร</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancelPayment">ยกเลิก</button>
+          <button class="btn-primary" id="confirmPayment">ยืนยันรับเงิน & ออกใบเสร็จ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="assets/autocare.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lineUserId = params.get('line_user_id');
+    let currentRequestId = null;
+    
+    async function loadRequests() {
+      const search = document.getElementById('searchInput').value;
+      const status = document.getElementById('statusFilter').value;
+      let url = `${API_BASE}/api/autocare/owner/requests?line_user_id=${lineUserId}`;
+      if (status) url += `&status=${status}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      
+      const resp = await fetch(url);
+      const data = await resp.json();
+      
+      const list = document.getElementById('requestsList');
+      if (!data.success || data.data.length === 0) {
+        list.innerHTML = '<p class="empty">ไม่พบงาน</p>';
+        return;
+      }
+      
+      list.innerHTML = data.data.map(r => `
+        <div class="owner-request-card" data-id="${r.id}">
+          <div class="row-main">
+            <span class="plate">${r.plate_number}</span>
+            <span class="status status-${r.status}">${getStatusName(r.status)}</span>
+          </div>
+          <div class="row-sub">
+            <span>👤 ${r.customer}</span>
+            <span>📞 ${r.phone}</span>
+          </div>
+          <div class="row-sub">
+            <span>🔧 ${getServiceName(r.service_type)}</span>
+            <span>📅 ${new Date(r.created_at).toLocaleDateString('th-TH')}</span>
+          </div>
+          <div class="actions">
+            <button class="btn-action" onclick="openStatusModal(${r.id})">📊 สถานะ</button>
+            <button class="btn-action" onclick="openQuoteModal(${r.id})">💰 เสนอราคา</button>
+            <button class="btn-action" onclick="openPaymentModal(${r.id})">💳 รับเงิน</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function openStatusModal(id) {
+      currentRequestId = id;
+      document.getElementById('statusModal').style.display = 'flex';
+    }
+    
+    function openQuoteModal(id) {
+      currentRequestId = id;
+      document.getElementById('quoteModal').style.display = 'flex';
+      updateQuoteSummary();
+    }
+    
+    function openPaymentModal(id) {
+      currentRequestId = id;
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
+    
+    // Close modals
+    ['cancelStatus', 'cancelQuote', 'cancelPayment'].forEach(id => {
+      document.getElementById(id).addEventListener('click', () => {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+      });
+    });
+    
+    // Save status
+    document.getElementById('saveStatus').addEventListener('click', async () => {
+      const resp = await fetch(`${API_BASE}/api/autocare/owner/status?line_user_id=${lineUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_id: currentRequestId,
+          status: document.getElementById('newStatus').value
+        })
+      });
+      if (resp.ok) {
+        document.getElementById('statusModal').style.display = 'none';
+        loadRequests();
+      }
+    });
+    
+    // Add quote item
+    document.getElementById('addQuoteItem').addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.className = 'quote-item';
+      div.innerHTML = `
+        <input type="text" class="item-name" placeholder="ชื่อรายการ">
+        <input type="number" class="item-cost" placeholder="ต้นทุน">
+        <input type="number" class="item-price" placeholder="ราคาขาย">
+        <input type="number" class="item-qty" value="1" min="1">
+      `;
+      document.getElementById('quoteItems').appendChild(div);
+    });
+    
+    // Update quote summary
+    function updateQuoteSummary() {
+      let totalCost = 0, totalPrice = 0;
+      document.querySelectorAll('.quote-item').forEach(item => {
+        const cost = parseFloat(item.querySelector('.item-cost').value) || 0;
+        const price = parseFloat(item.querySelector('.item-price').value) || 0;
+        const qty = parseInt(item.querySelector('.item-qty').value) || 1;
+        totalCost += cost * qty;
+        totalPrice += price * qty;
+      });
+      document.getElementById('totalCost').textContent = totalCost.toLocaleString();
+      document.getElementById('totalPrice').textContent = totalPrice.toLocaleString();
+      document.getElementById('totalProfit').textContent = (totalPrice - totalCost).toLocaleString();
+    }
+    document.getElementById('quoteItems').addEventListener('input', updateQuoteSummary);
+    
+    // Send quote
+    document.getElementById('sendQuote').addEventListener('click', async () => {
+      const items = [];
+      document.querySelectorAll('.quote-item').forEach(item => {
+        const name = item.querySelector('.item-name').value;
+        if (!name) return;
+        items.push({
+          name,
+          cost: parseFloat(item.querySelector('.item-cost').value) || 0,
+          price: parseFloat(item.querySelector('.item-price').value) || 0,
+          qty: parseInt(item.querySelector('.item-qty').value) || 1
+        });
+      });
+      
+      const resp = await fetch(`${API_BASE}/api/autocare/owner/quote?line_user_id=${lineUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: currentRequestId, items })
+      });
+      
+      if (resp.ok) {
+        alert('ส่งใบเสนอราคาเรียบร้อย');
+        document.getElementById('quoteModal').style.display = 'none';
+        loadRequests();
+      }
+    });
+    
+    // Confirm payment
+    document.getElementById('confirmPayment').addEventListener('click', async () => {
+      const resp = await fetch(`${API_BASE}/api/autocare/owner/paid?line_user_id=${lineUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_id: currentRequestId,
+          payment_method: document.getElementById('paymentMethod').value
+        })
+      });
+      
+      const result = await resp.json();
+      if (result.success) {
+        alert(`ออกใบเสร็จ #${result.data.receipt_number} เรียบร้อย`);
+        document.getElementById('paymentModal').style.display = 'none';
+        loadRequests();
+      } else {
+        alert('เกิดข้อผิดพลาด: ' + result.message);
+      }
+    });
+    
+    // Event listeners
+    document.getElementById('searchBtn').addEventListener('click', loadRequests);
+    document.getElementById('refreshBtn').addEventListener('click', loadRequests);
+    document.getElementById('statusFilter').addEventListener('change', loadRequests);
+    
+    loadRequests();
+  </script>
+</body>
+</html>

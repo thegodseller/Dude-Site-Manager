@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe Vision AI</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+    <style>
+        .camera-feed {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #ef4444;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .control-group {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .control-header {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        /* Toggles */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .toggle-row:last-child { border-bottom: none; }
+
+        .toggle-label { display: flex; align-items: center; gap: 10px; }
+        .toggle-icon { color: var(--text-muted); }
+        .toggle-text { font-size: 0.95rem; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Model Select */
+        select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            appearance: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip" onclick="history.back()" style="cursor: pointer;">
+            <span class="material-icons-round">arrow_back</span>
+            <span style="margin-left:8px">Back</span>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--secondary);">wifi</span>
+        </div>
+    </header>
+
+    <h1 class="gradient-text" style="font-size: 1.8rem; margin-bottom: 16px;">DuDe Vision</h1>
+
+    <!-- Camera Feed -->
+    <div class="camera-feed">
+        <!-- Placeholder for actual stream -->
+        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" 
+             style="width:100%; height:100%; object-fit:cover; opacity:0.6;" alt="Camera Feed">
+        <div class="camera-overlay">
+            <span class="material-icons-round" style="font-size:12px">fiber_manual_record</span> LIVE
+        </div>
+        <div style="position:absolute; bottom:10px; left:10px; font-family:monospace; font-size:10px; color:rgba(255,255,255,0.7);">
+            CAM-01 • <span id="clock">--:--:--</span>
+        </div>
+    </div>
+
+    <!-- AI Model Selection -->
+    <div class="control-group">
+        <div class="control-header">AI Model Engine</div>
+        <div style="position:relative">
+            <select id="model-select" onchange="changeModel(this.value)">
+                <option value="yolov8n">YOLOv8 Nano (Fastest)</option>
+                <option value="yolov8s">YOLOv8 Small (Balanced)</option>
+                <option value="yolov8m">YOLOv8 Medium (Accurate)</option>
+                <option value="custom_fire">🔥 Custom: Fire & Smoke</option>
+                <option value="custom_plate">🚗 Custom: License Plate</option>
+            </select>
+            <span class="material-icons-round" style="position:absolute; right:12px; top:12px; pointer-events:none;">expand_more</span>
+        </div>
+    </div>
+
+    <!-- Detection Controls -->
+    <div class="control-group">
+        <div class="control-header">Detection Filters</div>
+        
+        <!-- Fire -->
+        <div class="toggle-row">
+            <div class="toggle-label">
+                <span class="material-icons-round toggle-icon" style="color:#ef4444">local_fire_department</span>
+                <span class="toggle-text">Fire / Smoke Alert</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-fire" onchange="toggleDetection('fire', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Intruder -->
+        <div class="toggle-row">
+            <div class="toggle-label">
+                <span class="material-icons-round toggle-icon" style="color:#f59e0b">directions_run</span>
+                <span class="toggle-text">Intruder (Human)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked id="toggle-human" onchange="toggleDetection('human', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- License Plate -->
+        <div class="toggle-row">
+            <div class="toggle-label">
+                <span class="material-icons-round toggle-icon" style="color:#3b82f6">directions_car</span>
+                <span class="toggle-text">License Plate (ALPR)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-plate" onchange="toggleDetection('plate', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Motion -->
+        <div class="toggle-row">
+            <div class="toggle-label">
+                <span class="material-icons-round toggle-icon" style="color:#10b981">motion_photos_on</span>
+                <span class="toggle-text">Motion Detection</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" checked id="toggle-motion" onchange="toggleDetection('motion', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Object Count -->
+        <div class="toggle-row">
+            <div class="toggle-label">
+                <span class="material-icons-round toggle-icon" style="color:#8b5cf6">tag</span>
+                <span class="toggle-text">Object Counter</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-count" onchange="toggleDetection('count', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+    </div>
+
+    <script src="assets/js/dude_auth_guard.js"></script>
+    <script>
+        // 🇹🇭 ตรวจสอบสิทธิ์ก่อนแสดงผล
+        verifyAccess('vision');
+    </script>
+    <script src="assets/js/dude_liff_2026.js"></script>
+    <script>
+        // Update Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString();
+        }, 1000);
+
+        // Mock Functionality (Replace with actual API calls)
+        function changeModel(model) {
+            console.log("Switching model to:", model);
+            // Example: fetch('/api/vision/model', { method: 'POST', body: JSON.stringify({ model }) })
+            
+            // Visual feedback
+            const select = document.getElementById('model-select');
+            select.style.borderColor = 'var(--primary)';
+            setTimeout(() => select.style.borderColor = 'var(--glass-border)', 500);
+        }
+
+        function toggleDetection(type, active) {
+            console.log(`Toggling ${type}: ${active}`);
+            // Example: fetch('/api/vision/filter', { method: 'POST', body: JSON.stringify({ type, active }) })
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe RAG - Knowledge Base</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+    <style>
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.02);
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+            cursor: pointer;
+        }
+        
+        .upload-area.dragging {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        #file-input { display: none; }
+
+        .file-status {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+
+        #status-message {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            font-size: 0.85rem;
+            display: none;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        .progress-ring {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip" onclick="history.back()" style="cursor: pointer;">
+            <span class="material-icons-round">arrow_back</span>
+            <span style="margin-left:8px">Back</span>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--secondary);">psychology</span>
+        </div>
+    </header>
+
+    <h1 class="gradient-text" style="font-size: 1.8rem; margin-bottom: 8px;">DuDe RAG</h1>
+    <p style="color: var(--text-muted); margin-bottom: 32px;">Inject knowledge into your AI agent.</p>
+
+    <!-- Upload Interface -->
+    <div class="control-group">
+        <label for="file-input" class="upload-area" id="drop-zone">
+            <span class="material-icons-round upload-icon">cloud_upload</span>
+            <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 4px;">Choose a document</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">PDF, TXT, or Markdown (Max 10MB)</div>
+            <div id="file-name" class="file-status"></div>
+            <input type="file" id="file-input" accept=".pdf,.txt,.md" onchange="handleFile(this)">
+        </label>
+
+        <button class="btn-upgrade" id="upload-btn" onclick="startUpload()" disabled>
+            Start Injection
+        </button>
+
+        <div id="loader" class="progress-ring"></div>
+        <div id="status-message"></div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="control-group" style="background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.2);">
+        <div class="control-header" style="color: var(--primary); display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons-round" style="font-size: 1rem;">info</span>
+            How it works
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Uploaded documents are processed and indexed into our vector database. Your AI assistant will then be able to answer questions based on this knowledge in real-time.
+        </p>
+    </div>
+
+    <script src="assets/js/dude_auth_guard.js"></script>
+    <script>
+        verifyAccess('rag');
+    </script>
+    <script src="assets/js/dude_liff_2026.js"></script>
+    <script>
+        const API_URL = "/mcp/rag/ingest";
+        let selectedFile = null;
+
+        function handleFile(input) {
+            const file = input.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('file-name').textContent = `📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+                document.getElementById('upload-btn').disabled = false;
+            }
+        }
+
+        async function startUpload() {
+            if (!selectedFile) return;
+
+            const btn = document.getElementById('upload-btn');
+            const loader = document.getElementById('loader');
+            const status = document.getElementById('status-message');
+            const userId = sessionStorage.getItem('dude_line_user_id') || '';
+
+            // Loading state
+            btn.style.display = 'none';
+            loader.style.display = 'block';
+            status.style.display = 'block';
+            status.style.color = 'var(--text-muted)';
+            status.textContent = 'Processing and embedding...';
+
+            const fd = new FormData();
+            fd.append('file', selectedFile);
+            fd.append('owner_id', userId);
+
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: fd });
+                const data = await res.json();
+
+                if (data.ok) {
+                    status.textContent = `✅ Success! Injected ${data.chunks_embedded} chunks into the knowledge base.`;
+                    status.style.color = '#4ade80';
+                    document.getElementById('file-input').value = '';
+                    selectedFile = null;
+                } else {
+                    throw new Error(data.error || 'Server processing error');
+                }
+            } catch (err) {
+                console.error(err);
+                status.textContent = `❌ Error: ${err.message}`;
+                status.style.color = '#f87171';
+            } finally {
+                loader.style.display = 'none';
+                btn.style.display = 'block';
+                btn.textContent = 'Inject Another File';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe AI Hub 2026</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User" class="profile-img" id="user-img">
+            <div class="user-info">
+                <div class="greeting">Hello,</div>
+                <div class="username" id="user-name">Loading...</div>
+            </div>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--secondary);">wifi</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="gradient-text">DuDe<br>AI Hub</h1>
+        <p>Your intelligent assistant ecosystem.</p>
+    </section>
+
+    <!-- Service Grid -->
+    <main class="service-grid">
+        
+        <!-- DuDe VisioN -->
+        <div class="card-wrapper large">
+            <div class="service-card" data-service="vision" onclick="openSubMenu('vision')">
+                <div class="icon-box">
+                    <span class="material-icons-round">visibility</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe VisioN</div>
+                    <div class="card-desc">CCTV & AI Models</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe DrivE -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="drive" onclick="openSubMenu('drive')">
+                <div class="icon-box">
+                    <span class="material-icons-round">cloud_upload</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe DrivE</div>
+                    <div class="card-desc">Note & RAG</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe ServicE -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="service" onclick="openSubMenu('service')">
+                <div class="icon-box">
+                    <span class="material-icons-round">apps</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe ServicE</div>
+                    <div class="card-desc">Your Applications</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Sub-Menu Modal -->
+    <div id="submenu-modal" class="modal-backdrop">
+        <div class="modal-content bottom-sheet">
+            <div class="modal-header">
+                <h3 id="submenu-title">Menu</h3>
+                <span class="material-icons-round close-btn" onclick="closeModal()">close</span>
+            </div>
+            <div id="submenu-list" class="submenu-list">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Logic -->
+    <script src="assets/js/dude_liff_2026.js?v=prod_7"></script>
+</body>
+</html>

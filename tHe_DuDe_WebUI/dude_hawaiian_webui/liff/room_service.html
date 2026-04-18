@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Room Service Dashboard</title>
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; font-family: 'Orbitron', sans-serif; }
+        .stat-change { font-size: 0.8rem; font-weight: 600; padding: 4px 8px; border-radius: 8px; }
+        .stat-change.up { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .stat-change.down { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 20px 10px 0;
+        }
+        
+        .bar {
+            width: 10%;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            opacity: 0.7;
+            transition: height 1s ease;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255,255,255,0.05);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: var(--bg-card-hover);
+            color: var(--text-main);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="profile-chip" onclick="history.back()" style="cursor: pointer;">
+            <span class="material-icons-round">arrow_back</span>
+            <span style="margin-left:8px">Back</span>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--secondary);">trending_up</span>
+        </div>
+    </header>
+
+    <h1 class="gradient-text" style="font-size: 1.8rem; margin-bottom: 24px;">Revenue</h1>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('daily')">Daily</div>
+        <div class="tab" onclick="switchTab('weekly')">Weekly</div>
+        <div class="tab" onclick="switchTab('monthly')">Monthly</div>
+    </div>
+
+    <!-- Key Stats -->
+    <div class="stat-card">
+        <div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="revenue">฿ 12,450</div>
+        </div>
+        <div class="stat-change up">+15%</div>
+    </div>
+
+    <div class="stat-card">
+        <div>
+            <div class="stat-label">Occupancy Rate</div>
+            <div class="stat-value" id="occupancy">85%</div>
+        </div>
+        <div class="stat-change down">-2%</div>
+    </div>
+
+    <!-- Chart -->
+    <h3 class="section-title" style="margin-bottom: 16px; font-size: 1.1rem; color: var(--text-muted);">Sales Trend</h3>
+    <div class="chart-placeholder">
+        <!-- Mock Bars -->
+        <div class="bar" style="height: 40%"></div>
+        <div class="bar" style="height: 60%"></div>
+        <div class="bar" style="height: 35%"></div>
+        <div class="bar" style="height: 80%"></div>
+        <div class="bar" style="height: 55%"></div>
+        <div class="bar" style="height: 90%; background: var(--accent);"></div>
+        <div class="bar" style="height: 70%"></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <button class="btn-upgrade" style="width: 100%; margin-top: 10px;" onclick="window.location.href='https://booking.thegodseller.com'">
+        Open Full Booking System
+    </button>
+
+    <script src="assets/js/dude_auth_guard.js"></script>
+    <script>
+        verifyAccess('room');
+    </script>
+    <script src="assets/js/dude_liff_2026.js"></script>
+    <script>
+        // Mock Tab Functionality
+        function switchTab(period) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Randomize Data for effect
+            const rev = Math.floor(Math.random() * 50000) + 5000;
+            document.getElementById('revenue').textContent = '฿ ' + rev.toLocaleString();
+            
+            // Animate bars
+            document.querySelectorAll('.bar').forEach(bar => {
+                bar.style.height = (Math.random() * 80 + 10) + '%';
+            });
+        }
+    </script>
+</body>
+</html>

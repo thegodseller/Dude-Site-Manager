@@ -1,0 +1,15 @@
+tunnel: <TUNNEL_ID>
+credentials-file: /home/thegodseller/.cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  - hostname: dashboard.thegodseller.com
+    service: http://localhost:5173
+  - hostname: download.thegodseller.com
+    service: http://localhost:8088
+  - hostname: vision.thegodseller.com
+    service: http://192.168.11.15:5000
+  - hostname: ads.thegodseller.com
+    service: http://192.168.11.15:8080
+  - hostname: pi-status.thegodseller.com
+    service: http://192.168.11.15:9090
+  - service: http_status:404

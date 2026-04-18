@@ -1,0 +1,28 @@
+import { useState, useEffect } from 'react';
+import './App.css';
+
+function App() {
+  const [logs, setLogs] = useState<string[]>([
+    "[SYSTEM] Nexus Dashboard Initialized...",
+    "[VISION] Pi 5 connected at 192.168.11.15"
+  ]);
+
+  useEffect(() => {
+    const refreshData = async () => {
+      // Keep basic log updating logic if needed
+    };
+    const interval = setInterval(refreshData, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="app-container" dangerouslySetInnerHTML={{ __html: `
+      <!-- ── WIREFRAME CONTENT ── -->
+      ${require('./wireframe.html')}
+      <!-- ── LIBRARY CONTENT ── -->
+      ${require('./library.html')}
+    ` }} />
+  );
+}
+
+export default App;

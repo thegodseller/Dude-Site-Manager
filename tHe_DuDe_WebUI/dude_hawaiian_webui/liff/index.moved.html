@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DuDe LIFF — Services Hub</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    /* 🇹🇭 Purple Gradient Theme (Same as Privacy Policy) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Thai', sans-serif;
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #5b21b6 100%);
+      min-height: 100vh;
+      color: #e0e7ff;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-top: 10px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    #who {
+      font-size: 14px;
+      color: #c4b5fd;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px 16px;
+      text-align: center;
+      text-decoration: none;
+      color: #e0e7ff;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .card small {
+      font-size: 12px;
+      color: #a78bfa;
+      line-height: 1.4;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      color: #c4b5fd;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn:active {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    /* Gradient Icons */
+    .ic-rag {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+    }
+
+    .ic-note {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .ic-health {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    .ic-book {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .ic-iot {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>DuDe Services</h1>
+      <div id="who">กำลังตรวจสอบโปรไฟล์...</div>
+    </header>
+
+    <section class="grid">
+      <!-- 🇹🇭 1) Upload RAG -->
+      <a class="card" href="/liff/rag_upload.html">
+        <div class="icon ic-rag">📚</div>
+        <strong>RAG Upload</strong>
+        <small>เพิ่มความรู้ให้ AI</small>
+      </a>
+
+      <!-- 🇹🇭 2) Quick Note -->
+      <a class="card" href="/liff/quick_note.html">
+        <div class="icon ic-note">📝</div>
+        <strong>Quick Note</strong>
+        <small>จดบันทึกด่วน</small>
+      </a>
+
+      <!-- 🇹🇭 3) Health -->
+      <a class="card" href="/liff/health.html">
+        <div class="icon ic-health">❤️</div>
+        <strong>MediKeep</strong>
+        <small>สุขภาพ & นัดหมาย</small>
+      </a>
+
+      <!-- 🇹🇭 4) Booking -->
+      <a class="card" href="/liff/booking.html">
+        <div class="icon ic-book">🏨</div>
+        <strong>Booking</strong>
+        <small>จองห้องพัก</small>
+      </a>
+
+      <!-- 🇹🇭 5) IoT -->
+      <a class="card" href="/liff/iot.html">
+        <div class="icon ic-iot">📷</div>
+        <strong>Aegis IoT</strong>
+        <small>กล้อง & สั่งงาน</small>
+      </a>
+
+      <!-- 🇹🇭 6) Privacy -->
+      <a class="card" href="/liff/privacy.html">
+        <div class="icon" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">🔒</div>
+        <strong>Privacy</strong>
+        <small>นโยบายข้อมูล</small>
+      </a>
+    </section>
+
+    <div class="action-bar">
+      <a class="btn" href="/">🏠 Main UI</a>
+      <a class="btn" href="/liff/api.html">🔌 Blinko API</a>
+    </div>
+  </div>
+
+  <script>
+    // 🇹🇭 ใส่ LIFF ID จริงก่อนใช้ (ถ้ามี)
+    const LIFF_ID = "REPLACE_WITH_LIFF_ID";
+
+    async function boot() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        // Auto login if not logged in
+        if (!liff.isLoggedIn() && liff.isInClient()) {
+          // In LINE app, it usually is logged in.
+        } else if (!liff.isLoggedIn()) {
+          // liff.login(); // Optional: Auto login on external browser
+        }
+
+        if (liff.isLoggedIn()) {
+          const profile = await liff.getProfile();
+          document.querySelector('#who').textContent = `👋 สวัสดีคุณ ${profile.displayName}`;
+          sessionStorage.setItem('dude_line_user_id', profile.userId);
+        } else {
+          document.querySelector('#who').textContent = 'Guest User';
+        }
+      } catch (e) {
+        // LIFF init failed (maybe no ID)
+        console.log('LIFF init skipped/failed', e);
+        document.querySelector('#who').textContent = 'Local Mode';
+      }
+    }
+    boot();
+  </script>
+</body>
+
+</html>

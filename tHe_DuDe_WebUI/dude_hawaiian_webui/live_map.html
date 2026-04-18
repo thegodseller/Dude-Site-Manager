@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaturatit Live Map - DuDe Super Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .map-container {
+            height: calc(100vh - 80px);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: grayscale(0.2) contrast(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="glass sticky top-0 z-50 py-4 px-6 border-b border-white/10">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <img src="assets/logo.png" class="w-10 h-10 rounded-full border border-[#D4AF37]">
+                    <span class="text-lg font-bold font-tech tracking-wider text-[#D4AF37]">The Godseller</span>
+                </a>
+                <span class="text-slate-500 font-tech px-2">|</span>
+                <span class="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400">Jaturatit Live Map</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-2 text-[10px] font-bold text-red-500 uppercase animate-pulse">
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span>Live Tracking</span>
+                </div>
+                <a href="index.html"
+                    class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition">Back
+                    to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="map-container relative">
+        <iframe src="/gps-map/" allow="geolocation"></iframe>
+
+        <!-- Legend Overlay -->
+        <div class="absolute bottom-10 left-10 glass p-6 rounded-2xl border-cyan-500/30 max-w-xs pointer-events-none">
+            <h3 class="font-tech text-cyan-400 text-sm mb-4 uppercase tracking-widest">System Status</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-400 uppercase">GPS Feed</span>
+                    <span class="text-[10px] text-green-400 font-bold uppercase">Active</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-400 uppercase">Nodes Synced</span>
+                    <span class="text-[10px] text-white tech-font">AM_VISION_P01</span>
+                </div>
+                <div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                    <div class="bg-cyan-500 h-full w-2/3 shadow-[0_0_10px_#00f3ff]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pulse Overlay -->
+        <div class="absolute top-10 right-10 glass px-4 py-2 rounded-full border-white/10 flex items-center space-x-3">
+            <div class="text-[8px] font-bold text-slate-500 tracking-[0.2em] uppercase">Refresh Rate: 1.5s</div>
+        </div>
+    </main>
+</body>
+
+</html>

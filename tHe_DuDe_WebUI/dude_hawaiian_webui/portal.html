@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuDe Drive - Secure Vault Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-blue: #0066ff;
+            --neon-purple: #bc13fe;
+        }
+        body {
+            background-color: #020617;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .tech-font { font-family: 'JetBrains+Mono', monospace; }
+        
+        /* Cyberpunk Background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .neon-border {
+            position: relative;
+        }
+        .neon-border::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-blue), var(--neon-purple));
+            z-index: -1;
+            border-radius: inherit;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        .neon-border:focus-within::after {
+            opacity: 1;
+        }
+
+        /* Scan Animation */
+        .scanning {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanning::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--neon-cyan), transparent);
+            opacity: 0.5;
+            animation: scan 2s linear infinite;
+            z-index: 10;
+        }
+        @keyframes scan {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Particles */
+        canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="grid-bg"></div>
+    <canvas id="particles"></canvas>
+
+    <!-- Success Overlay -->
+    <div id="success-overlay" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
+        <div class="w-64 h-64 relative">
+            <div class="absolute inset-0 rounded-full border-4 border-cyan-500/20 animate-ping"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-cyan-500 animate-pulse flex items-center justify-center">
+                <svg class="w-32 h-32 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+            </div>
+        </div>
+        <h2 class="text-3xl font-bold text-white mt-8 tracking-widest tech-font uppercase animate-pulse">Access Granted</h2>
+        <p class="text-cyan-400 mt-2 tech-font">Decrypting Vault...</p>
+    </div>
+
+    <div class="glass-card w-full max-w-md p-10 rounded-3xl relative z-10 mx-4">
+        <!-- Logo Section -->
+        <div class="text-center mb-10">
+            <div class="inline-block p-4 rounded-2xl bg-cyan-500/10 mb-4 border border-cyan-500/20">
+                <svg class="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-black text-white tracking-tighter uppercase italic">DuDe <span class="text-cyan-400">Drive</span></h1>
+            <p class="text-slate-400 text-sm mt-1 uppercase tracking-widest tech-font">Private Local Secure Vault</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-6">
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Vessel Identity</label>
+                <div class="neon-border rounded-xl">
+                    <input type="text" id="username" placeholder="Username" required
+                        class="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-4 text-white placeholder-slate-600 focus:outline-none focus:ring-0 transition">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Access Protocol</label>
+                <div class="neon-border rounded-xl font-password">
+                    <input type="password" id="password" placeholder="••••••••" required
+                        class="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-4 text-white placeholder-slate-600 focus:outline-none focus:ring-0 transition">
+                </div>
+            </div>
+
+            <button type="submit" id="submit-btn" 
+                class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-5 rounded-xl uppercase tracking-widest shadow-lg shadow-cyan-900/20 hover:shadow-cyan-500/40 transition-all transform hover:-translate-y-1 active:scale-95 group">
+                <span class="relative z-10 group-hover:tracking-[0.2em] transition-all">Initiate Sequence</span>
+            </button>
+        </form>
+
+        <div class="mt-8 text-center">
+            <p id="error-msg" class="text-red-400 text-sm font-medium h-5 transition-opacity opacity-0 uppercase tech-font">Access Denied: Invalid Credentials</p>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="mt-10 pt-8 border-t border-white/5 flex justify-between items-center opacity-30">
+            <div class="text-[10px] text-slate-500 tech-font">NODE: DuDe_NAS_01</div>
+            <div class="text-[10px] text-slate-500 tech-font">ENCRYPTION: AES-256</div>
+            <div class="text-[10px] text-slate-500 tech-font">PORT: 8090</div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const overlay = document.getElementById('success-overlay');
+        const errorMsg = document.getElementById('error-msg');
+
+        // DEMO CREDENTIALS
+        const DEMO_USER = "demo";
+        const DEMO_PASS = "Drive2026";
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            submitBtn.classList.add('scanning');
+            submitBtn.disabled = true;
+            errorMsg.style.opacity = '0';
+
+            setTimeout(() => {
+                if(user === DEMO_USER && pass === DEMO_PASS) {
+                    // Success Sequence
+                    overlay.classList.remove('pointer-events-none');
+                    overlay.classList.add('opacity-100');
+                    
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html"; // Redirect to Custom Branded Dashboard
+                    }, 2500);
+                } else {
+                    // Failure Sequence
+                    submitBtn.classList.remove('scanning');
+                    submitBtn.disabled = false;
+                    errorMsg.style.opacity = '1';
+                    
+                    // Simple shake animation
+                    form.animate([
+                        { transform: 'translateX(0)' },
+                        { transform: 'translateX(-10px)' },
+                        { transform: 'translateX(10px)' },
+                        { transform: 'translateX(0)' }
+                    ], { duration: 300 });
+                }
+            }, 1500);
+        });
+
+        // Simple Particles
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            for (let i = 0; i < 50; i++) {
+                points.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.2)';
+            points.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        draw();
+    </script>
+</body>
+</html>

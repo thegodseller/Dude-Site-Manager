@@ -1,0 +1,51 @@
+FROM ubuntu:24.04
+
+SHELL ["/bin/bash", "-c"]
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    libtbb-dev \
+    ca-certificates \
+    git \
+    wget \
+    curl \
+    gcc \
+    g++ \
+    net-tools \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go (Ollama is written in Go)
+WORKDIR /home/ollama_ov_server
+ARG GOVERSION=1.24.1
+RUN curl -fsSL https://golang.org/dl/go${GOVERSION}.linux-amd64.tar.gz | tar xz -C /usr/local
+ENV PATH=/usr/local/go/bin:$PATH
+
+# Download OpenVINO GenAI Nightly Runtime
+# Matches Ubuntu 24.04 and provides required libraries
+RUN wget https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2026.1/linux/openvino_genai_ubuntu24_2026.1.0.0_x86_64.tar.gz
+RUN tar -xf openvino_genai_ubuntu24_2026.1.0.0_x86_64.tar.gz
+ENV GENAI_DIR=/home/ollama_ov_server/openvino_genai_ubuntu24_2026.1.0.0_x86_64
+
+# Configure Build Environment
+ENV CGO_ENABLED=1
+ENV GODEBUG=cgocheck=0
+ENV CGO_LDFLAGS="-L$GENAI_DIR/runtime/lib/intel64"
+ENV CGO_CFLAGS="-I$GENAI_DIR/runtime/include"
+ENV LD_LIBRARY_PATH="$GENAI_DIR/runtime/lib/intel64:$LD_LIBRARY_PATH"
+
+# Build Ollama with OpenVINO Backend
+WORKDIR /home/ollama_ov_server
+RUN git clone https://github.com/openvinotoolkit/openvino_contrib.git
+WORKDIR /home/ollama_ov_server/openvino_contrib/modules/ollama_openvino
+RUN sed -i 's/STREAMMING/STREAMING/g' genai/genai.go
+RUN go build -o /usr/bin/ollama .
+
+# Runtime Configuration
+ENV OLLAMA_HOST=0.0.0.0:11434
+EXPOSE 11434
+
+# Use setupvars.sh to correctly initialize environment
+# Use setupvars.sh to correctly initialize environment
+ENTRYPOINT ["/bin/bash", "-c", "source /home/ollama_ov_server/openvino_genai_ubuntu24_2026.1.0.0_x86_64/setupvars.sh && /usr/bin/ollama serve"]

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <!-- 🇹🇭 ป้องกันอักษรกุ้งกิ้ง -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IoT Dashboard</title>
+  <style>
+    body{font-family:system-ui;margin:0;padding:16px;background:#0b1020;color:#eaf2ff}
+    .row{display:flex;gap:10px;margin-bottom:12px;max-width:640px}
+    button{flex:1;padding:10px;border-radius:10px;border:1px solid #2b3b6b;background:#56c7ff;color:#00111f;font-weight:700}
+    input{flex:1;padding:10px;border-radius:10px;border:1px solid #2b3b6b;background:#121a33;color:#eaf2ff}
+    pre{white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <h2>IoT Dashboard</h2>
+  <div class="row">
+    <input id="deviceId" placeholder="device id (เช่น light_front_door)" />
+  </div>
+  <div class="row">
+    <button onclick="send('turn_off')">ปิดอุปกรณ์</button>
+    <button onclick="send('turn_on')">เปิดอุปกรณ์</button>
+    <button onclick="send('status')">เช็คสถานะ</button>
+  </div>
+  <pre id="out"></pre>
+
+  <script>
+    // 🇹🇭 endpoint ผ่าน nginx proxy (ดูข้อ 2 ด้านล่าง)
+    const IOT_URL = "/mcp/iot/command";
+
+    async function send(action){
+      const userId = sessionStorage.getItem('dude_line_user_id') || 'anonymous';
+      const deviceId = document.getElementById('deviceId').value || 'light_front_door';
+      const body = { intent:'iot.control', user_id:userId, action, device:{ id: deviceId } };
+      try{
+        const res = await fetch(IOT_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        const txt = await res.text(); // 🇹🇭 เผื่อ backend ยังไม่ได้ส่ง JSON
+        document.querySelector('#out').textContent = txt;
+      }catch(e){
+        document.querySelector('#out').textContent = String(e);
+      }
+    }
+  </script>
+</body>
+</html>

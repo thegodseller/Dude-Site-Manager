@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลูกค้า - Arany AutoCare</title>
+  <link rel="stylesheet" href="assets/autocare.css">
+</head>
+<body>
+  <div class="container customer-dashboard">
+    <header>
+      <img src="assets/logo.png" class="logo-img" alt="Arany AutoCare">
+      <h1>Arany AutoCare</h1>
+      <p class="welcome" id="welcomeMsg">สวัสดีครับ</p>
+    </header>
+    
+    <!-- Menu -->
+    <nav class="menu">
+      <button class="menu-btn active" data-tab="request">
+        <span class="icon">📝</span>
+        <span>สอบถามราคา</span>
+      </button>
+      <button class="menu-btn" data-tab="status">
+        <span class="icon">📊</span>
+        <span>สถานะรถ</span>
+      </button>
+      <button class="menu-btn" data-tab="receipts">
+        <span class="icon">🧾</span>
+        <span>ใบเสร็จ</span>
+      </button>
+    </nav>
+    
+    <!-- Tab: Request Service -->
+    <section id="requestTab" class="tab-content active">
+      <h2>ขอรับบริการ</h2>
+      
+      <div class="form-group">
+        <label>เลือกรถ</label>
+        <select id="vehicleSelect">
+          <option value="">-- เลือกรถ --</option>
+        </select>
+        <button class="btn-small" id="addVehicleBtn">+ เพิ่มรถใหม่</button>
+      </div>
+      
+      <div class="form-group">
+        <label>ประเภทบริการ</label>
+        <select id="serviceType">
+          <option value="oil_change">เปลี่ยนน้ำมันเครื่อง</option>
+          <option value="gear_oil">เปลี่ยนน้ำมันเกียร์</option>
+          <option value="diff_oil">เปลี่ยนน้ำมันเฟืองท้าย</option>
+          <option value="ac_refill">เติมน้ำยาแอร์</option>
+          <option value="ac_repair">ซ่อมระบบแอร์</option>
+          <option value="alternator">ไดนาโม</option>
+          <option value="engine">เครื่องยนต์</option>
+          <option value="suspension">ช่วงล่าง</option>
+          <option value="other">อื่นๆ</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>รายละเอียด/อาการ</label>
+        <textarea id="description" rows="3" placeholder="อธิบายอาการที่พบ..."></textarea>
+      </div>
+      
+      <button class="btn-primary" id="submitRequest">ส่งคำขอ</button>
+    </section>
+    
+    <!-- Tab: Status -->
+    <section id="statusTab" class="tab-content">
+      <h2>สถานะงานซ่อม</h2>
+      <div id="requestsList" class="requests-list">
+        <p class="loading">กำลังโหลด...</p>
+      </div>
+    </section>
+    
+    <!-- Tab: Receipts -->
+    <section id="receiptsTab" class="tab-content">
+      <h2>ใบเสร็จ</h2>
+      <div id="receiptsList" class="receipts-list">
+        <p class="loading">กำลังโหลด...</p>
+      </div>
+    </section>
+    
+    <!-- Modal: Add Vehicle -->
+    <div class="modal" id="vehicleModal" style="display:none;">
+      <div class="modal-content">
+        <h3>เพิ่มรถใหม่</h3>
+        <div class="form-group">
+          <label>ทะเบียนรถ *</label>
+          <input type="text" id="plateNumber" placeholder="กข-1234">
+        </div>
+        <div class="form-group">
+          <label>ยี่ห้อ</label>
+          <input type="text" id="brand" placeholder="Toyota, Honda...">
+        </div>
+        <div class="form-group">
+          <label>รุ่น</label>
+          <input type="text" id="model" placeholder="Vios, Civic...">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancelVehicle">ยกเลิก</button>
+          <button class="btn-primary" id="saveVehicle">บันทึก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="assets/autocare.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lineUserId = params.get('line_user_id');
+    
+    // Tab switching
+    document.querySelectorAll('.menu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+        
+        if (btn.dataset.tab === 'status') loadRequests();
+        if (btn.dataset.tab === 'receipts') loadReceipts();
+      });
+    });
+    
+    // Load user and vehicles
+      // 🇹🇭 Fix API: /customers/me/{id}
+      const userResp = await fetch(`${API_BASE}/customers/me/${lineUserId}`);
+      const userData = await userResp.json();
+      document.getElementById('welcomeMsg').textContent = `สวัสดี คุณ${userData.name}`;
+      
+      // await loadVehicles(); // 🇹🇭 Disable
+      await loadRequests(); // 🇹🇭 Now loads jobs
+    
+    async function loadVehicles() {
+      const resp = await fetch(`${API_BASE}/api/autocare/vehicles?line_user_id=${lineUserId}`);
+      const data = await resp.json();
+      const select = document.getElementById('vehicleSelect');
+      select.innerHTML = '<option value="">-- เลือกรถ --</option>';
+      data.data.forEach(v => {
+        select.innerHTML += `<option value="${v.id}">${v.plate_number} ${v.brand || ''} ${v.model || ''}</option>`;
+      });
+    }
+    
+    async function loadRequests() {
+      // 🇹🇭 Fix API: /jobs/track/{id}
+      const resp = await fetch(`${API_BASE}/jobs/track/${lineUserId}`);
+      const data = await resp.json();
+      const list = document.getElementById('requestsList');
+      
+      // 🇹🇭 Data is array directly, not {data: []}
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="empty">ยังไม่มีงานซ่อม</p>';
+        return;
+      }
+      list.innerHTML = data.map(r => `
+        <div class="request-card">
+          <div class="plate">${r.license_plate || 'รถทั่วไป'}</div>
+          <div class="service">${r.service_requested || 'เช็คระยะ'}</div>
+          <div class="status status-${r.status.toLowerCase()}">${getStatusName(r.status.toLowerCase())}</div>
+        </div>
+      `).join('');
+    }
+    
+    async function loadReceipts() {
+      const resp = await fetch(`${API_BASE}/api/autocare/receipts?line_user_id=${lineUserId}`);
+      const data = await resp.json();
+      const list = document.getElementById('receiptsList');
+      if (data.data.length === 0) {
+        list.innerHTML = '<p class="empty">ยังไม่มีใบเสร็จ</p>';
+        return;
+      }
+      list.innerHTML = data.data.map(r => `
+        <div class="receipt-card">
+          <div class="receipt-no">${r.receipt_number}</div>
+          <div class="amount">${Number(r.total_amount).toLocaleString()} บาท</div>
+          <div class="date">${new Date(r.paid_at).toLocaleDateString('th-TH')}</div>
+        </div>
+      `).join('');
+    }
+    
+    // Submit request
+    document.getElementById('submitRequest').addEventListener('click', async () => {
+      const vehicleId = document.getElementById('vehicleSelect').value;
+      if (!vehicleId) { alert('กรุณาเลือกรถ'); return; }
+      
+      const resp = await fetch(`${API_BASE}/api/autocare/requests?line_user_id=${lineUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vehicle_id: parseInt(vehicleId),
+          service_type: document.getElementById('serviceType').value,
+          description: document.getElementById('description').value
+        })
+      });
+      
+      const result = await resp.json();
+      if (result.success) {
+        alert('ส่งคำขอสำเร็จ! เราจะติดต่อกลับโดยเร็ว');
+        document.getElementById('description').value = '';
+      } else {
+        alert('เกิดข้อผิดพลาด: ' + result.message);
+      }
+    });
+    
+    // Vehicle modal
+    document.getElementById('addVehicleBtn').addEventListener('click', () => {
+      document.getElementById('vehicleModal').style.display = 'flex';
+    });
+    document.getElementById('cancelVehicle').addEventListener('click', () => {
+      document.getElementById('vehicleModal').style.display = 'none';
+    });
+    document.getElementById('saveVehicle').addEventListener('click', async () => {
+      const plate = document.getElementById('plateNumber').value;
+      if (!plate) { alert('กรุณากรอกทะเบียนรถ'); return; }
+      
+      const resp = await fetch(`${API_BASE}/api/autocare/vehicles?line_user_id=${lineUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plate_number: plate,
+          brand: document.getElementById('brand').value,
+          model: document.getElementById('model').value
+        })
+      });
+      
+      if (resp.ok) {
+        document.getElementById('vehicleModal').style.display = 'none';
+        await loadVehicles();
+      }
+    });
+    
+    init();
+  </script>
+</body>
+</html>

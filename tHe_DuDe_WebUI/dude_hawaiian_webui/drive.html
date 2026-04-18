@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dude Drive - Secure Cloud Storage | The God Seller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #3b82f6;
+            --neon-purple: #bc13fe;
+            --neon-cyan: #00f3ff;
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(59, 130, 246, 0.2);
+        }
+        body { 
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif; 
+            background-color: #020617; 
+            color: #f8fafc;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(188, 19, 254, 0.1) 0%, transparent 40%);
+        }
+        h1, h2, h3, .font-tech { font-family: 'Orbitron', 'Noto Sans Thai', sans-serif; }
+        
+        .glass { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .glow-purple { box-shadow: 0 0 20px rgba(188, 19, 254, 0.5); }
+
+        .price-card {
+            transition: all 0.3s ease;
+        }
+        .price-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+        }
+
+        .btn-cyber {
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn-cyber::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 0%; height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #2563eb);
+            transition: width 0.3s;
+            z-index: -1;
+        }
+        .btn-cyber:hover::before {
+            width: 100%;
+        }
+
+        /* 3D Float Animation */
+        @keyframes float3d {
+            0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+            50% { transform: translateY(-20px) rotateX(2deg) rotateY(-2deg); }
+        }
+        .float-img { animation: float3d 6s ease-in-out infinite; }
+
+        /* Chatbot Styles */
+        #chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        #chat-btn {
+            background: linear-gradient(135deg, #00f3ff, #bc13fe);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.5);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        #chat-btn:hover { transform: scale(1.1); }
+
+        #chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #chat-window.open {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #0f172a, #1e1b4b);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .msg {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease;
+        }
+        .msg.bot {
+            background: rgba(59, 130, 246, 0.2);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .msg.user {
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .chat-option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: #00f3ff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .chat-option-btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: #00f3ff;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 py-4 px-6 border-b border-white/5">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full border border-blue-500 overflow-hidden">
+                    <img src="assets/logo.png" class="w-full h-full object-cover">
+                </div>
+                <!-- <a href="index.html" class="text-lg font-bold font-tech tracking-wider text-white hover:text-blue-500 transition">The Godseller</a> -->
+                <span class="text-xl font-bold font-tech tracking-wider text-[#D4AF37]">The Godseller</span>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-white hover:text-cyan-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex space-x-8 font-semibold text-xs tracking-widest uppercase text-slate-400">
+                <a href="index.html" class="hover:text-white transition">Home</a>
+                <a href="vision.html" class="hover:text-white transition">Vision</a>
+                <a href="pos.html" class="hover:text-white transition">POS</a>
+                <a href="room_service.html" class="hover:text-white transition">Room Service</a>
+                <span class="text-cyan-400 font-bold glow-cyan">Drive</span>
+            </div>
+            
+             <div class="hidden lg:flex items-center space-x-4">
+                 <a href="http://100.68.192.75:8090/_/" target="_blank" class="border border-cyan-500/50 text-cyan-400 px-5 py-1.5 rounded-sm font-bold text-[10px] tracking-widest uppercase hover:bg-cyan-500 hover:text-black transition">DUDE ADMIN</a>
+            </div>
+        </div>
+        
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden lg:hidden absolute top-full left-0 w-full glass border-b border-white/10 py-4">
+             <div class="flex flex-col space-y-4 px-6 font-semibold text-xs tracking-widest uppercase text-slate-400">
+                <a href="index.html" class="hover:text-white transition">Home</a>
+                <a href="vision.html" class="hover:text-white transition">Vision</a>
+                <a href="pos.html" class="hover:text-white transition">POS</a>
+                <a href="room_service.html" class="hover:text-white transition">Room Service</a>
+                <span class="text-cyan-400 font-bold">Drive</span>
+             </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative py-20 lg:py-32 flex items-center justify-center min-h-[70vh]">
+        <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div>
+                <span class="bg-blue-900/40 border border-blue-500/30 text-blue-300 px-4 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-[0.2em] mb-8 inline-block shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                    Original Local Secure Vault
+                </span>
+                <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight text-white font-tech">
+                    พื้นที่เก็บข้อมูลส่วนตัว<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 animate-pulse">ที่ปลอดภัยที่สุดในไทย</span>
+                </h1>
+                <p class="text-lg text-slate-300 mb-8 max-w-lg leading-relaxed font-light">
+                    ระบบ Cloud Storage ส่วนตัวที่ไม่เหมือนใคร ข้อมูลของคุณจะถูกเก็บใน Local Data Center ที่มีการป้องกันสูงสุด เข้าถึงได้เร็วที่สุด และปลอดภัยที่สุด
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="portal.html" class="btn-cyber text-white px-8 py-4 rounded-lg font-bold tracking-widest shadow-lg hover:shadow-cyan-500/50 transition transform hover:scale-105">
+                        START STORAGE
+                    </a>
+                    <a href="#why-choose" class="border border-white/10 bg-white/5 text-white px-8 py-4 rounded-lg font-bold tracking-widest hover:bg-white/10 hover:border-white/30 transition">
+                        EXPLORE
+                    </a>
+                </div>
+            </div>
+            
+            <div class="relative group perspective-1000">
+                <div class="absolute inset-0 bg-blue-500/20 blur-[120px] rounded-full animate-pulse"></div>
+                <img src="assets/cyberpunk_server.png" 
+                     class="relative w-full rounded-2xl border border-white/10 shadow-2xl float-img group-hover:scale-105 transition duration-500"
+                     alt="Secure Cloud Server">
+                     
+                <!-- Floating Badge -->
+                <div class="absolute -bottom-6 -right-6 glass px-6 py-4 rounded-xl border-cyan-500/50 animate-bounce delay-700 hidden lg:block">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase tracking-widest">System Status</p>
+                            <p class="text-sm font-bold text-white font-tech">ONLINE</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Why Choose DuDe Drive Section -->
+    <section id="why-choose" class="py-20 bg-black/40 border-y border-white/5">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-4xl font-bold font-tech mb-4 text-white">Why Choose <span class="text-[#D4AF37]">DuDe Drive</span></h2>
+                <div class="h-1 w-20 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- 1. Local Data Center -->
+                <div class="glass p-8 rounded-2xl border-l-4 border-cyan-500 group hover:bg-cyan-500/5 transition">
+                    <div class="bg-cyan-500/10 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Local Data Center</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        ข้อมูลของคุณอยู่ในประเทศไทย เข้าถึงได้รวดเร็วระดับ Millisecond ไม่ต้องผ่าน Cloud ต่างประเทศ ลดความเสี่ยงในการรั่วไหลของข้อมูล
+                    </p>
+                </div>
+
+                <!-- 2. Security Standard -->
+                <div class="glass p-8 rounded-2xl border-l-4 border-purple-500 group hover:bg-purple-500/5 transition">
+                    <div class="bg-purple-500/10 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                        <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Security Standard</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        มาตรฐานความปลอดภัยระดับสากลด้วยการเข้ารหัส AES-256 และระบบ Authentication ที่เข้มงวด มั่นใจได้ว่าข้อมูลของคุณปลอดภัย 100%
+                    </p>
+                </div>
+
+                <!-- 3. Value for Money -->
+                <div class="glass p-8 rounded-2xl border-l-4 border-blue-500 group hover:bg-blue-500/5 transition">
+                    <div class="bg-blue-500/10 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                        <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Value for Money</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        คุ้มค่าที่สุดด้วยราคาที่เข้าถึงได้ เริ่มต้นเพียงหลักร้อยแต่ได้ฟีเจอร์ระดับ Enterprise พร้อมทีมดูแลตลอด 24 ชั่วโมง
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 relative">
+        <div class="absolute inset-0 bg-slate-900/50 skew-y-3 transform origin-top-left -z-10 h-full"></div>
+        
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl lg:text-5xl font-bold font-tech mb-4 text-white">Select Your <span class="text-purple-400">Vault</span></h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">เลือกแผนที่เหมาะกับการใช้งานของคุณ</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                
+                <!-- Starter -->
+                <div class="glass p-8 rounded-3xl border border-white/5 price-card relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-50"><svg class="w-12 h-12 text-slate-600 group-hover:text-blue-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></div>
+                    <h3 class="text-xl font-bold text-slate-300 font-tech mb-2">Starter</h3>
+                    <div class="text-4xl font-bold text-white mb-1">DuDe Help 7</div>
+                    <div class="text-sm text-slate-400 mb-6">บันทึก 2MP นาน 7 วัน + พื้นที่ฟรี 50GB</div>
+                    
+                    <div class="text-5xl font-bold text-blue-400 font-tech mb-2">129.-<span class="text-lg text-slate-500 font-normal">/เดือน</span></div>
+                    
+                    <ul class="space-y-4 mb-8 text-sm text-slate-300">
+                        <li class="flex items-center"><span class="text-blue-500 mr-2">✓</span> บันทึกย้อนหลัง 7 วัน</li>
+                        <li class="flex items-center"><span class="text-blue-500 mr-2">✓</span> ความคมชัด 2MP</li>
+                        <li class="flex items-center"><span class="text-blue-500 mr-2">✓</span> พื้นที่เก็บไฟล์ Private 50GB</li>
+                        <li class="flex items-center text-slate-500"><span class="mr-2">•</span> AI Face Recognition (Limited)</li>
+                    </ul>
+                    <button onclick="selectPackage('Starter')" class="block w-full text-center border border-white/20 text-white py-3 rounded-xl hover:bg-blue-600 hover:border-transparent transition uppercase tracking-widest font-bold text-xs">Choose Plan</button>
+                </div>
+
+                <!-- Standard (Popular) -->
+                <div class="glass p-8 rounded-3xl border border-cyan-500/50 price-card relative overflow-hidden transform md:-translate-y-4 shadow-[0_0_40px_rgba(0,243,255,0.1)]">
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-black font-bold text-[10px] px-4 py-1 rounded-b-lg tracking-widest uppercase shadow-lg">Popular Choice</div>
+                    <div class="absolute top-0 right-0 p-4 opacity-80"><svg class="w-12 h-12 text-cyan-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                    
+                    <h3 class="text-xl font-bold text-cyan-300 font-tech mb-2">Standard</h3>
+                    <div class="text-4xl font-bold text-white mb-1">DuDe Save 15</div>
+                    <div class="text-sm text-cyan-100/70 mb-6">บันทึก 2MP นาน 7 วัน + พื้นที่ฟรี 50GB</div>
+                    
+                    <div class="text-6xl font-bold text-cyan-400 font-tech mb-2">199.-<span class="text-lg text-slate-500 font-normal">/เดือน</span></div>
+                    
+                    <ul class="space-y-4 mb-8 text-sm text-slate-200">
+                         <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> บันทึกย้อนหลัง 7 วัน</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> ความคมชัด 2MP</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> พื้นที่เก็บไฟล์ Private 50GB</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Smart AI Detection</li>
+                    </ul>
+                    <button onclick="selectPackage('Standard')" class="block w-full text-center bg-cyan-500 text-black py-4 rounded-xl hover:bg-cyan-400 transition uppercase tracking-widest font-bold text-xs shadow-lg shadow-cyan-500/30">Get Started</button>
+                </div>
+
+                <!-- Business -->
+                <div class="glass p-8 rounded-3xl border border-white/5 price-card relative overflow-hidden group">
+                     <div class="absolute top-0 right-0 p-4 opacity-50"><svg class="w-12 h-12 text-slate-600 group-hover:text-purple-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div>
+                    <h3 class="text-xl font-bold text-slate-300 font-tech mb-2">Business</h3>
+                    <div class="text-4xl font-bold text-white mb-1">DuDe Save 30</div>
+                    <div class="text-sm text-slate-400 mb-6">บันทึก 2MP นาน 30 วัน + พื้นที่ฟรี 500GB</div>
+                    
+                    <div class="text-5xl font-bold text-purple-400 font-tech mb-2">349.-<span class="text-lg text-slate-500 font-normal">/เดือน</span></div>
+                    
+                    <ul class="space-y-4 mb-8 text-sm text-slate-300">
+                        <li class="flex items-center"><span class="text-purple-500 mr-2">✓</span> บันทึกย้อนหลัง 30 วัน</li>
+                        <li class="flex items-center"><span class="text-purple-500 mr-2">✓</span> ความคมชัด 2MP</li>
+                        <li class="flex items-center"><span class="text-purple-500 mr-2">✓</span> พื้นที่เก็บไฟล์ Private 500GB</li>
+                        <li class="flex items-center"><span class="text-purple-500 mr-2">✓</span> Priority Support 24/7</li>
+                    </ul>
+                    <button onclick="selectPackage('Business')" class="block w-full text-center border border-white/20 text-white py-3 rounded-xl hover:bg-purple-600 hover:border-transparent transition uppercase tracking-widest font-bold text-xs">Contact Sales</button>
+                </div>
+            </div>
+
+            <!-- Top-up Section -->
+            <div class="mt-12 max-w-4xl mx-auto glass p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-500/20 p-3 rounded-lg text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold uppercase tracking-widest">Storage Top-up</h4>
+                        <p class="text-slate-400 text-sm">เพิ่มพื้นที่จัดเก็บข้อมูลส่วนตัว (Private Data)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-right hidden md:block">
+                        <p class="text-2xl font-bold text-white font-tech">100 GB</p>
+                        <p class="text-xs text-blue-400 uppercase tracking-wider">High Speed</p>
+                    </div>
+                    <div class="h-10 w-px bg-white/10 hidden md:block"></div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-xl font-bold text-white">50.- <span class="text-xs text-slate-500 font-normal">/เดือน</span></span>
+                        <a href="http://100.68.192.75" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition border border-white/10">Add Now</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Professional Architect Assurance -->
+            <div class="mt-12 text-center">
+                 <div class="inline-flex items-center space-x-2 bg-green-500/10 px-4 py-2 rounded-full border border-green-500/20">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span class="text-xs text-green-400 font-bold tracking-wider uppercase">ออกแบบและดูแลโดย Software Architect มืออาชีพ</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Signals Section -->
+    <section class="py-20 border-t border-white/5 bg-black/40 backdrop-blur-sm">
+        <div class="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+            <div class="group">
+                <div class="mb-4 inline-block p-4 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition">
+                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <p class="text-2xl font-bold font-tech text-white">AES-256</p>
+                <p class="text-[10px] uppercase text-slate-500 tracking-[0.2em] mt-2">Military Grade Encryption</p>
+            </div>
+            <div class="group">
+                <div class="mb-4 inline-block p-4 rounded-full bg-purple-500/10 group-hover:bg-purple-500/20 transition">
+                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <p class="text-2xl font-bold font-tech text-white">99.99%</p>
+                <p class="text-[10px] uppercase text-slate-500 tracking-[0.2em] mt-2">Uptime Guarantee</p>
+            </div>
+             <div class="group">
+                <div class="mb-4 inline-block p-4 rounded-full bg-cyan-500/10 group-hover:bg-cyan-500/20 transition">
+                    <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <p class="text-2xl font-bold font-tech text-white">LOCAL</p>
+                <p class="text-[10px] uppercase text-slate-500 tracking-[0.2em] mt-2">Private Data Center</p>
+            </div>
+            <div class="col-span-2 md:col-span-1 flex items-center justify-center">
+                 <div class="glass p-4 rounded-xl border border-white/10 hover:border-[#D4AF37]/50 transition cursor-pointer group">
+                    <a href='https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' target="_blank" class="flex items-center space-x-4">
+                        <img src="https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5" alt="DBD Registered" class="h-10 grayscale group-hover:grayscale-0 transition duration-500">
+                        <div class="text-left">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest group-hover:text-[#D4AF37] transition">Trust Verified</p>
+                            <p class="text-[8px] text-slate-600">Click to verify</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-[10px] text-slate-600 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <p>© 2026 DUDE DRIVE. POWERED BY THE GOD SELLER.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+                <a href="#" class="hover:text-white transition">SLA</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Widget -->
+    <div id="chat-widget">
+        <div id="chat-window" class="glass">
+            <div class="chat-header">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-white">DuDe Drive Assistant</p>
+                        <p class="text-[10px] text-cyan-400">Online • AI Support</p>
+                    </div>
+                </div>
+                <button id="close-chat" class="text-slate-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will appear here -->
+            </div>
+            
+            <div class="chat-input-area hidden" id="lead-form">
+                <p class="text-xs text-cyan-400 mb-2">กรอกข้อมูลเพื่อให้เจ้าหน้าที่ติดต่อกลับ:</p>
+                <input type="text" id="lead-name" placeholder="ชื่อของคุณ" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mb-2 focus:outline-none focus:border-cyan-500">
+                <input type="email" id="lead-email" placeholder="อีเมล (สำหรับรับข้อมูล)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mb-2 focus:outline-none focus:border-cyan-500">
+                <input type="tel" id="lead-phone" placeholder="เบอร์โทรศัพท์" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mb-2 focus:outline-none focus:border-cyan-500">
+                <button onclick="submitLead()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2 rounded-lg text-xs font-bold uppercase transition">ส่งข้อมูล</button>
+            </div>
+        </div>
+
+        <div id="chat-btn">
+            <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Chatbot Logic
+        const chatBtn = document.getElementById('chat-btn');
+        const chatWindow = document.getElementById('chat-window');
+        const closeChat = document.getElementById('close-chat');
+        const chatMessages = document.getElementById('chat-messages');
+        const leadForm = document.getElementById('lead-form');
+
+        const script = {
+            welcome: {
+                text: "สวัสดีครับ! ผม DuDe Drive Assistant ยินดีให้บริการครับ 🛡️ กำลังมองหาพื้นที่เก็บข้อมูล CCTV ที่ปลอดภัย หรือ Cloud ส่วนตัวสำหรับเก็บไฟล์สำคัญอยู่ใช่ไหมครับ? เลือกหัวข้อที่สนใจด้านล่างได้เลยครับ:",
+                options: [
+                    { label: "📦 สอบถามราคาและแพ็กเกจ", next: "pricing" },
+                    { label: "❓ ทำไมต้องเลือก DuDe Drive?", next: "why" },
+                    { label: "🔒 ความปลอดภัยของข้อมูล", next: "security" },
+                    { label: "💬 ติดต่อ Architect โดยตรง", action: "contact_architect" }
+                ]
+            },
+            pricing: {
+                text: "เรามี 3 แพ็กเกจสุดคุ้มที่ออกแบบมาเพื่อความปลอดภัยสูงสุดครับ<br><br>📦 <b>Starter (129.-/ด.)</b>: บันทึก 2MP 7 วัน + 50GB<br>⭐ <b>Standard (199.-/ด.)</b>: บันทึก 2MP 15 วัน + 100GB (ยอดนิยม!)<br>🏢 <b>Business (349.-/ด.)</b>: บันทึก 2MP 30 วัน + 500GB<br><br>สนใจแพ็กเกจไหนเป็นพิเศษไหมครับ? หรือให้ผมติดต่อกลับเพื่อให้ข้อมูลเพิ่ม?",
+                options: [
+                    { label: "สนใจสมัครบริการ (ทิ้งข้อมูลติดต่อ)", action: "lead_gen" },
+                    { label: "กลับสู่เมนูหลัก", next: "welcome" }
+                ]
+            },
+            why: {
+                text: "สิ่งที่ทำให้ DuDe Drive แตกต่าง:<br><br>1. <b>Local Data Center</b>: ข้อมูลเก็บในไทย 100% เร็วและเป็นส่วนตัว<br>2. <b>Architect Security</b>: ดูแลโดย Software Architect พร้อมมาตรฐาน AES-256<br>3. <b>Cost Efficiency</b>: ระบบบีบอัดไฟล์อัจฉริยะ ประหยัดกว่า 40%",
+                options: [
+                    { label: "สนใจสมัครบริการ", action: "lead_gen" },
+                    { label: "กลับสู่เมนูหลัก", next: "welcome" }
+                ]
+            },
+            security: {
+                text: "เราใช้ระบบ <b>Private Storage Encryption</b> ระดับสูง ข้อมูลของคุณจะถูกเก็บแยกในพื้นที่ส่วนตัว ไม่มีการปะปนกับผู้ใช้อื่น และระบบป้องกันการเข้าถึงที่ไม่ได้รับอนุญาต 2 ชั้นครับ มั่นใจได้ 100% ครับ!",
+                options: [
+                    { label: "กลับสู่เมนูหลัก", next: "welcome" }
+                ]
+            }
+        };
+
+        let currentInterest = "";
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            div.innerHTML = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addOptions(options) {
+            const div = document.createElement('div');
+            div.className = 'chat-options';
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'chat-option-btn';
+                btn.innerText = opt.label;
+                btn.onclick = () => handleOption(opt);
+                div.appendChild(btn);
+            });
+            chatMessages.appendChild(div);
+            // Scroll to bottom
+            setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 100);
+        }
+
+        function handleOption(opt) {
+            addMessage(opt.label, 'user');
+            
+            // Remove options buttons (visual cleanup - optional, keeping history is better usually, but lets remove clickable effect)
+            const optionBtns = document.querySelectorAll('.chat-option-btn');
+            optionBtns.forEach(b => b.onclick = null);
+
+            setTimeout(() => {
+                if (opt.action === 'contact_architect') {
+                    window.open('https://line.me/ti/p/your_line_id', '_blank'); // Replace with actual Line ID or link
+                    addMessage("ผมเปิดหน้าต่าง Line เพื่อติดต่อ Architect ให้แล้วครับ หากไม่ขึ้น คลิก <a href='https://line.me/ti/p/gp-Pa-bXyW' class='underline text-cyan-400'>ที่นี่</a>", 'bot');
+                    return;
+                }
+                
+                if (opt.action === 'lead_gen') {
+                    addMessage("ยินดีครับ! รบกวนแจ้ง ชื่อ และ เบอร์ติดต่อกลับ ด้านล่างนี้ได้เลยครับ เดี๋ยวผมให้ทีมงานรีบติดต่อไปให้ข้อมูลทันทีครับ 👇", 'bot');
+                    currentInterest = "Interest in Package";
+                    leadForm.classList.remove('hidden');
+                    return;
+                }
+
+                if (opt.next) {
+                    const nextStep = script[opt.next];
+                    addMessage(nextStep.text, 'bot');
+                    if (nextStep.options) addOptions(nextStep.options);
+                }
+            }, 500);
+        }
+
+        async function submitLead() {
+            const name = document.getElementById('lead-name').value;
+            const email = document.getElementById('lead-email').value;
+            const phone = document.getElementById('lead-phone').value;
+            
+            if (!name || !phone || !email) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
+                return;
+            }
+
+            leadForm.classList.add('hidden');
+            addMessage(`พยายามส่งข้อมูล... (ชื่อ: ${name}, เบอร์: ${phone})`, 'user');
+
+            try {
+                const response = await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, interest: currentInterest })
+                });
+                
+                if (response.ok) {
+                    setTimeout(() => {
+                        addMessage("ได้รับข้อมูลเรียบร้อยครับ! 🎉 เจ้าหน้าที่จะติดต่อกลับโดยเร็วที่สุดครับ ขอบคุณที่สนใจ DuDe Drive ครับ", 'bot');
+                    }, 500);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Fallback message even if API fails (so user doesn't feel ignored)
+                setTimeout(() => {
+                    addMessage("ขออภัยครับ ระบบขัดข้องเล็กน้อย แต่ผมบันทึกข้อมูลไว้แล้ว จะรีบแจ้งเจ้าหน้าที่ให้ครับ", 'bot');
+                }, 500);
+            }
+        }
+
+        // Init Chat
+        let isChatInit = false;
+        function initChat() {
+            if (isChatInit) return;
+            addMessage(script.welcome.text, 'bot');
+            addOptions(script.welcome.options);
+            isChatInit = true;
+        }
+
+        chatBtn.addEventListener('click', () => {
+            chatWindow.classList.toggle('open');
+            if (chatWindow.classList.contains('open')) {
+                initChat();
+            }
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatWindow.classList.remove('open');
+        });
+
+        function selectPackage(pkgName) {
+            chatWindow.classList.add('open');
+            if (!isChatInit) initChat();
+            
+            setTimeout(() => {
+                currentInterest = `Selected Package: ${pkgName}`;
+                addMessage(`ผมสนใจแพ็กเกจ <b>${pkgName}</b> ครับ อยากสมัครใช้บริการ`, 'user');
+                setTimeout(() => {
+                    addMessage(`เยี่ยมเลยครับ! แพ็กเกจ ${pkgName} คุ้มค่ามากครับ 🛡️<br>รบกวนกรอกข้อมูลเพื่อเปิดสิทธิ์ใช้งานด้านล่างนี้ได้เลยครับ`, 'bot');
+                    leadForm.classList.remove('hidden');
+                }, 600);
+            }, 300);
+        }
+    </script>
+</body>
+</html>

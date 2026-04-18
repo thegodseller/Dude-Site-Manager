@@ -1,0 +1,14 @@
+{
+  "name": "dude-hawaiian-monorepo",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Unified AI Orchestrator Monorepo",
+  "scripts": {
+    "dev": "pnpm --filter dude-hawaiian-webui dev",
+    "build": "pnpm --recursive run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

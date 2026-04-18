@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuDe Drive - Secure Vault Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --sidebar-width: 280px;
+        }
+        body {
+            background-color: #020617;
+            font-family: 'Inter', sans-serif;
+            color: #f8fafc;
+        }
+        .tech-font { font-family: 'JetBrains+Mono', monospace; }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .file-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .file-card:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: var(--neon-cyan);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -10px rgba(0, 243, 255, 0.2);
+        }
+
+        .status-bar {
+            background: linear-gradient(90deg, #1e3a8a, #1e40af);
+            height: 4px;
+            width: 100%;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .status-progress {
+            background: var(--neon-cyan);
+            height: 100%;
+            width: 15%; /* Mock progress */
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar h-full flex flex-col p-6 glass-panel z-20">
+        <div class="flex items-center gap-3 mb-12">
+            <div class="p-2 rounded-lg bg-cyan-500/20 border border-cyan-500/30">
+                <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                </svg>
+            </div>
+            <h1 class="text-xl font-bold tracking-tighter uppercase italic">DuDe <span class="text-cyan-400">Vault</span></h1>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <a href="#" onclick="switchTab('files')" id="tab-files" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-500/10 text-cyan-400 font-semibold border border-cyan-500/20 tab-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                My Files
+            </a>
+            <a href="#" onclick="switchTab('cctv')" id="tab-cctv" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition group tab-btn">
+                <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                CCTV Drive
+            </a>
+            <a href="#" onclick="switchTab('shared')" id="tab-shared" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition group tab-btn">
+                <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Shared
+            </a>
+            <a href="#" onclick="switchTab('security')" id="tab-security" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition group tab-btn">
+                <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                Security
+            </a>
+            <a href="#" onclick="switchTab('activity')" id="tab-activity" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition group tab-btn">
+                <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Activity
+            </a>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-white/5">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Storage Capacity</span>
+                <span class="text-[10px] text-cyan-400 font-bold">15%</span>
+            </div>
+            <div class="status-bar mb-1"><div class="status-progress"></div></div>
+            <div class="text-[10px] text-slate-600 tech-font">7.5 GB of 50 GB used</div>
+            
+            <button onclick="window.location.href='portal.html'" class="w-full mt-6 flex items-center justify-center gap-2 py-3 rounded-xl border border-red-500/20 text-red-500 hover:bg-red-500/10 transition text-sm font-bold uppercase tracking-widest">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Secure Eject
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0 bg-slate-950/20 relative">
+        <!-- Top Bar -->
+        <header class="h-20 flex items-center justify-between px-8 border-b border-white/5 glass-panel z-10">
+            <div class="flex items-center gap-4 flex-1">
+                <div class="relative w-full max-w-md">
+                    <svg class="absolute left-3 top-3 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" placeholder="Search decrypted files..." class="w-full bg-slate-900/50 border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition">
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="text-right mr-4 lg:block hidden">
+                    <div class="text-sm font-bold text-white uppercase tracking-tight">Vessel: demo_user</div>
+                    <div class="text-[10px] text-cyan-400 tech-font">IP: 100.68.192.75 [ENCRYPTED]</div>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20 ring-2 ring-white/10">
+                    D
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-8" id="main-content-scroll">
+            
+            <!-- SECTION: MY FILES -->
+            <div id="section-files" class="content-section">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                            My Secure Vault
+                            <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-500 text-[10px] uppercase tracking-widest border border-green-500/20">Active</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm mt-1">Managed files in node <span class="text-cyan-400 tech-font">DuDe_NAS_01</span></p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition">Add Folder</button>
+                        <button class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 text-sm font-bold shadow-lg shadow-cyan-500/20 hover:scale-105 transition active:scale-95">Upload File</button>
+                    </div>
+                </div>
+
+                <!-- Breadcrumbs -->
+                <div class="flex items-center gap-2 text-xs text-slate-500 mb-8 tech-font">
+                    <span class="hover:text-cyan-400 cursor-pointer">vault</span>
+                    <span class="text-slate-700">/</span>
+                    <span class="text-slate-300">root</span>
+                </div>
+
+                <!-- File Grid -->
+                <div id="file-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+
+            <!-- SECTION: CCTV DRIVE -->
+            <div id="section-cctv" class="content-section hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                            CCTV Drive Playback
+                            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 text-[10px] uppercase tracking-widest border border-blue-500/20">Synced</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm mt-1">Accessing encrypted camera nodes</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    <!-- Filters Sidebar -->
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="glass-panel p-6 rounded-2xl">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Camera Node</label>
+                            <select id="cameraSelect" class="w-full bg-slate-900 border border-white/5 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                                <option value="" disabled selected>Select Camera</option>
+                            </select>
+
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mt-6 mb-2">Chronological Date</label>
+                            <input type="date" id="dateSelect" class="w-full bg-slate-900 border border-white/5 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+
+                            <button onclick="loadCCTV()" class="w-full mt-6 bg-cyan-500 text-slate-950 font-bold py-3 rounded-xl uppercase tracking-widest text-xs hover:scale-105 transition active:scale-95">Sync Recordings</button>
+                        </div>
+                    </div>
+
+                    <!-- Player & List -->
+                    <div class="lg:col-span-3 space-y-6">
+                        <div class="glass-panel p-2 rounded-2xl overflow-hidden shadow-2xl relative">
+                            <video id="mainPlayer" controls class="w-full rounded-xl bg-black aspect-video"></video>
+                            <div class="p-4 flex justify-between items-center">
+                                <h3 id="videoTitle" class="text-sm font-semibold text-slate-300">Secure Playback Feed</h3>
+                                <a id="downloadBtn" href="#" download class="hidden text-cyan-400 text-xs font-bold hover:underline">Download MP4</a>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl">
+                            <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-4 flex justify-between">
+                                Decrypted Files <span id="fileCount" class="text-slate-500">0</span>
+                            </h3>
+                            <div id="cctv-list" class="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                <p class="text-center text-slate-600 py-10 text-sm uppercase tech-font">Select camera and date to load files</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OTHER SECTIONS (Placeholders for now, but in same UI style) -->
+            <div id="section-shared" class="content-section hidden py-20 text-center">
+                <div class="text-slate-600 uppercase tracking-[4px] tech-font">Direct Link Protocol: Offline</div>
+            </div>
+            <div id="section-security" class="content-section hidden py-20 text-center">
+                <div class="text-slate-600 uppercase tracking-[4px] tech-font">Firewall Integrity: 100%</div>
+            </div>
+            <div id="section-activity" class="content-section hidden">
+                 <div class="space-y-4" id="activity-log">
+                     <!-- Activities will load here -->
+                 </div>
+            </div>
+
+        </div>
+
+        <!-- System Message Overlay (Branding) -->
+        <div class="absolute bottom-6 right-6 p-4 rounded-2xl glass-panel text-[10px] font-bold text-slate-500 tech-font uppercase tracking-[3px] pointer-events-none opacity-50">
+            DuDe Hawaiian Integration Layer v2.0
+        </div>
+    </main>
+
+    <script>
+        // CONFIGURATION
+        const API_CCTV = "/recordings"; // Adjust based on Nginx proxy
+        const API_FILES = "/files";      // Future: ag_boss proxy
+
+        // STATE
+        let activeTab = 'files';
+
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-cyan-500/10', 'text-cyan-400', 'font-semibold', 'border-cyan-500/20');
+                b.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('text-slate-400');
+            activeBtn.classList.add('bg-cyan-500/10', 'text-cyan-400', 'font-semibold', 'border-cyan-500/20');
+
+            if(tabId === 'cctv') initCCTV();
+            if(tabId === 'files') loadDummyFiles();
+        }
+
+        // --- MY FILES LOGIC ---
+        function loadDummyFiles() {
+            const grid = document.getElementById('file-grid');
+            const files = [
+                { name: "Family_Secret_Recipe.pdf", size: "1.2 MB", time: "10m ago", type: "pdf", color: "orange" },
+                { name: "Private_Key_Backup.txt", size: "4 KB", time: "2h ago", type: "txt", color: "blue" },
+                { name: "Vault_Design_v2.psd", size: "145 MB", time: "Yesterday", type: "img", color: "purple" }
+            ];
+            
+            grid.innerHTML = files.map(f => `
+                <div class="file-card p-5 rounded-2xl cursor-pointer group">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="p-3 rounded-xl bg-${f.color}-500/10 text-${f.color}-400 border border-${f.color}-500/20 group-hover:bg-${f.color}-500/20 transition">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <button class="text-slate-600 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></button>
+                    </div>
+                    <h3 class="font-bold text-slate-200 truncate pr-4">${f.name}</h3>
+                    <div class="flex items-center justify-between mt-2 text-[10px] text-slate-500 uppercase tech-font">
+                        <span>${f.time}</span>
+                        <span>${f.size}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- CCTV LOGIC ---
+        async function initCCTV() {
+            const cameraSelect = document.getElementById('cameraSelect');
+            const dateSelect = document.getElementById('dateSelect');
+            dateSelect.valueAsDate = new Date();
+
+            try {
+                const res = await fetch(API_CCTV + "/");
+                if(!res.ok) throw new Error("Failed to load recordings root");
+                const data = await res.json();
+                
+                // Existing logic from playback.html
+                const cameras = data.filter(item => item.type === "directory").map(item => item.name);
+                cameraSelect.innerHTML = '<option value="" disabled selected>Select Camera</option>';
+                cameras.forEach(cam => {
+                    const option = document.createElement('option');
+                    option.value = cam;
+                    option.textContent = cam.toUpperCase();
+                    cameraSelect.appendChild(option);
+                });
+                if(cameras.length > 0) cameraSelect.value = cameras[0];
+
+            } catch (err) {
+                console.error(err);
+                cameraSelect.innerHTML = '<option disabled>Offline</option>';
+            }
+        }
+
+        async function loadCCTV() {
+            const cam = document.getElementById('cameraSelect').value;
+            const date = document.getElementById('dateSelect').value;
+            const listEl = document.getElementById('cctv-list');
+            
+            if(!cam || !date) return alert("Select Node & Cycle");
+
+            listEl.innerHTML = '<p class="text-center text-cyan-400 py-10 text-xs animate-pulse">Syncing Encrypted Packets...</p>';
+
+            try {
+                const url = `${API_CCTV}/${cam}/${date}/`;
+                const res = await fetch(url);
+                if(!res.ok) throw new Error("Folder not found");
+                const data = await res.json();
+                const videos = data.filter(f => f.name.endsWith('.mp4')).sort((a,b) => a.name.localeCompare(b.name));
+                
+                document.getElementById('fileCount').innerText = videos.length;
+                renderCCTVList(videos, cam, date);
+
+            } catch (err) {
+                listEl.innerHTML = '<p class="text-center text-red-500 py-10 text-xs uppercase">No Packets Found for this Cycle</p>';
+            }
+        }
+
+        function renderCCTVList(files, cam, date) {
+            const listEl = document.getElementById('cctv-list');
+            listEl.innerHTML = files.map(f => {
+                let timeDisplay = f.name;
+                const match = f.name.match(/_(\d{2}-\d{2}-\d{2})\.mp4$/);
+                if(match) timeDisplay = match[1].replace(/-/g, ':');
+
+                return `
+                    <div onclick="playCCTV('${cam}', '${date}', '${f.name}')" class="flex items-center justify-between p-3 bg-white/5 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition group border border-transparent hover:border-cyan-500/20">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-cyan-500 group-hover:text-slate-900 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /></svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-slate-200">${timeDisplay}</div>
+                                <div class="text-[10px] text-slate-500 tech-font uppercase">${formatBytes(f.size)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function playCCTV(cam, date, filename) {
+            const player = document.getElementById('mainPlayer');
+            const title = document.getElementById('videoTitle');
+            const dl = document.getElementById('downloadBtn');
+            const url = `${API_CCTV}/${cam}/${date}/${filename}`;
+
+            player.src = url;
+            player.play();
+            title.innerText = `NODE: ${cam} | PKT: ${filename}`;
+            dl.href = url;
+            dl.classList.remove('hidden');
+            
+            document.getElementById('main-content-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function formatBytes(bytes) {
+            if (!+bytes) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+        }
+
+        // INITIAL LOAD
+        window.onload = () => {
+            switchTab('files');
+        };
+    </script>
+</body>
+</html>

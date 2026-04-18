@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#1E3A5F"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
+    
+    <!-- Inner Circle (Gold Ring) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#D4AF37"
+        android:strokeWidth="3"
+        android:pathData="M54,54m-42,0a42,42 0,1 1,84 0a42,42 0,1 1,-84 0"/>
+    
+    <!-- Scales of Justice - Left Scale -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M28,45 L38,45 L33,35 Z"/>
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M33,35 L33,25 L35,25 L35,35"/>
+    
+    <!-- Scales of Justice - Right Scale -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M70,45 L80,45 L75,35 Z"/>
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M75,35 L75,25 L73,25 L73,35"/>
+    
+    <!-- Center Pillar -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M52,25 L56,25 L56,75 L52,75 Z"/>
+    
+    <!-- Crossbar -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M25,35 L83,35 L83,38 L25,38 Z"/>
+    
+    <!-- Base -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M44,75 L64,75 L62,82 L46,82 Z"/>
+    
+    <!-- Center Gem (Wisdom) -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M54,25 L56,27 L54,29 L52,27 Z"/>
+</vector>

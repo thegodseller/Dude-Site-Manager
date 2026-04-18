@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลงทะเบียน - Arany AutoCare</title>
+  <link rel="stylesheet" href="assets/autocare.css">
+</head>
+<body>
+  <div class="container">
+    <img src="assets/logo.png" class="logo-img" alt="Arany AutoCare">
+    <h1>ลงทะเบียนสมาชิก</h1>
+    <p class="subtitle">Arany AutoCare</p>
+    
+    <form id="registerForm">
+      <div class="form-group">
+        <label>ชื่อ *</label>
+        <input type="text" id="firstName" required placeholder="ชื่อจริง">
+      </div>
+      
+      <div class="form-group">
+        <label>นามสกุล *</label>
+        <input type="text" id="lastName" required placeholder="นามสกุล">
+      </div>
+      
+      <div class="form-group">
+        <label>เบอร์โทรศัพท์ *</label>
+        <input type="tel" id="phone" required placeholder="08X-XXX-XXXX">
+      </div>
+      
+      <!-- Email removed as not in backend schema yet -->
+      
+      <button type="submit" class="btn-primary" id="submitBtn">
+        ลงทะเบียน
+      </button>
+    </form>
+    
+    <div class="message" id="message" style="display:none;"></div>
+  </div>
+  
+  <script src="assets/autocare.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lineUserId = params.get('line_user_id');
+    
+    if (!lineUserId) {
+      showMessage('ไม่พบ LINE User ID กรุณาเปิดผ่าน LINE', 'error');
+    }
+    
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'กำลังบันทึก...';
+      
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      
+      const data = {
+        line_user_id: lineUserId,
+        name: `${firstName} ${lastName}`.trim(), // 🇹🇭 Combine for schema
+        phone: document.getElementById('phone').value
+      };
+      
+      try {
+        // 🇹🇭 Fix API Endpoint: /customers/register
+        const resp = await fetch(`${API_BASE}/customers/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        // Backend returns the created customer object, so check status
+        if (resp.ok) {
+          const result = await resp.json(); // It's the customer obj
+          showMessage('ลงทะเบียนสำเร็จ! กำลังไปหน้าหลัก...', 'success');
+          setTimeout(() => {
+            window.location.href = `customer.html?line_user_id=${lineUserId}`;
+          }, 1500);
+        } else {
+          showMessage('เกิดข้อผิดพลาด: ' + resp.statusText, 'error');
+          btn.disabled = false;
+          btn.textContent = 'ลงทะเบียน';
+        }
+      } catch (err) {
+        showMessage('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
+        btn.disabled = false;
+        btn.textContent = 'ลงทะเบียน';
+      }
+    });
+    
+    function showMessage(text, type) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = 'message ' + type;
+      msg.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

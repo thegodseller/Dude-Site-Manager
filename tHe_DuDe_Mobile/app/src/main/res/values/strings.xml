@@ -1,0 +1,69 @@
+<resources>
+    <!-- 🏛️ App Name & Branding -->
+    <string name="app_name">Themis Verdict</string>
+    <string name="app_full_name">Themis Verdict: Manus Reasoning</string>
+    <string name="app_tagline">คำตัดสินที่เหนือกว่าด้วย AI</string>
+    <string name="app_tagline_en">Superior Judgment Powered by AI</string>
+    
+    <!-- 🔗 The Four Pillars API Endpoints -->
+    <string name="hermes_endpoint">Hermes (Gatekeeper) Port 11112</string>
+    <string name="athena_endpoint">Athena (Knowledge) Port 11113</string>
+    <string name="mnemosyne_endpoint">Mnemosyne (Memory) Port 13332</string>
+    <string name="librarian_endpoint">Librarian (Documents) Port 11114</string>
+    
+    <!-- 🔔 Service & Notifications -->
+    <string name="workflow_service_desc">บริการซิงค์ข้อมูล Workflow แบบ Real-time</string>
+    <string name="workflow_service_title">กำลังเชื่อมต่อกับระบบวิเคราะห์...</string>
+    <string name="workflow_complete">✅ วิเคราะห์เสร็จสิ้น</string>
+    <string name="workflow_in_progress">⏳ กำลังวิเคราะห์...</string>
+    
+    <!-- 🎯 UI Labels -->
+    <string name="input_choice_a">สิ่งที่คุณลังเล (ทางเลือก A)</string>
+    <string name="input_choice_b">สิ่งที่คุณลังเล (ทางเลือก B)</string>
+    <string name="input_context">ข้อเท็จจริง/บริบท/ข้อมูลอ้างอิง</string>
+    <string name="button_start_analysis">เริ่มวิเคราะห์</string>
+    <string name="button_generate_report">generate report</string>
+    <string name="button_back_home">กลับไปเริ่มต้น</string>
+    <string name="button_back">แชร์รายงานนี้</string>
+    
+    <!-- ⚖️ Verdict Display -->
+    <string name="verdict_title">คำตัดสินสุดท้าย</string>
+    <string name="confidence_level">ระดับความเชื่อมั่น</string>
+    <string name="reasoning_title">เหตุผลประกอบ</string>
+    
+    <!-- 🦉 Athena Insight -->
+    <string name="athena_insight_title">Athena Insight</string>
+    <string name="athena_insight_subtitle">เปรียบเทียบทุกความลังเลด้วยข้อมูลจริง</string>
+    
+    <!-- 🧠 Manus Reasoning -->
+    <string name="manus_reasoning_title">Manus Reasoning</string>
+    <string name="manus_reasoning_subtitle">วิเคราะห์เชิงลึกด้วย AI</string>
+    
+    <!-- 🔄 Workflow Status -->
+    <string name="status_collecting_data">กำลังวิเคราะห์ข้อกฎหมาย...</string>
+    <string name="status_analyzing">ประมวลผลความเป็นไปได้...</string>
+    <string name="status_evaluating">กำลังวิเคราะห์ข้อกฎหมาย...</string>
+    <string name="status_generating">ประมวลผลความเป็นไปได้...</string>
+    <string name="confidence_percentage">ระดับวิเคราะห์สำเร็จ: %d%%</string>
+    
+    <!-- 🌐 URLs -->
+    <string name="url_themis_main">https://themis.thegodseller.com</string>
+    <string name="url_themis_manus">https://themis.thegodseller.com/manus-reasoning</string>
+    <string name="url_themis_auth">https://themis.thegodseller.com/auth</string>
+    
+    <!-- 📝 Session & Auth -->
+    <string name="session_expired">เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่</string>
+    <string name="login_success">เข้าสู่ระบบสำเร็จ</string>
+    <string name="logout_success">ออกจากระบบสำเร็จ</string>
+    
+    <!-- ⚠️ Error Messages -->
+    <string name="error_network">ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์</string>
+    <string name="error_no_email_app">ไม่พบแอปอีเมล</string>
+    <string name="error_no_phone_app">ไม่สามารถโทรออกได้</string>
+    <string name="error_no_browser">ไม่สามารถเปิดลิงก์ได้</string>
+    <string name="error_no_app">ไม่พบแอปที่รองรับลิงก์นี้</string>
+    
+    <!-- ℹ️ Info Messages -->
+    <string name="info_sync_started">เริ่มการซิงค์ข้อมูล...</string>
+    <string name="info_sync_complete">ซิงค์ข้อมูลเสร็จสิ้น</string>
+</resources>

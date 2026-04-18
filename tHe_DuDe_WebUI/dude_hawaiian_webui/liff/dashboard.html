@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DuDe AI Hub 2026</title>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/dude_liff_2026.css">
+    
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-chip">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User" class="profile-img" id="user-img">
+            <div class="user-info">
+                <div class="greeting">Hello,</div>
+                <div class="username" id="user-name">Loading...</div>
+            </div>
+        </div>
+        <div class="status-indicator">
+            <span class="material-icons-round" style="color:var(--secondary);">wifi</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="gradient-text">DuDe<br>AI Hub</h1>
+        <p>Your intelligent assistant ecosystem.</p>
+    </section>
+
+    <!-- Service Grid -->
+    <main class="service-grid">
+        
+        <!-- DuDe Vision (Premium Feature) -->
+        <div class="card-wrapper large">
+            <div class="service-card" data-service="vision">
+                <div class="icon-box">
+                    <span class="material-icons-round">visibility</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe Vision</div>
+                    <div class="card-desc">Smart CCTV & AI Analysis</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe Drive -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="drive">
+                <div class="icon-box">
+                    <span class="material-icons-round">cloud_upload</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe Drive</div>
+                    <div class="card-desc">Storage & Clips</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe Note -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="note">
+                <div class="icon-box">
+                    <span class="material-icons-round">edit_note</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe Note</div>
+                    <div class="card-desc">AI Notes & Reminders</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe RAG -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="rag">
+                <div class="icon-box">
+                    <span class="material-icons-round">psychology</span>
+                </div>
+                <div>
+                    <div class="card-title">DuDe RAG</div>
+                    <div class="card-desc">Knowledge Base</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DuDe Room Service -->
+        <div class="card-wrapper">
+            <div class="service-card" data-service="room">
+                <div class="icon-box">
+                    <span class="material-icons-round">room_service</span>
+                </div>
+                <div>
+                    <div class="card-title">Hotel Service</div>
+                    <div class="card-desc">Room & Sales</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Upgrade Modal -->
+    <div id="upgrade-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="material-icons-round" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;">lock</span>
+            <h2 id="upgrade-service-name">Service Locked</h2>
+            <p style="color: var(--text-muted); margin-top: 8px;">
+                This premium feature is not included in your current package. Upgrade to access full capabilities.
+            </p>
+            <button class="btn-upgrade" onclick="goToUpgrade()">Upgrade Now</button>
+            <button class="btn-close" onclick="closeModal()">Maybe Later</button>
+        </div>
+    </div>
+
+    <!-- Core Logic -->
+    <script src="assets/js/dude_liff_2026.js"></script>
+</body>
+</html>

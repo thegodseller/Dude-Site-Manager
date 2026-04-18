@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+    <!-- Background -->
+    <path
+        android:fillColor="#0A1628"
+        android:pathData="M0,0h288v288h-288z"/>
+    
+    <!-- Scales of Justice - Left Scale -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M94,140 L134,140 L114,100 Z"/>
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M114,100 L114,70 L122,70 L122,100"/>
+    
+    <!-- Scales of Justice - Right Scale -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M154,140 L194,140 L174,100 Z"/>
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M174,100 L174,70 L166,70 L166,100"/>
+    
+    <!-- Center Pillar -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M136,70 L152,70 L152,210 L136,210 Z"/>
+    
+    <!-- Crossbar -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M70,100 L218,100 L218,114 L70,114 Z"/>
+    
+    <!-- Base -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M108,210 L180,210 L172,230 L116,230 Z"/>
+    
+    <!-- Center Gem (Wisdom) -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M144,70 L152,78 L144,86 L136,78 Z"/>
+    
+    <!-- Glow Effect -->
+    <path
+        android:fillColor="#40D4AF37"
+        android:pathData="M144,144m-80,0a80,80 0,1 1,160 0a80,80 0,1 1,-160 0"/>
+</vector>

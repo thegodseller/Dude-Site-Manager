@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — DuDe Hawaiian</title>
+  <style>
+    /* 🇹🇭 สไตล์ตาม UI เดิม - Purple Gradient Theme */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Thai', sans-serif;
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #5b21b6 100%);
+      min-height: 100vh;
+      color: #e0e7ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 700px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+    
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    }
+    
+    .icon-wrapper svg {
+      width: 40px;
+      height: 40px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+    }
+    
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 16px;
+      color: #c4b5fd;
+      margin-bottom: 32px;
+    }
+    
+    .section {
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #a78bfa;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-title::before {
+      content: '●';
+      color: #22c55e;
+      font-size: 12px;
+    }
+    
+    .section p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #ddd6fe;
+      margin-bottom: 8px;
+    }
+    
+    .section ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+    
+    .section li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #c4b5fd;
+      margin-bottom: 6px;
+    }
+    
+    .highlight {
+      background: rgba(139, 92, 246, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #e9d5ff;
+      font-weight: 500;
+    }
+    
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 32px;
+      padding: 14px 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: #c4b5fd;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 13px;
+      color: #a78bfa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Lock Icon -->
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24">
+        <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </div>
+    
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">Your data stays with you. Locally.</p>
+    
+    <!-- Local-First Promise -->
+    <div class="section">
+      <div class="section-title">Local-First Promise</div>
+      <p>
+        DuDe Hawaiian is designed as a <span class="highlight">local-first AI assistant</span>. 
+        Your personal data, notes, and health records are stored directly on your own server (The DuDe Machine).
+      </p>
+    </div>
+    
+    <!-- Data Collection -->
+    <div class="section">
+      <div class="section-title">Data Collection</div>
+      <p>
+        We collect minimal data necessary for the operation of the AI agents (Boss, Butler, Librarian, etc.). 
+        This includes:
+      </p>
+      <ul>
+        <li>Chat logs (stored locally in Vector DB)</li>
+        <li>IoT device states</li>
+        <li>Health metrics you explicitly input</li>
+      </ul>
+    </div>
+    
+    <!-- Third-Party Sharing -->
+    <div class="section">
+      <div class="section-title">Third-Party Sharing</div>
+      <p>
+        We do <strong>not</strong> sell your data. External connections (like LINE Webhook) are used solely to 
+        facilitate communication features you enable.
+      </p>
+    </div>
+    
+    <!-- Back Button -->
+    <a href="/" class="btn-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to DuDe Dashboard
+    </a>
+    
+    <div class="footer">
+      © 2025 DuDe Hawaiian. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

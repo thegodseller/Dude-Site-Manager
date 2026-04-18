@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV Playback - DuDe Hawaiian</title>
+    <!-- Use Tailwind CSS (CDN for simplicity as per existing site structure, or standard CSS if preferred, but existing site likely uses a mix) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <nav class="p-6 border-b border-gray-800 bg-gray-900/50 backdrop-blur fixed w-full z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">DuDe Hawaiian</a>
+            <div class="space-x-6">
+                <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+                <a href="how-to-use.html" class="hover:text-blue-400 transition">How to Use</a>
+                <a href="pricing.html" class="hover:text-blue-400 transition">Pricing</a>
+                <a href="playback.html" class="text-blue-400 font-semibold">Play Back</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto pt-32 px-4">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold mb-4">CCTV Playback</h1>
+            <p class="text-gray-400">Select a camera and date to view recordings.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar: Filters -->
+            <div class="glass-panel p-6 rounded-2xl h-fit">
+                <h3 class="text-xl font-semibold mb-4 text-blue-300">Filters</h3>
+                
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-2">Camera</label>
+                    <select id="cameraSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition">
+                        <!-- Populated by JS -->
+                        <option value="" disabled selected>Loading cameras...</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-2">Date</label>
+                    <input type="date" id="dateSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition">
+                </div>
+
+                <button id="loadBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition shadow-lg shadow-blue-900/20">
+                    Load Recordings
+                </button>
+            </div>
+
+            <!-- Content: Player & List -->
+            <div class="lg:col-span-3 space-y-6">
+                
+                <!-- Video Player -->
+                <div class="glass-panel p-2 rounded-2xl overflow-hidden shadow-2xl">
+                    <video id="mainPlayer" controls class="w-full rounded-xl bg-black aspect-video">
+                        <p class="text-center py-20 text-gray-500">Select a video to play</p>
+                    </video>
+                    <div class="p-4 flex justify-between items-center">
+                        <h2 id="videoTitle" class="text-lg font-medium text-white">No video selected</h2>
+                        <a id="downloadBtn" href="#" download class="hidden bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download
+                        </a>
+                    </div>
+                </div>
+
+                <!-- File List -->
+                <div class="glass-panel p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center justify-between">
+                        <span>Recordings</span>
+                        <span id="fileCount" class="text-sm font-normal text-gray-400">0 files found</span>
+                    </h3>
+                    <div id="fileList" class="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div class="text-center text-gray-500 py-10">Select camera and date to load files</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "/recordings";
+        
+        const cameraSelect = document.getElementById('cameraSelect');
+        const dateSelect = document.getElementById('dateSelect');
+        const loadBtn = document.getElementById('loadBtn');
+        const fileList = document.getElementById('fileList');
+        const mainPlayer = document.getElementById('mainPlayer');
+        const videoTitle = document.getElementById('videoTitle');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const fileCount = document.getElementById('fileCount');
+
+        // Initialize
+        async function init() {
+            // Set today as default date
+            dateSelect.valueAsDate = new Date();
+            
+            // 1. Fetch Cameras (Directories in /recordings/)
+            try {
+                const res = await fetch(API_BASE + "/");
+                if(!res.ok) throw new Error("Failed to load recordings root");
+                const data = await res.json();
+                
+                cameraSelect.innerHTML = '<option value="" disabled selected>Select Camera</option>';
+                
+                // Filter only directories
+                const cameras = data.filter(item => item.type === "directory").map(item => item.name);
+                
+                cameras.forEach(cam => {
+                    const option = document.createElement('option');
+                    option.value = cam;
+                    option.textContent = cam.toUpperCase(); // Prettify name
+                    cameraSelect.appendChild(option);
+                });
+
+                if(cameras.length > 0) {
+                    cameraSelect.value = cameras[0]; // Auto select first cam
+                }
+
+            } catch (err) {
+                console.error(err);
+                cameraSelect.innerHTML = '<option disabled>Error loading cameras</option>';
+            }
+        }
+
+        async function loadRecordings() {
+            const cam = cameraSelect.value;
+            const date = dateSelect.value; // YYYY-MM-DD format
+            
+            if(!cam || !date) {
+                alert("Please select a camera and a date.");
+                return;
+            }
+
+            fileList.innerHTML = '<div class="text-center text-gray-400 py-5">Loading...</div>';
+            fileCount.innerText = "Loading...";
+
+            try {
+                // Path structure: /recordings/{cam}/{date}/
+                // NOTE: Nginx autoindex json returns file list
+                const url = `${API_BASE}/${cam}/${date}/`;
+                const res = await fetch(url);
+                
+                if(res.status === 404) {
+                     fileList.innerHTML = '<div class="text-center text-gray-500 py-5">No recordings found for this date.</div>';
+                     fileCount.innerText = "0 files found";
+                     return;
+                }
+
+                if(!res.ok) throw new Error("Failed to fetch files");
+
+                const data = await res.json();
+                // Filter .mp4 files
+                const videos = data.filter(f => f.name.endsWith('.mp4'));
+
+                // Sort by name (time) desc or asc? Usually desc is better (newest first)
+                // But user might want to watch timeline. Let's do ASC (Morning -> Evening)
+                videos.sort((a,b) => a.name.localeCompare(b.name));
+
+                renderFileList(videos, cam, date);
+
+            } catch (err) {
+                console.error(err);
+                fileList.innerHTML = '<div class="text-center text-red-400 py-5">Error loading files or no folder exists.</div>';
+                fileCount.innerText = "Error";
+            }
+        }
+
+        function renderFileList(files, cam, date) {
+            fileList.innerHTML = '';
+            fileCount.innerText = `${files.length} files found`;
+
+            if(files.length === 0) {
+                fileList.innerHTML = '<div class="text-center text-gray-500 py-5">No .mp4 files found.</div>';
+                return;
+            }
+
+            files.forEach(file => {
+                // Parse time from filename if possible? 
+                // Filename: {cam}_%Y-%m-%d_%H-%M-%S.mp4
+                // Extract HH:MM:SS
+                let timeDisplay = file.name;
+                const match = file.name.match(/_(\d{2}-\d{2}-\d{2})\.mp4$/);
+                if(match) {
+                    timeDisplay = match[1].replace(/-/g, ':');
+                }
+
+                const el = document.createElement('div');
+                el.className = "flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-700 rounded-lg cursor-pointer transition group";
+                el.onclick = () => playVideo(cam, date, file.name);
+
+                el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-200">${timeDisplay}</div>
+                            <div class="text-xs text-gray-500 size-${file.size}">${formatBytes(file.size)}</div>
+                        </div>
+                    </div>
+                    <div class="text-gray-500 group-hover:text-blue-300">
+                        Play
+                    </div>
+                `;
+                fileList.appendChild(el);
+            });
+        }
+
+        function playVideo(cam, date, filename) {
+            const url = `${API_BASE}/${cam}/${date}/${filename}`;
+            mainPlayer.src = url;
+            mainPlayer.play();
+            
+            videoTitle.innerText = `${cam} - ${filename}`;
+            downloadBtn.href = url;
+            downloadBtn.classList.remove('hidden');
+            
+            // Scroll to top to see player
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        // Listeners
+        loadBtn.addEventListener('click', loadRecordings);
+        
+        // Load cameras on start
+        init();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Hub - DuDe Super Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-gold: #D4AF37;
+            --glass-bg: rgba(15, 23, 42, 0.7);
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-social {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-social:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950">
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-3">
+                <img src="assets/logo.png" class="w-10 h-10 rounded-full border border-[#D4AF37]">
+                <span class="text-lg font-bold font-tech tracking-wider text-[#D4AF37]">The Godseller</span>
+            </a>
+            <a href="index.html"
+                class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white">Home</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-6 py-20 max-w-4xl">
+        <div class="text-center mb-16">
+            <h1 class="text-4xl lg:text-5xl font-bold font-tech mb-4 uppercase tracking-tighter">Secure <span
+                    class="text-[#D4AF37]">Download</span> Hub</h1>
+            <p class="text-slate-400">เข้าสู่ระบบเพื่อเข้าถึงไฟล์ Private และ Bundle เฉพาะสำหรับคุณ</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12">
+            <!-- Identity Section -->
+            <div id="auth-section" class="glass p-8 rounded-3xl border-[#D4AF37]/20">
+                <h2 class="text-xl font-bold mb-8 uppercase tracking-widest text-[#D4AF37]">Identity Verification</h2>
+                <div id="auth-content" class="space-y-4">
+                    <button onclick="location.href='/control/api/auth/line/login'"
+                        class="btn-social w-full bg-[#00B900] text-white font-bold py-4 rounded-xl flex items-center justify-center space-x-3">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg"
+                            class="w-6 h-6 invert">
+                        <span>Login with LINE</span>
+                    </button>
+                    <button disabled title="Coming Soon"
+                        class="btn-social w-full bg-[#0088cc]/50 text-white/50 font-bold py-4 rounded-xl flex items-center justify-center space-x-3 cursor-not-allowed">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg"
+                            class="w-6 h-6 opacity-30">
+                        <span>Login with Telegram</span>
+                    </button>
+                    <button disabled title="Coming Soon"
+                        class="btn-social w-full bg-white/20 text-black/50 font-bold py-4 rounded-xl flex items-center justify-center space-x-3 cursor-not-allowed">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_&quot;G&quot;_logo.svg"
+                            class="w-6 h-6 opacity-20">
+                        <span>Login with Google</span>
+                    </button>
+                </div>
+                <p class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest leading-relaxed text-center">
+                    *การเข้าสู่ระบบจะช่วยให้เรายืนยันสิทธิ์ในการเข้าถึงไฟล์ <br> Le Blocs TV และระบบจัดการส่วนตัวอื่นๆ
+                </p>
+            </div>
+
+            <!-- File List -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-bold mb-8 uppercase tracking-widest text-white">Available Packages</h2>
+                <div id="file-list" class="space-y-4">
+                    <!-- Default Public File -->
+                    <div
+                        class="glass p-5 rounded-2xl border-white/5 flex items-center justify-between group hover:border-[#D4AF37]/50 transition">
+                        <div class="flex items-center space-x-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm">จตุรทิศสัญจร.apk</h3>
+                                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Public Client Bundle</p>
+                            </div>
+                        </div>
+                        <a href="#"
+                            class="text-[10px] font-bold text-[#D4AF37] hover:underline uppercase tracking-widest">Download</a>
+                    </div>
+                    
+                    <div id="private-files-container" class="space-y-4">
+                        <!-- Private files will be injected here -->
+                    </div>
+
+                    <!-- Placeholder for loading -->
+                    <div id="private-files-placeholder"
+                        class="py-10 text-center border-2 border-dashed border-white/5 rounded-2xl">
+                        <p class="text-[10px] text-slate-600 uppercase tracking-widest">Login to unlock Private Files
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const DOWNLOAD_API = "/control/api/downloads";
+
+        async function fetchFiles() {
+            const privateContainer = document.getElementById('private-files-container');
+            const placeholder = document.getElementById('private-files-placeholder');
+            const authContent = document.getElementById('auth-content');
+
+            try {
+                const res = await fetch(DOWNLOAD_API);
+                const data = await res.json();
+
+                if (data.status === "authenticated") {
+                    if (placeholder) placeholder.style.display = 'none';
+
+                    // Update Auth UI
+                    authContent.innerHTML = `
+                        <div class="text-center py-6">
+                            <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/50">
+                                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <h2 class="text-lg font-bold text-white mb-1 uppercase tracking-widest">ยินดีต้อนรับ</h2>
+                            <p class="text-cyan-400 font-tech text-xs mb-6">${data.user_name}</p>
+                            <button onclick="location.href='/control/api/auth/logout'" class="text-[10px] text-slate-500 hover:text-white uppercase tracking-widest underline decoration-dotted">Logout</button>
+                        </div>
+                    `;
+
+                    // Render Private Files
+                    privateContainer.innerHTML = data.files.map(file => `
+                        <div class="glass p-5 rounded-2xl border-white/5 flex items-center justify-between group hover:border-cyan-500/50 transition bg-cyan-500/5">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm text-cyan-50">${file.name}</h3>
+                                    <p class="text-[10px] text-cyan-500/70 uppercase tracking-widest">${file.category}</p>
+                                </div>
+                            </div>
+                            <a href="${file.url}" class="text-[10px] font-bold text-cyan-400 hover:underline uppercase tracking-widest">Download</a>
+                        </div>
+                    `).join('');
+                } else {
+                     if (placeholder) placeholder.style.display = 'block';
+                }
+            } catch (e) {
+                console.error("API Error:", e);
+            }
+        }
+
+        // Check if already authenticated on load
+        window.onload = () => fetchFiles();
+    </script>
+</body>
+
+</html>

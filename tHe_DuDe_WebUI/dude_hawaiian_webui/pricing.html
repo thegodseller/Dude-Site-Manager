@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Pricing - The Godseller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #bc13fe;
+            --neon-cyan: #00f3ff;
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body { 
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif; 
+            background-color: #020617;
+            color: #f8fafc;
+        }
+        h1, h2, h3, .font-tech { font-family: 'Orbitron', sans-serif; }
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+        .neon-border-gold { border: 1px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 py-4 px-6 border-b border-white/5">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-20 h-20 rounded-full border-2 border-[#D4AF37] overflow-hidden">
+                    <img src="assets/logo.png" class="w-full h-full object-cover">
+                </div>
+                <a href="index.html" class="text-xl font-bold font-tech tracking-wider text-[#D4AF37]">The Godseller</a>
+            </div>
+            <div class="flex items-center space-x-6 hidden lg:flex">
+                <a href="index.html" class="text-xs uppercase tracking-widest text-slate-400 hover:text-white transition">Back to Home</a>
+                <a href="how-to-use.html" class="text-xs uppercase tracking-widest text-slate-400 hover:text-white transition">How to use</a>
+                <a href="privacy.html" class="text-xs uppercase tracking-widest text-slate-400 hover:text-white transition">Privacy</a>
+                <a href="https://ui.thegodseller.com" class="bg-[#D4AF37] text-black px-6 py-2 rounded-sm font-bold text-[10px] tracking-widest uppercase hover:bg-yellow-500 transition">Log In</a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full glass border-t border-white/10 p-6 flex flex-col space-y-4 lg:hidden z-40 bg-[#020617]/90">
+            <a href="index.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Back to Home</a>
+            <a href="pricing.html" class="text-white block py-2 border-b border-white/5 border-l-4 pl-2 border-l-[#D4AF37]">Pricing</a>
+            <a href="privacy.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Privacy</a>
+            <a href="how-to-use.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">How to use</a>
+            <a href="https://ui.thegodseller.com" class="text-[#D4AF37] font-bold block py-2 mt-2">Log In</a>
+        </div>
+    </nav>
+
+    <!-- Pricing Content -->
+    <main class="flex-grow py-32 container mx-auto px-6">
+        <div class="text-center mb-24">
+            <h1 class="text-5xl lg:text-7xl font-bold mb-6 italic tracking-tighter uppercase">Elite <span class="text-[#D4AF37]">Investment</span></h1>
+            <p class="text-slate-400 max-w-2xl mx-auto uppercase tracking-[0.3em] text-xs">Premium AI Infrastructure & Smart Service Tiers</p>
+            <div class="w-32 h-[1px] bg-[#D4AF37]/50 mx-auto mt-10"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <!-- Starter -->
+            <div class="glass p-12 rounded-[2rem] border-white/5 flex flex-col items-center group hover:border-[#D4AF37]/20 transition">
+                <div class="text-xs font-bold tracking-[0.4em] uppercase text-slate-500 mb-6">Standard Tier</div>
+                <h3 class="text-3xl font-bold mb-4 font-tech italic">Starter AI</h3>
+                <div class="text-4xl font-bold text-[#D4AF37] mb-12">CONTACT US</div>
+                <ul class="space-y-6 mb-16 text-slate-400 w-full text-sm">
+                    <li class="flex items-center border-b border-white/5 pb-4"><span class="text-[#D4AF37] mr-4">▪</span> 1x DuDe Hawaiian Hybrid Core</li>
+                    <li class="flex items-center border-b border-white/5 pb-4"><span class="text-[#D4AF37] mr-4">▪</span> Basic Automation Routines</li>
+                    <li class="flex items-center border-b border-white/5 pb-4"><span class="text-[#D4AF37] mr-4">▪</span> 1 Year Technical Support</li>
+                    <li class="flex items-center border-b border-white/5 pb-4"><span class="text-[#D4AF37] mr-4">▪</span> Edge Computing Hardware</li>
+                </ul>
+                <a href="mailto:chanukrit@thegodseller.com" class="w-full py-4 glass border-white/10 rounded-xl font-bold tracking-widest uppercase text-xs hover:bg-white/5 transition text-center">Inquire Plan</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="glass p-12 rounded-[2rem] neon-border-gold bg-[#D4AF37]/5 relative flex flex-col items-center">
+                <div class="absolute top-0 right-0 bg-[#D4AF37] text-black px-6 py-1.5 font-bold text-[8px] tracking-[0.3em] uppercase rounded-bl-2xl">Full System</div>
+                <div class="text-xs font-bold tracking-[0.4em] uppercase text-[#D4AF37] mb-6">Premium Tier</div>
+                <h3 class="text-3xl font-bold mb-4 font-tech italic">Enterprise Elite</h3>
+                <div class="text-4xl font-bold text-white mb-12 uppercase italic">Custom Build</div>
+                <ul class="space-y-6 mb-16 text-slate-300 w-full text-sm">
+                    <li class="flex items-center border-b border-[#D4AF37]/10 pb-4"><span class="text-[#D4AF37] mr-4">★</span> Full DuDe Cluster Integration</li>
+                    <li class="flex items-center border-b border-[#D4AF37]/10 pb-4"><span class="text-[#D4AF37] mr-4">★</span> Aegis Vision Security Stack</li>
+                    <li class="flex items-center border-b border-[#D4AF37]/10 pb-4"><span class="text-[#D4AF37] mr-4">★</span> 24/7 Remote Monitoring</li>
+                    <li class="flex items-center border-b border-[#D4AF37]/10 pb-4"><span class="text-[#D4AF37] mr-4">★</span> White-Glove Installation</li>
+                </ul>
+                <a href="mailto:chanukrit@thegodseller.com" class="w-full py-4 bg-[#D4AF37] text-black rounded-xl font-bold tracking-widest uppercase text-xs hover:bg-yellow-500 transition shadow-[0_0_30px_rgba(212,175,55,0.4)] text-center">Contact chanukrit@thegodseller.com</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-12 border-t border-white/5">
+        <div class="container mx-auto px-6 text-center">
+            <!-- DBD Verified Badge -->
+            <div id="dbd-badge" class="flex justify-center py-6 mb-8">
+                <a href='https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' target="_blank">
+                    <img src='https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' alt="DBD Registered" />
+                </a>
+            </div>
+
+            <div class="text-[10px] tracking-[0.3em] text-white font-bold italic uppercase flex justify-center space-x-8 flex-wrap gap-y-4 mb-8">
+                <a href="privacy.html" class="hover:text-[#D4AF37] transition">Privacy</a>
+                <a href="refund.html" class="hover:text-[#D4AF37] transition">Terms & Refund</a>
+                <a href="mailto:chanukrit@thegodseller.com" class="hover:text-[#D4AF37] transition">Complaint Channel</a>
+            </div>
+            <div class="text-[10px] tracking-[0.3em] text-white font-bold italic uppercase">
+                © 2026 The Godseller. UNITING INTELLIGENCE.
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Mobile Menu Script -->
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        if (btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dude POS - Chat-Based Sales Tracking | The God Seller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-orange: #ff9d00;
+            --neon-gold: #ffd700;
+            --glass-bg: rgba(15, 23, 42, 0.8);
+        }
+        body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; background-color: #020617; color: #f8fafc; }
+        h1, h2, h3, .font-tech { font-family: 'Orbitron', sans-serif; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255,165,0,0.2); }
+        .text-glow { text-shadow: 0 0 15px var(--neon-orange); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="glass sticky top-0 z-50 py-4 px-6 border-b border-orange-500/30">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full border border-orange-500 overflow-hidden">
+                    <img src="assets/logo.png" class="w-full h-full object-cover">
+                </div>
+                <a href="index.html" class="text-lg font-bold font-tech tracking-wider text-white hover:text-orange-500 transition">The Godseller</a>
+            </div>
+            <div class="hidden lg:flex space-x-8 font-semibold text-xs tracking-widest uppercase text-slate-400">
+                <a href="index.html" class="hover:text-white">Home</a>
+                <a href="vision.html" class="hover:text-white">Vision</a>
+                <span class="text-orange-500 font-bold">POS</span>
+                <a href="room_service.html" class="hover:text-white">Room Service</a>
+                <a href="drive.html" class="hover:text-white">Drive</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full glass border-t border-white/10 p-6 flex flex-col space-y-4 lg:hidden z-40 bg-[#020617]/90">
+             <a href="index.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Home</a>
+             <a href="vision.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Vision</a>
+             <a href="pos.html" class="text-white block py-2 border-b border-white/5 border-l-4 pl-2 border-l-orange-500">POS</a>
+             <a href="room_service.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Room Service</a>
+             <a href="drive.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Drive</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="relative py-28 overflow-hidden text-center">
+        <div class="container mx-auto px-6 relative z-10">
+            <span class="text-orange-500 text-[10px] tracking-[0.3em] font-bold uppercase mb-4 block animate-pulse">● Business Intelligence Active</span>
+            <h1 class="text-5xl lg:text-7xl font-bold mb-6 font-tech uppercase tracking-tighter">
+                Smart Sales <br><span class="text-glow text-orange-500">In Your Pocket</span>
+            </h1>
+            <p class="text-lg text-slate-400 mb-10 max-w-2xl mx-auto">
+                ติดตามยอดขาย สต็อก และรายงานผลประกอบการได้ทันทีผ่าน 
+                <span class="text-green-400 font-bold">LINE</span>, 
+                <span class="text-green-600 font-bold">WhatsApp</span>, 
+                และ <span class="text-blue-400 font-bold">Telegram</span>
+            </p>
+            
+            <!-- Hero Image -->
+            <div class="relative max-w-4xl mx-auto rounded-2xl p-1 bg-gradient-to-b from-orange-500/50 to-transparent shadow-2xl">
+                <img src="assets/pos_dashboard.jpg" class="rounded-xl w-full border border-orange-500/20">
+            </div>
+        </div>
+        <!-- BG Elements -->
+        <div class="absolute top-0 w-full h-full pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-black to-black"></div>
+    </header>
+
+    <!-- Features -->
+    <section class="py-20 bg-black">
+        <div class="container mx-auto px-6 grid md:grid-cols-3 gap-8">
+            <div class="glass p-8 rounded-xl hover:border-orange-500 transition">
+                <div class="text-4xl mb-4">💬</div>
+                <h3 class="text-xl font-bold text-white mb-2">Chat Integration</h3>
+                <p class="text-slate-400 text-sm">ไม่ต้องเปิดคอมฯ แค่พิมพ์ถามในแชท ก็รู้ยอดขายวันนี้ทันที รองรับทุกแอปฯ แชทหลัก</p>
+            </div>
+            <div class="glass p-8 rounded-xl hover:border-orange-500 transition">
+                <div class="text-4xl mb-4">📊</div>
+                <h3 class="text-xl font-bold text-white mb-2">Real-time Analytics</h3>
+                <p class="text-slate-400 text-sm">กราฟวิเคราะห์แนวโน้มยอดขาย สินค้าขายดี และช่วงเวลา Golden Hour</p>
+            </div>
+            <div class="glass p-8 rounded-xl hover:border-orange-500 transition">
+                <div class="text-4xl mb-4">🔔</div>
+                <h3 class="text-xl font-bold text-white mb-2">Instant Alerts</h3>
+                <p class="text-slate-400 text-sm">แจ้งเตือนทันทีเมื่อมีการชำระเงิน หรือสต็อกสินค้าใกล้หมด</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-xs text-slate-600 bg-slate-900/50">
+        © 2026 Dude POS. Powered by The God Seller.
+    </footer>
+    
+    <!-- Mobile Menu Script -->
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        if (btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

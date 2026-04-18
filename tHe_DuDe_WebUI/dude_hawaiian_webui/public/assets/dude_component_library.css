@@ -1,0 +1,94 @@
+/* DuDe Component Library v2.1 */
+:root {
+    --neon-blue: #00f3ff;
+    --neon-green: #39ff14;
+    --neon-gold: #ffd700;
+    --neon-purple: #bc13fe;
+    --neon-red: #ff0055;
+    --bg-dark: #0a0a0a;
+    --card-bg: #151515;
+    --border-dim: rgba(255, 255, 255, 0.1);
+}
+
+/* Typography */
+.text-neon-blue { color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
+.text-neon-green { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
+.text-neon-gold { color: var(--neon-gold); text-shadow: 0 0 5px var(--neon-gold); }
+.text-blue { color: #2196f3; }
+.text-green { color: #4caf50; }
+
+/* Cards & Boxes */
+.dude-card-dark {
+    background: var(--card-bg);
+    border-left: 4px solid var(--neon-blue);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.status-box {
+    border: 1px solid var(--border-dim);
+    padding: 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.border-gold { border-color: var(--neon-gold) !important; }
+.border-green { border-color: var(--neon-green) !important; }
+
+/* Badges */
+.badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.badge-green { background: #064e3b; color: #6ee7b7; border: 1px solid #10b981; }
+.badge-purple { background: #4c1d95; color: #c4b5fd; border: 1px solid #8b5cf6; }
+.badge-live { background: var(--neon-red); color: white; animation: blink 1.5s infinite; }
+
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+/* Grid System */
+.grid-2-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .grid-2-cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+.flex-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dude-button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main, #e0e0e0);
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dude-button:hover {
+    background: var(--neon-blue);
+    color: #000;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--neon-blue);
+}

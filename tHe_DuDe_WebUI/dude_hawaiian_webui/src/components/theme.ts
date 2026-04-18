@@ -1,0 +1,16 @@
+export const T = {
+  bg:       '#0a0e1a',
+  surface:  '#111827',
+  s2:       '#1a2235',
+  s3:       '#243047',
+  border:   '#2a3a55',
+  accent:   '#3b82f6',
+  accentGlow: 'rgba(59, 130, 246, 0.2)',
+  critical: '#ef4444',
+  warning:  '#f59e0b',
+  success:  '#10b981',
+  info:     '#6366f1',
+  text:     '#f1f5f9',
+  sub:      '#94a3b8',
+  muted:    '#475569',
+};

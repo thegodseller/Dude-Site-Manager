@@ -1,0 +1,9 @@
+packages:
+  - 'tHe_DuDe_WebUI/*'
+  - 'tHe_DuDe_Mobile/*'
+  - 'tHe_DuDe_Service/agents/*'
+allowBuilds:
+  '@swc/core': true
+  openvino-genai-node: true
+  openvino-node: true
+  openvino-tokenizers-node: true

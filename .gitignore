@@ -1,0 +1,32 @@
+.aider*
+.env
+tHe_DuDe_Secret/
+backups/
+logs/
+node_modules/
+.DS_Store
+*.log
+
+# Large model files and archives
+*.tar.gz
+*.zip
+*.bin
+*.pt
+*.onnx
+*.ov
+
+# Python virtual environments
+venv/
+ov_venv/
+.venv/
+
+# Database data
+**/data/postgres/
+**/data/qdrant/
+tHe_DuDe_Compose/data/
+
+# Build artifacts
+dist/
+build/
+.next/
+.codex

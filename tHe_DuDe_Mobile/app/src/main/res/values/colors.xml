@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Themis Verdict Color Palette - Justice & Wisdom Theme -->
+    
+    <!-- Primary Colors - Deep Blue (Wisdom) -->
+    <color name="themis_primary">#1E3A5F</color>
+    <color name="themis_primary_dark">#0F1F33</color>
+    <color name="themis_primary_light">#2E5A8F</color>
+    <color name="themis_on_primary">#FFFFFF</color>
+    
+    <!-- Secondary Colors - Gold (Justice) -->
+    <color name="themis_secondary">#D4AF37</color>
+    <color name="themis_secondary_dark">#AA8C2C</color>
+    <color name="themis_secondary_light">#E5C76B</color>
+    <color name="themis_on_secondary">#000000</color>
+    
+    <!-- Accent Colors -->
+    <color name="themis_accent">#FFD700</color>
+    <color name="themis_accent_soft">#FFF8DC</color>
+    
+    <!-- Background Colors - Deep Navy -->
+    <color name="themis_background">#0A1628</color>
+    <color name="themis_background_variant">#121F35</color>
+    <color name="themis_on_background">#FFFFFF</color>
+    
+    <!-- Surface Colors -->
+    <color name="themis_surface">#162237</color>
+    <color name="themis_surface_variant">#1E2F4A</color>
+    <color name="themis_on_surface">#FFFFFF</color>
+    <color name="themis_on_surface_variant">#B0B8C4</color>
+    
+    <!-- Error Colors -->
+    <color name="themis_error">#CF6679</color>
+    <color name="themis_error_container">#8B1E3F</color>
+    <color name="themis_on_error">#FFFFFF</color>
+    
+    <!-- Success Colors -->
+    <color name="themis_success">#4CAF50</color>
+    <color name="themis_success_light">#81C784</color>
+    
+    <!-- Warning Colors -->
+    <color name="themis_warning">#FFA726</color>
+    <color name="themis_warning_light">#FFB74D</color>
+    
+    <!-- Text Colors -->
+    <color name="themis_text_primary">#FFFFFF</color>
+    <color name="themis_text_secondary">#B0B8C4</color>
+    <color name="themis_text_disabled">#6B7280</color>
+    
+    <!-- Divider & Border -->
+    <color name="themis_divider">#2A3A52</color>
+    <color name="themis_border">#3A4A62</color>
+</resources>

@@ -1,0 +1,38 @@
+<resources>
+    <!-- Themis Verdict Theme - Justice & Wisdom -->
+    <style name="Theme.ThemisVerdict" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Primary brand color - Deep Blue (Wisdom) -->
+        <item name="colorPrimary">@color/themis_primary</item>
+        <item name="colorPrimaryVariant">@color/themis_primary_dark</item>
+        <item name="colorOnPrimary">@color/themis_on_primary</item>
+        
+        <!-- Secondary brand color - Gold (Justice) -->
+        <item name="colorSecondary">@color/themis_secondary</item>
+        <item name="colorSecondaryVariant">@color/themis_secondary_dark</item>
+        <item name="colorOnSecondary">@color/themis_on_secondary</item>
+        
+        <!-- Background colors - Deep Navy -->
+        <item name="android:colorBackground">@color/themis_background</item>
+        <item name="colorOnBackground">@color/themis_on_background</item>
+        
+        <!-- Surface colors -->
+        <item name="colorSurface">@color/themis_surface</item>
+        <item name="colorOnSurface">@color/themis_on_surface</item>
+        
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/themis_primary_dark</item>
+        <item name="android:navigationBarColor">@color/themis_background</item>
+        
+        <!-- Window properties -->
+        <item name="android:windowBackground">@color/themis_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+    
+    <!-- Splash Theme -->
+    <style name="Theme.ThemisVerdict.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/themis_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_themis_splash</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.ThemisVerdict</item>
+    </style>
+</resources>
