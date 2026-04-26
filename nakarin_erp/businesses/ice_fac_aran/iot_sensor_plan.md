@@ -7,5 +7,13 @@ Candidate monitoring areas:
 - water flow
 - power usage
 - storage conditions
+- water quality related measurements when supported by approved sensors
+- maintenance or vehicle status signals when relevant
 
-Sensor list, sampling interval, and alert thresholds are `UNKNOWN: requires owner confirmation`.
+## Confirmed Integration Direction
+
+- IoT sensors may use Tuya.
+- IoT sensors may use Zigbee.
+- IoT sensors may use Wi-Fi.
+
+Sensor list, sampling interval, alert thresholds, and approved device models are `UNKNOWN: requires owner confirmation`.

@@ -12,3 +12,4 @@
 - 2026-04-26: Added `bmad_bridge/` policy files so BMAD artifacts must reference affected Nakarin ERP files and cannot replace the source of truth.
 - 2026-04-26: Updated workflow documentation to require `./scripts/validate_nakarin_erp.sh` after changes under `nakarin_erp/**`.
 - 2026-04-26: Recorded that the Nakarin ERP foundation is now committed in three documentation commits covering source of truth, validation script, and agent validation workflow.
+- 2026-04-26: Deepened the Ice Fac Aran module for Phase 2 confirmed scope without changing other business modules.
