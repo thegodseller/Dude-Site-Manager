@@ -13,3 +13,5 @@
 - 2026-04-26: Updated workflow documentation to require `./scripts/validate_nakarin_erp.sh` after changes under `nakarin_erp/**`.
 - 2026-04-26: Recorded that the Nakarin ERP foundation is now committed in three documentation commits covering source of truth, validation script, and agent validation workflow.
 - 2026-04-26: Deepened the Ice Fac Aran module for Phase 2 confirmed scope without changing other business modules.
+- 2026-04-27: Added file intake integration guidance and approved Magika as a candidate file type detection layer for uploads and document imports.
+- 2026-04-27: Added controlled Magika and RackPeek evaluation scripts plus infrastructure intake guidance without changing runtime code.
