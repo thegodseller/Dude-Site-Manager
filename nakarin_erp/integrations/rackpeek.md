@@ -20,4 +20,7 @@
 
 - Local evaluation may be prepared through `tools/install_rackpeek.sh`.
 - Repository inspection may be performed through `tools/eval_rackpeek.sh`.
+- RackPeek was cloned locally for evaluation at `tools/vendor/RackPeek`.
+- The observed local clone state was commit `a223715` and tag `RackPeek-1.3.1`.
+- `tools/vendor/RackPeek` is local-only evaluation material and must not be committed.
 - Build, runtime startup, and scan execution are intentionally out of scope for this phase.

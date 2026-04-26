@@ -9,6 +9,7 @@
 ## Local Evaluation Support
 
 - Magika can be installed through `tools/install_magika.sh`.
+- `pipx` is required before running the Magika install path.
 - Magika can be evaluated through `tools/eval_magika.sh`.
 - The antivirus warning still applies: Magika is not a malware scanner.
 

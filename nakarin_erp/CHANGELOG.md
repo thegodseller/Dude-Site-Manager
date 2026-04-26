@@ -15,3 +15,4 @@
 - 2026-04-26: Deepened the Ice Fac Aran module for Phase 2 confirmed scope without changing other business modules.
 - 2026-04-27: Added file intake integration guidance and approved Magika as a candidate file type detection layer for uploads and document imports.
 - 2026-04-27: Added controlled Magika and RackPeek evaluation scripts plus infrastructure intake guidance without changing runtime code.
+- 2026-04-27: Recorded local evaluation findings that Magika install requires `pipx` and RackPeek was cloned locally at `tools/vendor/RackPeek` without build, startup, or scanning.
