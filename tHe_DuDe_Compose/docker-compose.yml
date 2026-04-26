@@ -262,6 +262,19 @@ services:
     networks:
       - dude_net
 
+  visionlabel:
+    build:
+      context: ../tHe_DuDe_Service/VisionLabel
+      dockerfile: Dockerfile
+    container_name: visionlabel
+    restart: unless-stopped
+    ports:
+      - "11119:80"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - dude_net
+
 networks:
   dude_net:
     driver: bridge
