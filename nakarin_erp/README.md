@@ -42,3 +42,11 @@
 ## Integration Bridges
 
 - `bmad_bridge/`: BMAD workflow integration rules that must defer to Nakarin ERP as the business source of truth
+
+## Validation
+
+Run the lightweight consistency check from the repository root:
+
+```bash
+./scripts/validate_nakarin_erp.sh
+```
