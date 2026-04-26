@@ -16,10 +16,11 @@ Nakarin ERP is the single source of truth for business operations.
 4. Shared business rules must live in nakarin_erp/shared/.
 5. Do not hard-code business-specific behavior into DuDe Core.
 6. If code changes business behavior, update Nakarin ERP documentation in the same commit.
-7. If documentation and code disagree, stop and report the conflict.
-8. Never guess approval rules, accounting rules, stock rules, production rules, or report definitions.
-9. Use UNKNOWN: requires owner confirmation when information is missing.
-10. Keep changes small, traceable, and reversible.
+7. After any change under nakarin_erp/**, run ./scripts/validate_nakarin_erp.sh from the repository root.
+8. If documentation and code disagree, stop and report the conflict.
+9. Never guess approval rules, accounting rules, stock rules, production rules, or report definitions.
+10. Use UNKNOWN: requires owner confirmation when information is missing.
+11. Keep changes small, traceable, and reversible.
 
 ## Supported Business Modules
 

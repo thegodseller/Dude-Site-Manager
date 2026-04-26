@@ -50,3 +50,5 @@ Run the lightweight consistency check from the repository root:
 ```bash
 ./scripts/validate_nakarin_erp.sh
 ```
+
+Run this script after any change under nakarin_erp/**.

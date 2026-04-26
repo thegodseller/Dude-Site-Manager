@@ -27,9 +27,10 @@ After making changes:
 2. Update CHANGELOG.md.
 3. Update affected business changelog.md if business-specific.
 4. Add an entry to DECISIONS.md if an architectural or business decision was made.
-5. Run available tests or validation commands.
-6. Show changed files.
-7. Summarize what changed, why, and how to verify.
+5. Run ./scripts/validate_nakarin_erp.sh after any change under nakarin_erp/**.
+6. Run any other available tests or validation commands if relevant.
+7. Show changed files.
+8. Summarize what changed, why, and how to verify.
 
 ## No-Drift Rules
 
