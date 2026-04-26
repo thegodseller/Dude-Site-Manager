@@ -11,6 +11,10 @@
 - Magika can be installed through `tools/install_magika.sh`.
 - `pipx` is required before running the Magika install path.
 - Magika can be evaluated through `tools/eval_magika.sh`.
+- Local evaluation result on Linux Mint 22.3: install completed successfully with user-local `pipx` installed via `python3 -m pip install --user --break-system-packages pipx`.
+- `python3 -m pipx ensurepath` reported that `~/.local/bin` was already on `PATH`.
+- `./tools/install_magika.sh` installed `magika 1.0.2`.
+- `./tools/eval_magika.sh` completed successfully and detected the controlled sample text file as `text/plain`.
 - The antivirus warning still applies: Magika is not a malware scanner.
 
 ## Recommended Use Cases

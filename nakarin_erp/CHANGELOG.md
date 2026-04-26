@@ -16,3 +16,4 @@
 - 2026-04-27: Added file intake integration guidance and approved Magika as a candidate file type detection layer for uploads and document imports.
 - 2026-04-27: Added controlled Magika and RackPeek evaluation scripts plus infrastructure intake guidance without changing runtime code.
 - 2026-04-27: Recorded local evaluation findings that Magika install requires `pipx` and RackPeek was cloned locally at `tools/vendor/RackPeek` without build, startup, or scanning.
+- 2026-04-27: Completed controlled local Magika evaluation using user-local `pipx`; `magika 1.0.2` installed successfully and the eval script passed on the sample text file.
