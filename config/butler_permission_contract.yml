@@ -1,0 +1,61 @@
+version: 1
+description: Phase 1 operator safety contract for ag_butler.
+allow_prefixes:
+  - ["git", "status"]
+  - ["git", "diff"]
+  - ["git", "log"]
+  - ["docker", "compose", "ps"]
+  - ["docker", "compose", "logs"]
+  - ["df", "-h"]
+  - ["free", "-h"]
+  - ["tailscale", "status"]
+  - ["ls"]
+  - ["cat"]
+  - ["grep"]
+  - ["find"]
+  - ["tail"]
+  - ["curl"]
+ask_prefixes:
+  - ["git", "add"]
+  - ["git", "commit"]
+  - ["git", "push"]
+  - ["docker", "compose", "restart"]
+  - ["docker", "compose", "up"]
+  - ["docker", "compose", "down"]
+  - ["systemctl", "start"]
+  - ["systemctl", "stop"]
+  - ["systemctl", "restart"]
+  - ["reboot"]
+  - ["shutdown"]
+block_prefixes:
+  - ["rm", "-rf", "/"]
+  - ["sudo", "rm"]
+  - ["mkfs"]
+  - ["dd"]
+  - ["docker", "volume", "rm"]
+  - ["docker", "system", "prune"]
+  - ["chmod", "-R", "777"]
+  - ["chown", "-R"]
+  - ["wget"]
+  - ["nc"]
+  - ["ncat"]
+  - ["ssh"]
+  - ["scp"]
+  - ["rsync"]
+localhost_curl:
+  allowed_hosts:
+    - "127.0.0.1"
+    - "localhost"
+  allowed_path_keywords:
+    - "health"
+shell_meta_blocklist:
+  - ";"
+  - "&&"
+  - "||"
+  - "|"
+  - ">"
+  - "<"
+  - "$("
+  - "`"
+audit:
+  recent_limit: 50
