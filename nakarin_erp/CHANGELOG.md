@@ -17,3 +17,7 @@
 - 2026-04-27: Added controlled Magika and RackPeek evaluation scripts plus infrastructure intake guidance without changing runtime code.
 - 2026-04-27: Recorded local evaluation findings that Magika install requires `pipx` and RackPeek was cloned locally at `tools/vendor/RackPeek` without build, startup, or scanning.
 - 2026-04-27: Completed controlled local Magika evaluation using user-local `pipx`; `magika 1.0.2` installed successfully and the eval script passed on the sample text file.
+- 2026-04-27: Added a local RackPeek seed inventory and safe start/stop scripts so the local Web UI can show DuDe infrastructure data without network scanning.
+- 2026-04-27: Updated the local RackPeek start path to keep the mounted config writable because RackPeek creates local backup files during load/migration.
+- 2026-04-27: Moved local RackPeek from host port `18080` to `127.0.0.1:18081` so `18080` remains reserved for local llama-server use.
+- 2026-04-27: Fixed the RackPeek local seed config by quoting incompatible `notes` values and updating the seeded RackPeek service entry from `18080` to `18081`.

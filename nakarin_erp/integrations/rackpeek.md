@@ -23,4 +23,13 @@
 - RackPeek was cloned locally for evaluation at `tools/vendor/RackPeek`.
 - The observed local clone state was commit `a223715` and tag `RackPeek-1.3.1`.
 - `tools/vendor/RackPeek` is local-only evaluation material and must not be committed.
-- Build, runtime startup, and scan execution are intentionally out of scope for this phase.
+- RackPeek shows zero hardware, systems, and services until a valid inventory `config.yaml` exists under the mounted config path.
+- The local DuDe seed inventory path is `ops/rackpeek/config/config.yaml`.
+- The mounted local config directory must remain writable because RackPeek creates backup files such as `config.yaml.bak.*`.
+- RackPeek uses local host port `18081` and container port `8080`.
+- Host port `18080` is reserved for local llama-server.
+- The local RackPeek Web UI should be opened at `http://127.0.0.1:18081`.
+- RackPeek is manual inventory only for the DuDe local workflow and must not be treated as a network scanner.
+- Current verification result: RackPeek HTTP 500 was traced to invalid seed YAML; quoted `notes` values and the corrected `rackpeek-ui` port `18081` removed the config parse error, RackPeek starts cleanly, and Docker shows `127.0.0.1:18081->8080/tcp`.
+- `UNKNOWN: host curl may still fail in this environment despite Docker port mapping; verify from browser at http://127.0.0.1:18081.`
+- Production scan policy remains `UNKNOWN: requires owner confirmation`.

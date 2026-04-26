@@ -1,0 +1,201 @@
+version: 3
+resources:
+- kind: Desktop
+  ram:
+    size: 23
+  cpus:
+  - model: Intel(R) Core(TM) i5-8400T CPU @ 1.70GHz
+    cores: 6
+    threads: 6
+  name: OptiPlex-3060
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: 'Current DuDe workstation/server host. Exact NIC inventory and non-root drive layout are UNKNOWN: requires owner confirmation.'
+- kind: System
+  type: baremetal
+  os: linux-mint-22.3
+  cores: 6
+  ram: 23
+  drives:
+  - size: 457
+  name: dude-hawaiian-host
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: 'Local DuDe Hawaiian repository host. Additional filesystem layout, backup policy, and non-root storage details are UNKNOWN: requires owner confirmation.'
+  runsOn:
+  - OptiPlex-3060
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 18081
+    protocol: TCP
+    url: http://127.0.0.1:18081
+  name: rackpeek-ui
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: RackPeek Web UI exposed locally. Host port 18080 remains reserved for llama-server. Manual inventory only; not a network scanner.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 11111
+    protocol: TCP
+    url: http://localhost:11111
+  name: ag_boss
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 11111 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 11112
+    protocol: TCP
+    url: http://localhost:11112
+  name: ag_librarian
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 11112 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 11113
+    protocol: TCP
+    url: http://localhost:11113
+  name: ag_adventure
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 11113 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 11114
+    protocol: TCP
+    url: http://localhost:11114
+  name: ag_negotiator
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 11114 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 11115
+    protocol: TCP
+    url: http://localhost:11115
+  name: ag_watcher
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 11115 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 11116
+    protocol: TCP
+    url: http://localhost:11116
+  name: ag_butler
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 11116 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 15551
+    protocol: TCP
+    url: http://localhost:15551
+  name: lineliff
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 15551 maps to container port 8080.
+  runsOn:
+  - dude-hawaiian-host
+- kind: Service
+  network:
+    ip: 127.0.0.1
+    port: 8050
+    protocol: TCP
+    url: http://localhost:8050
+  name: db_mem0
+  tags:
+  - DuDe Core
+  - Nakarin ERP
+  - Ice Fac Aran
+  labels:
+    platform: DuDe Core
+    business: Nakarin ERP
+    deployment: Ice Fac Aran
+  notes: Host port 8050 maps to container port 8050.
+  runsOn:
+  - dude-hawaiian-host
+connections: []
