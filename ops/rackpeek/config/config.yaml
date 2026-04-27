@@ -177,7 +177,7 @@ resources:
     platform: DuDe Core
     business: Nakarin ERP
     deployment: Ice Fac Aran
-  notes: Host port 11118 maps to container port 8080. Verified Up.
+  notes: 'DuDe Global Control Dashboard for monitoring and control. Host port 11118 maps to container port 8080. Verified Up.'
   runsOn:
   - dude-hawaiian-host
 - kind: Service
@@ -322,24 +322,6 @@ resources:
     business: Nakarin ERP
     deployment: Ice Fac Aran
   notes: Host port 11435 maps to container port 11434. Verified Up.
-  runsOn:
-  - dude-hawaiian-host
-- kind: Service
-  network:
-    ip: 127.0.0.1
-    port: 8088
-    protocol: TCP
-    url: http://localhost:8088
-  name: dude-download-portal
-  tags:
-  - DuDe Core
-  - Nakarin ERP
-  - Ice Fac Aran
-  labels:
-    platform: DuDe Core
-    business: Nakarin ERP
-    deployment: Ice Fac Aran
-  notes: Host port 8088 maps to container port 80. Verified Up (Healthy).
   runsOn:
   - dude-hawaiian-host
 - kind: Service

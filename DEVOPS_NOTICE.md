@@ -8,6 +8,7 @@ The infrastructure is split into two distinct layers serving different purposes.
 |:---|:---|:---|:---|
 | `thegodseller.com` | **15551** | **Corporate Website** (The Godseller) | `tHe_DuDe_WebUI/corporate_site/` |
 | `dashboard.thegodseller.com` | **5173** | **DuDe Dashboard** (Nexus Control) | `tHe_DuDe_WebUI/dude_hawaiian_webui/` |
+| `global-control.local` | **11118** | **DuDe Global Control Dashboard** | `tHe_DuDe_Service/dude_web_control/` |
 
 ## ⚠️ Critical Rules for AI Agents
 1. The corporate static site lives in `tHe_DuDe_WebUI/corporate_site/`.
