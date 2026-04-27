@@ -122,6 +122,8 @@ services:
       - ../tHe_DuDe_Service/skills:/app/skills
     networks:
       - dude_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   ag_negotiator:
     build:
@@ -143,6 +145,8 @@ services:
     networks:
       - dude_net
       - dude_dmz
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   ag_watcher:
     build:
@@ -190,6 +194,8 @@ services:
       - "11113:8000"
     networks:
       - dude_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   ag_adventure:
     build:
