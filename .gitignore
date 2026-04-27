@@ -20,6 +20,10 @@ venv/
 ov_venv/
 .venv/
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Database data
 **/data/postgres/
 **/data/qdrant/

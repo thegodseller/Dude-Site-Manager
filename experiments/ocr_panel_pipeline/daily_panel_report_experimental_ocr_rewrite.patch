@@ -1,0 +1,589 @@
+diff --git a/daily_panel_report.py b/daily_panel_report.py
+index 213a6f4..2eed0ae 100644
+--- a/daily_panel_report.py
++++ b/daily_panel_report.py
+@@ -148,70 +148,55 @@ def capture_snapshot(
+ #
+ DISPLAY_REGIONS: list[tuple[str, int, int, int, int]] = [
+     # (label, x1, y1, x2, y2)
+-    ("R1L", 875, 65, 1005, 145),
+-    ("R1R", 1100, 50, 1230, 130),
+-    ("R2L", 885, 250, 1005, 330),
+-    ("R2R", 1110, 235, 1230, 315),
+-    ("R3L", 895, 395, 1015, 475),
+-    ("R3R", 1120, 380, 1240, 460),
+-    ("R4L", 910, 540, 1030, 620),
+-    ("R4R", 1135, 525, 1255, 605),
++    ("R1L", 800, 50, 1050, 160),
++    ("R1R", 1060, 30, 1310, 140),
++    ("R2L", 810, 230, 1060, 350),
++    ("R2R", 1070, 210, 1320, 330),
++    ("R3L", 820, 380, 1070, 490),
++    ("R3R", 1080, 360, 1330, 480),
++    ("R4L", 830, 520, 1080, 640),
++    ("R4R", 1090, 510, 1340, 630),
+ ]
+ 
+ 
+ def _preprocess_single_display(img_region, label: str) -> tuple[str, any]:
+     """
+-    Preprocess a single cropped display region for OCR.
+-
+-    Strategy for red LED 7-segment on dark background:
+-      1. Extract red channel (red LEDs are strongest in R channel)
+-      2. Threshold to isolate bright digits
+-      3. Invert for tesseract (dark text on white background)
+-      4. Morphological cleanup
+-
+-    Returns (label, processed_image).
++    Preprocess a single cropped display region for OCR targeting 7-segment.
+     """
+     import cv2
+     import numpy as np
+ 
+-    # Red LED digits: the R channel has the strongest signal
++    # 1. Red Channel and Contrast
+     if len(img_region.shape) == 3:
+-        # Extract just the red channel
+-        red_ch = img_region[:, :, 2]  # BGR format → channel 2 = Red
++        red_ch = img_region[:, :, 2]
+     else:
+         red_ch = img_region
+ 
+-    # Threshold: red LED pixels are bright in the R channel
+-    # Use a relatively high threshold to isolate the glowing digits
+-    _, binary = cv2.threshold(red_ch, 150, 255, cv2.THRESH_BINARY)
+-
+-    # Invert: tesseract expects dark text on white background
+-    inverted = cv2.bitwise_not(binary)
++    # 2. Otsu's Thresholding (Adaptive)
++    _, thresh = cv2.threshold(red_ch, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+ 
+-    # Morphological cleanup: close small gaps in digit strokes
+-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+-    cleaned = cv2.morphologyEx(inverted, cv2.MORPH_CLOSE, kernel, iterations=1)
+-
+-    # Remove small noise
+-    kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+-    cleaned = cv2.morphologyEx(cleaned, cv2.MORPH_OPEN, kernel_open, iterations=1)
+-
+-    # Scale up for better OCR (tesseract works better with larger text)
+-    h, w = cleaned.shape[:2]
+-    scaled = cv2.resize(cleaned, (w * 3, h * 3), interpolation=cv2.INTER_NEAREST)
++    # 3. Morphological Closing & Dilation (Bridge 7-segment gaps)
++    kernel = np.ones((3, 3), np.uint8)
++    closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
++    dilated = cv2.dilate(closed, kernel, iterations=1)
++    
++    # 4. Blur slightly to smooth edges for AI
++    processed = cv2.GaussianBlur(dilated, (3, 3), 0)
++    
++    # 5. Invert for OCR
++    inverted = cv2.bitwise_not(processed)
++    
++    # 6. Massive Scaling and Padding
++    h, w = inverted.shape[:2]
++    scaled = cv2.resize(inverted, (w * 4, h * 4), interpolation=cv2.INTER_CUBIC)
++    final = cv2.copyMakeBorder(scaled, 60, 60, 60, 60, cv2.BORDER_CONSTANT, value=255)
+ 
+-    return label, scaled
++    return label, final
+ 
+ 
+ def preprocess_for_ocr(image_path: Path) -> Path:
+     """
+-    Preprocess a control panel image for 7-segment OCR.
+-
+-    Crops each of the 6 display regions, processes them individually
+-    for red-LED 7-segment extraction, and stitches them into a clean
+-    vertical layout that tesseract can read row by row.
+-
+-    Returns path to the preprocessed composite image.
++    Preprocess a control panel image by auto-detecting red LED display regions.
+     """
+     import cv2
+     import numpy as np
+@@ -221,90 +206,64 @@ def preprocess_for_ocr(image_path: Path) -> Path:
+         raise ValueError(f"Could not read image for preprocessing: {image_path}")
+ 
+     h, w = img.shape[:2]
+-    LOG.info("Original image size: %dx%d", w, h)
++    LOG.info("Original image size: %dx%d (Auto-detecting regions...)", w, h)
++
++    # 1. Mask Red LEDs
++    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
++    mask1 = cv2.inRange(hsv, np.array([0, 50, 50]), np.array([10, 255, 255]))
++    mask2 = cv2.inRange(hsv, np.array([160, 50, 50]), np.array([180, 255, 255]))
++    red_mask = cv2.bitwise_or(mask1, mask2)
++    
++    # Clean mask and STRONGLY Dilate horizontally to merge digits
++    # Increased width from 40 to 80 to bridge gaps in '14' etc.
++    # 2. Define FIXED Regions of Interest (ROI) - SNIPER MODE
++    # Adjusted for 1920x1080 based on raw image inspection
++    fixed_regions = [
++        ("R1", 270, 75, 65, 42),
++        ("     R2", 270, 175, 65, 42),
++        ("R3", 270, 292, 65, 42),
++        ("     R4", 270, 398, 65, 42),
++        ("R5", 270, 495, 65, 42),
++        # Lower Unit (Status Displays)
++        ("L1", 208, 595, 55, 38), ("L2", 308, 595, 55, 38),
++        ("L3", 208, 655, 55, 38), ("L4", 308, 655, 55, 38),
++    ]
+ 
+-    # Process each display region
+     processed_regions: list[tuple[str, any]] = []
+-    for label, x1, y1, x2, y2 in DISPLAY_REGIONS:
+-        # Clamp coordinates to image bounds
+-        x1c = max(0, min(x1, w))
+-        y1c = max(0, min(y1, h))
+-        x2c = max(0, min(x2, w))
+-        y2c = max(0, min(y2, h))
+-
+-        if x2c - x1c < 10 or y2c - y1c < 10:
+-            LOG.warning("Display region %s too small after clamping, skipping", label)
+-            continue
+-
+-        crop = img[y1c:y2c, x1c:x2c]
+-        label_result, processed = _preprocess_single_display(crop, label)
+-        processed_regions.append((label_result, processed))
+-
+-        # Also save individual crops for debugging
+-        crop_path = image_path.with_name(f"{image_path.stem}_crop_{label}.png")
++    for label, bx, by, bw, bh in fixed_regions:
++        x1, y1 = bx, by
++        x2, y2 = bx + bw, by + bh
++        
++        crop = img[y1:y2, x1:x2]
++        _, processed = _preprocess_single_display(crop, label)
++        processed_regions.append((label, processed))
++        
++        # Save crops
++        crop_path = image_path.with_name(f"{image_path.stem}_crop_{label.strip()}.png")
+         cv2.imwrite(str(crop_path), processed)
+-        LOG.info("Saved crop %s: region=(%d,%d,%d,%d) → %s", label, x1c, y1c, x2c, y2c, crop_path)
+-
+-    if not processed_regions:
+-        raise ValueError("No display regions could be extracted from the image")
+-
+-    # Stitch into composite: arrange as rows for tesseract
+-    # Each row: [Left display]  [spacing]  [Right display]
+-    SPACER_WIDTH = 100
+-    composite_rows = []
+-
+-    for i in range(0, len(processed_regions), 2):
+-        left_label, left_img = processed_regions[i]
+-        if i + 1 < len(processed_regions):
+-            right_label, right_img = processed_regions[i + 1]
+-        else:
+-            right_img = np.ones_like(left_img) * 255  # white placeholder
+-
+-        # Match heights
+-        max_h = max(left_img.shape[0], right_img.shape[0])
+-        left_padded = np.ones((max_h, left_img.shape[1]), dtype=np.uint8) * 255
+-        left_padded[:left_img.shape[0], :] = left_img
+-        right_padded = np.ones((max_h, right_img.shape[1]), dtype=np.uint8) * 255
+-        right_padded[:right_img.shape[0], :] = right_img
+-
+-        spacer = np.ones((max_h, SPACER_WIDTH), dtype=np.uint8) * 255
+-        row = np.hstack([left_padded, spacer, right_padded])
+-        composite_rows.append(row)
+-
+-        # Add vertical spacer between rows
+-        if i + 2 < len(processed_regions):
+-            v_spacer = np.ones((30, row.shape[1]), dtype=np.uint8) * 255
+-            composite_rows.append(v_spacer)
+-
+-    # Match all row widths
+-    max_w = max(r.shape[1] for r in composite_rows)
+-    padded_rows = []
+-    for r in composite_rows:
+-        if r.shape[1] < max_w:
+-            pad = np.ones((r.shape[0], max_w - r.shape[1]), dtype=np.uint8) * 255
+-            r = np.hstack([r, pad])
+-        padded_rows.append(r)
+-
+-    composite = np.vstack(padded_rows)
+-
+-    # Add white border for tesseract
+-    border = 20
+-    bordered = cv2.copyMakeBorder(
+-        composite, border, border, border, border,
+-        cv2.BORDER_CONSTANT, value=255,
+-    )
+-
+-    preprocessed_path = image_path.with_name(image_path.stem + "_preprocessed.png")
+-    cv2.imwrite(str(preprocessed_path), bordered)
+-    LOG.info("Preprocessed composite saved: %s (%dx%d)", preprocessed_path, bordered.shape[1], bordered.shape[0])
+-
+-    return preprocessed_path
++        LOG.info("Sniper Cropped %s at (%d,%d)", label.strip(), bx, by)
+ 
+ 
+-# ---------------------------------------------------------------------------
+-# Step 2: Run OCR
+-# ---------------------------------------------------------------------------
+-
++    if not processed_regions:
++        # Save the mask for debugging if nothing found
++        mask_debug_path = image_path.with_name(f"{image_path.stem}_red_mask_fail.png")
++        cv2.imwrite(str(mask_debug_path), red_mask)
++        raise ValueError(f"No display regions detected. Check {mask_debug_path}")
++
++    # Stitch composite for tesseract (all in one vertical column for easier parsing if needed)
++    total_h = sum(r[1].shape[0] for r in processed_regions)
++    max_w = max(r[1].shape[1] for r in processed_regions)
++    composite = np.ones((total_h, max_w), dtype=np.uint8) * 255
++    
++    curr_y = 0
++    for _, r_img in processed_regions:
++        ch, cw = r_img.shape
++        composite[curr_y:curr_y+ch, 0:cw] = r_img
++        curr_y += ch
++        
++    composite_path = image_path.with_name(f"{image_path.stem}_preprocessed.png")
++    cv2.imwrite(str(composite_path), composite)
++    return composite_path
+ def run_ocr_via_watcher(image_path: Path) -> str:
+     """Call the watcher service /api/ocr endpoint."""
+     import requests
+@@ -341,88 +300,176 @@ def run_ocr_direct(image_path: Path) -> str:
+     return result.stdout.strip()
+ 
+ 
+-def run_ocr_single_region(image_path: Path) -> str:
+-    """OCR a single cropped display region (single text line, digits only)."""
+-    tesseract_bin = shutil.which("tesseract")
+-    if not tesseract_bin:
+-        raise RuntimeError("tesseract not installed")
+-    result = subprocess.run(
+-        [tesseract_bin, str(image_path), "stdout",
+-         "--psm", "7",  # treat image as a single text line
+-         "-c", "tessedit_char_whitelist=0123456789.-"],
+-        capture_output=True, text=True, check=False,
+-    )
+-    text = result.stdout.strip()
+-    # Clean: remove stray spaces/dots that aren't part of a number
+-    text = re.sub(r"\s+", "", text)  # remove all whitespace
+-    text = re.sub(r"^\.+", "", text)  # strip leading dots
+-    text = re.sub(r"\.+$", "", text)  # strip trailing dots
+-    text = re.sub(r"\.{2,}", ".", text)  # collapse multiple dots
+-    return text or "0"
++def decode_7segment(digit_img) -> str:
++    """
++    Highly robust 7-segment decoder with minus sign and Otsu threshold support.
++    """
++    import cv2
++    import numpy as np
+ 
++    # 1. Binarize using Otsu (Adaptive to light)
++    # We use Otsu's to find the best threshold automatically
++    _, binary = cv2.threshold(digit_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
++    h, w = binary.shape
++    if h < 8 or w < 3: return ""
++
++    # 2. Deskew (Slant correction)
++    m = cv2.moments(binary)
++    if m['m00'] > 50: # Only deskew if enough pixels
++        mu11 = m['mu11'] / m['m00']
++        mu02 = m['mu02'] / m['m00']
++        slant = mu11 / mu02
++        M = np.float32([[1, -slant, 0.5 * h * slant], [0, 1, 0]])
++        binary = cv2.warpAffine(binary, M, (w, h), flags=cv2.INTER_LINEAR)
++
++    # 3. Stretch Horizontally
++    binary = cv2.resize(binary, (w * 2, h), interpolation=cv2.INTER_NEAREST)
++    h, w = binary.shape
++
++    # 4. Scan Lines (Tighter positioning)
++    h_lines = [0.15, 0.50, 0.85]
++    v_lines = [0.35, 0.65] # Moved closer to center
++    
++    h_hits = []
++    for hl in h_lines:
++        row = binary[int(hl*h), int(0.35*w):int(0.65*w)]
++        h_hits.append(np.mean(row) > 100)
++        
++    v_hits = [[False, False], [False, False]] 
++    for i, vl in enumerate(v_lines):
++        col = binary[:, int(vl*w)]
++        top_part = col[int(0.15*h):int(0.40*h)]
++        bot_part = col[int(0.60*h):int(0.85*h)]
++        v_hits[i][0] = np.mean(top_part) > 100
++        v_hits[i][1] = np.mean(bot_part) > 100
++        
++    lt, lb = v_hits[0]
++    rt, rb = v_hits[1]
++    t, m, b = h_hits
++    
++    # 5. Mapping with Minus Sign support
++    res = ""
++    # Standard 0-9
++    if t and b and lt and lb and rt and rb and not m: res = "0"
++    elif rt and rb and not t and not m and not b: res = "1"
++    elif t and m and b and rt and lb and not lt and not rb: res = "2"
++    elif t and m and b and rt and rb and not lt and not lb: res = "3"
++    elif m and lt and rt and rb and not t and not b: res = "4"
++    elif t and m and b and lt and rb and not rt and not lb: res = "5"
++    elif t and m and b and lt and lb and rb and not rt: res = "6"
++    elif t and rt and rb and not m and not b: res = "7"
++    elif t and m and b and lt and lb and rt and rb: res = "8"
++    elif t and m and b and lt and rt and rb and not lb: res = "9"
++    
++    # Special: Minus Sign
++    if not res and m and not t and not b and not lt and not lb and not rt and not rb:
++        res = "-"
++        
++    # Special: '1' fallback
++    if not res and rt and rb: res = "1"
++    
++    return res
++
++def run_ocr_single_region(image_path: Path) -> str:
++    """OCR a single cropped display region using custom segment analysis."""
++    import cv2
++    import numpy as np
++    
++    img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
++    if img is None: return "0"
++    
++    # Bridge digits
++    kernel_bridge = np.ones((7, 7), np.uint8)
++    inverted = cv2.bitwise_not(img)
++    bridged = cv2.morphologyEx(inverted, cv2.MORPH_CLOSE, kernel_bridge)
++    n_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(bridged, connectivity=8)
++    
++    digit_blobs = []
++    crop_h = img.shape[0]
++    for i in range(1, n_labels):
++        x, y, w, h, area = stats[i]
++        if h > crop_h * 0.4 and area > 100:
++            digit_blobs.append((x, y, w, h))
++    
++    digit_blobs = sorted(digit_blobs, key=lambda b: b[0])
++    
++    display_val = ""
++    for dx, dy, dw, dh in digit_blobs:
++        pad = 5
++        y1, y2 = max(0, dy-pad), min(img.shape[0], dy+dh+pad)
++        x1, x2 = max(0, dx-pad), min(img.shape[1], dx+dw+pad)
++        digit_img = img[y1:y2, x1:x2]
++        display_val += decode_7segment(digit_img)
++        
++    return display_val or "0"
+ 
+ def run_ocr(image_path: Path, skip_preprocess: bool = False) -> tuple[list[tuple[str, str]], Path]:
+     """
+-    Run per-region OCR on the control panel image.
+-
+-    Preprocesses the image, then OCR's each display crop individually
+-    for maximum accuracy.
+-
+-    Returns (list of (label, value) pairs, preprocessed_composite_path).
++    Run per-region OCR using fixed ROIs.
+     """
+-    # Preprocess: creates individual crop files + composite
+     if not skip_preprocess:
+         processed_path = preprocess_for_ocr(image_path)
+     else:
+         processed_path = image_path
+ 
+-    # OCR each individual crop
+     results: list[tuple[str, str]] = []
+-    for label, *_ in DISPLAY_REGIONS:
++    # Check all possible labels from our fixed regions
++    labels = ["R1", "R2", "R3", "R4", "R5", "L1", "L2", "L3", "L4"]
++    for label in labels:
+         crop_file = image_path.with_name(f"{image_path.stem}_crop_{label}.png")
+         if crop_file.exists():
+-            value = run_ocr_single_region(crop_file)
+-            LOG.info("OCR region %s: %r", label, value)
+-            results.append((label, value))
++            val = run_ocr_single_region(crop_file)
++            LOG.info("OCR region %s: %r", label, val)
++            results.append((label, val or "0"))
+         else:
+-            LOG.warning("Crop file missing for region %s", label)
+-            results.append((label, "---"))
++            results.append((label, "0"))
+ 
+     return results, processed_path
+ 
+ 
++def run_ocr_single_digit(image_path: Path) -> str:
++    """Run OCR on a single digit image using PSM 10."""
++    tesseract_bin = shutil.which("tesseract")
++    if not tesseract_bin:
++        return ""
++        
++    result = subprocess.run(
++        [tesseract_bin, str(image_path), "stdout",
++         "--psm", "10", # Single character
++         "-c", "tessedit_char_whitelist=0123456789"],
++        capture_output=True, text=True, check=False,
++    )
++    return result.stdout.strip()
++
++
+ # ---------------------------------------------------------------------------
+ # Step 3: Build Rows from Per-Region OCR Results
+ # ---------------------------------------------------------------------------
+ 
+ def build_rows_from_regions(region_results: list[tuple[str, str]]) -> list[tuple[str, str]]:
+     """
+-    Convert per-region OCR results into display rows.
+-
+-    Input: [("R1L", "0"), ("R1R", "0"), ("R2L", "0"), ...]
+-    Output: [("0", "0"), ("0", "0"), ("0", "0")]  — 3 rows
++    Simpler grouping for unified display.
+     """
+-    # Group by row number
+-    row_map: dict[str, dict[str, str]] = {}
+-    for label, value in region_results:
+-        # label format: "R1L", "R1R", "R2L", etc.
+-        row_key = label[:2]  # "R1", "R2", "R3"
+-        side = label[2]      # "L" or "R"
+-        if row_key not in row_map:
+-            row_map[row_key] = {}
+-        row_map[row_key][side] = value
+-
+-    # Build ordered rows
+-    rows: list[tuple[str, str]] = []
+-    for rk in sorted(row_map.keys()):
+-        left = row_map[rk].get("L", "---")
+-        right = row_map[rk].get("R", "---")
+-        rows.append((left, right))
+-
+-    # Pad to at least 4 rows
+-    while len(rows) < 4:
+-        rows.append(("---", "---"))
+-
++    rows = []
++    # Main Panel
++    main_rows = []
++    for label, val in region_results:
++        if label.strip().startswith("R"):
++            main_rows.append(val)
++    
++    # Status Panel
++    status_rows = []
++    for label, val in region_results:
++        if label.strip().startswith("L"):
++            status_rows.append(val)
++            
++    # Format as pairs or single values
++    for val in main_rows:
++        rows.append((val, "---"))
++    
++    if status_rows:
++        rows.append(("Status:", " ".join(status_rows)))
++        
+     return rows
+ 
+ 
+@@ -455,15 +502,13 @@ def parse_7segment(ocr_text: str) -> list[tuple[str, str]]:
+ 
+ def save_ocr_result_json(rows: list[tuple[str, str]], output_path: str | None = None) -> None:
+     """Save the latest OCR results as a JSON file for the dashboard."""
+-    # Default to a path accessible by the WebUI
+-    path = output_path or "/home/pi/DuDe_Watcher/last_ocr_report.json"
+-    
+-    # In this environment, we might need to use a different path
+-    if not os.path.exists(os.path.dirname(path)):
+-        # Fallback for Dell server simulation
+-        path = "/home/thegodseller/DuDe_Hawaiian/tHe_DuDe_WebUI/dude_hawaiian_webui/public/last_ocr_report.json"
+-        os.makedirs(os.path.dirname(path), exist_ok=True)
+-
++    # Try to find a sensible path
++    if output_path:
++        path = output_path
++    else:
++        # Save relative to the script directory if other paths fail
++        path = str(SCRIPT_DIR / "last_ocr_report.json")
++        
+     data = {
+         "timestamp": datetime.now().isoformat(),
+         "date": datetime.now().strftime("%d-%m-%Y"),
+@@ -472,11 +517,12 @@ def save_ocr_result_json(rows: list[tuple[str, str]], output_path: str | None =
+     }
+     
+     try:
++        os.makedirs(os.path.dirname(path), exist_ok=True)
+         with open(path, "w") as f:
+             json.dump(data, f, indent=4)
+         LOG.info("OCR result JSON dumped to %s", path)
+     except Exception as e:
+-        LOG.error("Failed to dump OCR JSON: %s", e)
++        LOG.error("Failed to dump OCR JSON to %s: %s", path, e)
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -674,6 +720,10 @@ def build_parser() -> argparse.ArgumentParser:
+         "--test-ocr-only", action="store_true",
+         help="Capture + OCR only, show results without sending to LINE",
+     )
++    parser.add_argument(
++        "--sources-config",
++        help="Path to JSON file with multiple sources (e.g. sources.json)",
++    )
+     parser.add_argument(
+         "--verbose", action="store_true",
+         help="Enable verbose logging",
+@@ -696,14 +746,49 @@ def main() -> int:
+     LOGS_DIR.mkdir(parents=True, exist_ok=True)
+ 
+     try:
+-        return run_pipeline(
+-            source=args.source,
+-            image_path=args.image_path,
+-            nvr_url=args.nvr_url,
+-            negotiator_url=args.negotiator_url,
+-            dry_run=args.dry_run,
+-            test_ocr_only=args.test_ocr_only,
+-        )
++        # Load sources
++        sources = []
++        if args.sources_config:
++            with open(args.sources_config, 'r') as f:
++                sources = json.load(f)
++        else:
++            # Fallback to single source from args/env
++            sources = [{"name": "ตู้ที่ 1", "url": args.nvr_url}]
++
++        combined_messages = []
++        date_str = datetime.now().strftime("%d-%m-%Y %H:%M")
++        combined_messages.append(f"🧊 Ice Fac Aran - Panel Report\n📅 {date_str}\n")
++
++        for source in sources:
++            name = source.get("name", "Unknown Panel")
++            url = source.get("url")
++            LOG.info(">>> Processing %s: %s", name, url)
++            
++            # 1. Capture & OCR
++            try:
++                img_path = capture_snapshot(source=args.source, nvr_url=url)
++                ocr_results, _ = run_ocr(img_path)
++                rows = build_rows_from_regions(ocr_results)
++                
++                # Format sub-report
++                combined_messages.append(f"[{name}]")
++                for i, (left, right) in enumerate(rows, 1):
++                    combined_messages.append(f"  {left.ljust(5)} {right}")
++                combined_messages.append("") # Spacer
++                
++            except Exception as e:
++                LOG.error("Failed to process %s: %s", name, e)
++                combined_messages.append(f"[{name}] ⚠️ Error: {e}\n")
++
++        final_message = "\n".join(combined_messages)
++        LOG.info("Final Report Content:\n%s", final_message)
++
++        if args.test_ocr_only:
++            return 0
++
++        # Send to negotiator
++        return send_to_negotiator(final_message, args.negotiator_url).get("status") == "success"
++
+     except Exception as exc:
+         LOG.exception("Pipeline failed with unhandled error: %s", exc)
+         return 2
