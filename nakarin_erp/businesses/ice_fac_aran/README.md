@@ -5,6 +5,7 @@ Business module for ice factory production and operations.
 ## Owner Confirmation
 
 Before implementing any automation or LINE workflows, all business rules must be finalized in the [Owner Confirmation Checklist](owner_confirmation_checklist.md).
+For a more practical review session, use the [Owner Interview Form (Thai)](owner_interview_form_th.md).
 
 ## Local Scope
 

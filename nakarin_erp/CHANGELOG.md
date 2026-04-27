@@ -23,3 +23,4 @@
 - 2026-04-27: Fixed the RackPeek local seed config by quoting incompatible `notes` values and updating the seeded RackPeek service entry from `18080` to `18081`.
 - 2026-04-27: Created `owner_confirmation_checklist.md` for Ice Fac Aran to lock business rules and approval chains before implementation.
 - 2026-04-27: Translated `owner_confirmation_checklist.md` into Thai for business owner review.
+- 2026-04-27: Created `owner_interview_form_th.md` as a practical tool for capturing owner decisions.
