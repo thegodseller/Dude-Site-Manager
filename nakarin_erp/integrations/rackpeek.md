@@ -31,5 +31,8 @@
 - The local RackPeek Web UI should be opened at `http://127.0.0.1:18081`.
 - RackPeek is manual inventory only for the DuDe local workflow and must not be treated as a network scanner.
 - Current verification result: RackPeek HTTP 500 was traced to invalid seed YAML; quoted `notes` values and the corrected `rackpeek-ui` port `18081` removed the config parse error, RackPeek starts cleanly, and Docker shows `127.0.0.1:18081->8080/tcp`.
+- LiteLLM local gateway (`http://127.0.0.1:4000`) has been added to the manual inventory in `ops/rackpeek/config/config.yaml`.
+- Latest manual audit (2026-04-27) synchronized `ops/rackpeek/config/config.yaml` with running Docker/host services (Fixing agent ports 11112-11114, db_mem0 13332, and adding database/auxiliary containers).
+- RackPeek is a manual inventory tool; it does not auto-discover services. Use `docker ps` and `ss -ltnp` to verify reality before updating the inventory.
 - `UNKNOWN: host curl may still fail in this environment despite Docker port mapping; verify from browser at http://127.0.0.1:18081.`
 - Production scan policy remains `UNKNOWN: requires owner confirmation`.
