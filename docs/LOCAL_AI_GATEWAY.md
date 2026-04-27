@@ -33,3 +33,9 @@ Unified access to local LLMs for DuDe via LiteLLM and direct llama.cpp endpoints
 ## Security
 - LiteLLM is bound to `0.0.0.0` for container reachability. Do not expose port 4000 publicly.
 - Model servers (1808x) remain bound to `127.0.0.1`.
+
+## Security & Secret Hygiene (STRICT)
+- **NEVER** run `cat .env` or equivalent commands that output raw values to the terminal or logs.
+- **NEVER** commit real API keys, tokens, or secrets to the repository.
+- **ALWAYS** use `scripts/print_env_keys_safe.sh` for inspecting environment configuration.
+- **ALWAYS** redact values in any debugging output or documentation.
