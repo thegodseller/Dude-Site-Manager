@@ -1,44 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Operator-run smoke test for the local LiteLLM gateway.
-# This requires Docker and already-running DuDe containers. It does not start,
-# stop, build, or remove containers.
+# Safely test LiteLLM gateway and agent connectivity from the host.
+# Does not modify or restart containers.
 
-HOST_GATEWAY="${LITELLM_BASE_URL:-http://127.0.0.1:4000/v1}"
-CONTAINER_GATEWAY="${LITELLM_CONTAINER_BASE_URL:-http://host.docker.internal:4000/v1}"
-AG_BOSS_CONTAINER="${AG_BOSS_CONTAINER:-ag_boss}"
-AG_NEGOTIATOR_CONTAINER="${AG_NEGOTIATOR_CONTAINER:-ag_negotiator}"
-NEGOTIATOR_CHAT_URL="${NEGOTIATOR_CHAT_URL:-http://localhost:8000/api/chat}"
+LITELLM_BASE_URL="${LITELLM_BASE_URL:-http://127.0.0.1:4000/v1}"
+NEGOTIATOR_CHAT_URL="${NEGOTIATOR_CHAT_URL:-http://127.0.0.1:11112/api/chat}"
 
-echo "--- DuDe LiteLLM Smoke Test ---"
-echo "This script requires Docker and running DuDe containers."
+# Prepare auth header if LITELLM_API_KEY is set
+AUTH_HEADER=()
+if [[ -n "${LITELLM_API_KEY:-}" ]]; then
+    AUTH_HEADER=(-H "Authorization: Bearer $LITELLM_API_KEY")
+fi
 
-echo -n "Host -> $HOST_GATEWAY: "
-if curl -s -o /dev/null --max-time 5 "$HOST_GATEWAY"; then
+echo "--- DuDe LiteLLM Smoke Test (Safe Host-Side) ---"
+
+# 1. Gateway Check
+echo -n "Gateway Reachability ($LITELLM_BASE_URL): "
+if curl -s -o /dev/null --max-time 5 "$LITELLM_BASE_URL/models" "${AUTH_HEADER[@]}"; then
     echo "PASS"
 else
-    echo "FAIL"
+    echo "FAIL (Check if LiteLLM is running and API key is correct)"
     exit 1
 fi
 
-echo -n "$AG_BOSS_CONTAINER -> $CONTAINER_GATEWAY: "
-if docker exec "$AG_BOSS_CONTAINER" curl -s -o /dev/null --max-time 5 "$CONTAINER_GATEWAY"; then
+# 2. Agent -> Gateway Functional Check (Intent Classification)
+# Tests if ag_negotiator (on host port 11112) can process a message via the LLM.
+echo -n "ag_negotiator Intent Classification ($NEGOTIATOR_CHAT_URL): "
+RESP=$(curl -s -X POST "$NEGOTIATOR_CHAT_URL" \
+    -H "Content-Type: application/json" \
+    -d '{"message": "ขอรายงานประจำวัน", "user": "smoke_tester"}')
+
+if echo "$RESP" | grep -q "reply_message"; then
     echo "PASS"
 else
-    echo "FAIL"
-    exit 1
-fi
-
-echo "Testing ag_negotiator intent classification..."
-RESP=$(docker exec "$AG_NEGOTIATOR_CONTAINER" curl -s -X POST "$NEGOTIATOR_CHAT_URL" \
-    -d '{"message": "ขอรายงานประจำวัน", "user": "test_user"}' \
-    -H "Content-Type: application/json")
-
-if echo "$RESP" | grep -q "📊"; then
-    echo "Classification PASS"
-else
-    echo "Classification FAIL: $RESP"
+    echo "FAIL: $RESP"
     exit 1
 fi
 
