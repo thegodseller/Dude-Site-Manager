@@ -1,0 +1,96 @@
+/* DuDe SaaS — Global Styles */
+/* Import in main.tsx: import './dude.css' */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Bebas+Neue&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 14px; }
+
+body {
+  background: var(--dude-bg, #080c14);
+  color: var(--dude-text, #f0f4ff);
+  font-family: var(--dude-font, 'IBM Plex Sans Thai', Sarabun, sans-serif);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0f1623; }
+::-webkit-scrollbar-thumb { background: #1e2d42; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3d58; }
+
+/* ── Selection ── */
+::selection { background: rgba(59,130,246,0.3); color: #f0f4ff; }
+
+/* ── Keyframes ── */
+@keyframes dude-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+@keyframes dude-ping {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes dude-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dude-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+@keyframes dude-slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dude-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes dude-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* ── Utility classes ── */
+.dude-slide-in  { animation: dude-slide-in 0.22s ease-out both; }
+.dude-fade-in   { animation: dude-fade-in 0.18s ease-out both; }
+.dude-pulse     { animation: dude-pulse 1.8s ease-in-out infinite; }
+.dude-blink     { animation: dude-blink 1s ease-in-out infinite; }
+.dude-spin      { animation: dude-spin 0.7s linear infinite; }
+
+/* Skeleton shimmer */
+.dude-skeleton {
+  background: linear-gradient(90deg, #161f30 25%, #1e2a3f 50%, #161f30 75%);
+  background-size: 800px 100%;
+  animation: dude-shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+/* Ping ring for critical alerts */
+.dude-ping::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: dude-ping 1.2s cubic-bezier(0,0,0.2,1) infinite;
+}
+
+/* Mono text */
+.dude-mono { font-family: 'IBM Plex Mono', monospace; }
+
+/* Truncate */
+.dude-truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
