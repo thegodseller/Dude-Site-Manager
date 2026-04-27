@@ -1,63 +1,39 @@
 # Local AI Gateway Architecture
 
-DuDe can optionally use LiteLLM as an OpenAI-compatible gateway to local models.
-This path is enabled only when services receive `LITELLM_BASE_URL`.
+Unified access to local LLMs for DuDe via LiteLLM and llama.cpp.
 
-## Example Architecture
-
-```text
-[DuDe agents running in Docker]
+## Architecture
+\`\`\`text
+[DuDe Agents (Docker)]
       |
-      | http://host.docker.internal:4000/v1
+      | (http://host.docker.internal:4000)
       v
-[LiteLLM gateway on Docker host]
+[LiteLLM Gateway (Host Venv - Bound to 0.0.0.0)]
       |
-      +---- 18080 ----> llama-server example: fast model
-      +---- 18082 ----> llama-server example: local chat model
-      +---- 18084 ----> llama-server example: code model
-      +---- 18086 ----> llama-server example: embedding model
-```
+      +---- (18080) ----> [llama-server (Qwen3.5 0.8B)]
+      +---- (18082) ----> [llama-server (Qwen2.5 1.5B)]
+      +---- (18084) ----> [llama-server (Qwen2.5-Coder 3B)]
+      +---- (18086) ----> [llama-server (Qwen3-Embedding 0.6B)]
+\`\`\`
 
-The ports and model names above are local examples, not project requirements.
-Keep them aligned with the operator's LiteLLM configuration.
+## Component Map
+| Alias | Port | Backend Model | Responsibility |
+| :--- | :--- | :--- | :--- |
+| \`dude-fast\` | 18080 | Qwen3.5 0.8B | Intent detection, simple chat. |
+| \`dude-local\` | 18082 | Qwen2.5 1.5B | General Thai reasoning, fallback. |
+| \`dude-code\` | 18084 | Qwen2.5-Coder 3B | Scripting, debugging, technical analysis. |
+| \`dude-embed\` | 18086 | Qwen3-Embedding 0.6B | RAG, Vector generation. |
 
-## Example Component Map
-
-| Alias | Example Port | Responsibility |
-| :--- | :--- | :--- |
-| `dude-fast` | 18080 | Intent detection and simple replies. |
-| `dude-local` | 18082 | General Thai reasoning and fallback. |
-| `dude-code` | 18084 | Scripting, debugging, and technical analysis. |
-| `dude-embed` | 18086 | RAG and vector generation. |
+## Security & Connectivity
+- **Binding**: LiteLLM is bound to \`0.0.0.0\` to allow communication between the Docker bridge network and the host gateway.
+- **Risk**: Port 4000 is open on all interfaces. **Do not expose port 4000 to the public internet.**
+- **Network**: Ensure the machine is behind a firewall or restricted to local/private LAN.
+- **API keys**: `dummy-local-key` is a non-secret local placeholder only. Do not commit real API keys.
+- **Configuration**: Prefer setting `LITELLM_API_KEY` through local `.env` or shell environment.
+- **Future Improvement**: Transition LiteLLM into the Docker Compose network to restrict access to internal containers only.
 
 ## Operations
-
-Local host-side tooling may live outside this repository, for example under a
-user-managed `~/dude-litellm/` directory. Treat that path as an operator example,
-not a repository dependency.
-
-Repository helpers:
-
-- Smoke test: `scripts/smoke_test_litellm_gateway.sh`
-- Benchmark: `scripts/benchmark_litellm_models.sh`
-
-The smoke test requires Docker and running DuDe containers. The benchmark calls
-only the configured local LiteLLM endpoint.
-
-## Linux Container Access
-
-When a container calls `http://host.docker.internal:4000/v1` on Linux, that
-specific compose service needs:
-
-```yaml
-extra_hosts:
-  - "host.docker.internal:host-gateway"
-```
-
-Do not add host gateway access to services that do not call LiteLLM.
-
-## Secret Handling
-
-Do not commit real API keys. Use environment variables or local secret
-management. `dummy-local-key` is acceptable only as a documented local
-placeholder for development gateways that require a non-empty value.
+- **Status**: \`~/dude-litellm/status-local-ai-stack.sh\`
+- **Health Check**: \`~/dude-litellm/healthcheck-local-ai-stack.sh\`
+- **Smoke Test**: \`scripts/smoke_test_litellm_gateway.sh\`
+- **Benchmark**: \`scripts/benchmark_litellm_models.sh\`

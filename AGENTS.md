@@ -41,3 +41,11 @@ This repository may be edited by:
 - Antigravity
 
 All tools must follow the same source of truth.
+
+## Nested Repo Push Rule:
+- tHe_DuDe_Service is a gitlink/nested repository.
+- Always commit and push tHe_DuDe_Service first.
+- Then commit/update/push the parent repository.
+- Never push parent gitlink commits that reference nested commits not available on the nested remote.
+
+---

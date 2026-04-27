@@ -29,5 +29,11 @@ The infrastructure is split into two distinct layers serving different purposes.
   - `cd /home/thegodseller/DuDe_Hawaiian/tHe_DuDe_WebUI/dude_hawaiian_webui`
   - `npm run dev`
 
+## Nested Repo Push Rule:
+- tHe_DuDe_Service is a gitlink/nested repository.
+- Always commit and push tHe_DuDe_Service first.
+- Then commit/update/push the parent repository.
+- Never push parent gitlink commits that reference nested commits not available on the nested remote.
+
 ---
 *Last updated: 2026-04-18 by Antigravity AI*
