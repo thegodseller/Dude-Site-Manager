@@ -21,3 +21,4 @@
 - 2026-04-27: Updated the local RackPeek start path to keep the mounted config writable because RackPeek creates local backup files during load/migration.
 - 2026-04-27: Moved local RackPeek from host port `18080` to `127.0.0.1:18081` so `18080` remains reserved for local llama-server use.
 - 2026-04-27: Fixed the RackPeek local seed config by quoting incompatible `notes` values and updating the seeded RackPeek service entry from `18080` to `18081`.
+- 2026-04-27: Created `owner_confirmation_checklist.md` for Ice Fac Aran to lock business rules and approval chains before implementation.
