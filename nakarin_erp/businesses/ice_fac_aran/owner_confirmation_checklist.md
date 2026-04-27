@@ -1,201 +1,201 @@
-# Ice Fac Aran Owner Confirmation Checklist
+# รายการตรวจสอบเพื่อการยืนยันจากเจ้าของธุรกิจ (Ice Fac Aran)
 
-## Purpose
-This file is used to lock business rules before LINE cards, ERP workflows, automation, IoT, or approval logic are implemented. It serves as a single source of truth for requirements that require explicit confirmation from the business owner ("เสี่ย" / "คุณที").
+## วัตถุประสงค์ (Purpose)
+ไฟล์นี้ใช้เพื่อล็อคกฎทางธุรกิจก่อนที่จะเริ่มการพัฒนา LINE Card, เวิร์กโฟลว์ ERP, ระบบอัตโนมัติ, IoT หรือตรรกะการอนุมัติ โดยใช้เป็นแหล่งข้อมูลอ้างอิงหลักที่ต้องได้รับการยืนยันอย่างชัดเจนจากเจ้าของธุรกิจ ("เสี่ย" / "คุณที")
 
-## Approval Roles
-- **Who can approve leave requests?**
-  - UNKNOWN: requires owner confirmation
-- **Who can approve cash/material withdrawal requests?**
-  - UNKNOWN: requires owner confirmation
-- **Are "เสี่ย" and "คุณที" both required, or is either one enough?**
-  - UNKNOWN: requires owner confirmation
-- **Is approval sequential or parallel?**
-  - UNKNOWN: requires owner confirmation
-- **What happens if one approver is unavailable?**
-  - UNKNOWN: requires owner confirmation
-- **What actions require owner-only approval?**
-  - UNKNOWN: requires owner confirmation
+## บทบาทการอนุมัติ (Approval Roles)
+- **ใครมีอำนาจอนุมัติคำขอลา?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครมีอำนาจอนุมัติคำขอเบิกเงินหรือวัสดุอุปกรณ์?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ต้องได้รับการอนุมัติจากทั้ง "เสี่ย" และ "คุณที" หรือแค่คนใดคนหนึ่ง?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การอนุมัติเป็นแบบตามลำดับ (Sequential) หรือแบบขนาน (Parallel)?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **หากผู้อนุมัติคนใดคนหนึ่งไม่ว่าง จะต้องดำเนินการอย่างไร?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การดำเนินการใดบ้างที่ต้องให้เจ้าของอนุมัติเพียงผู้เดียวเท่านั้น?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Employee Identity and Photo Capture
-- **What employee fields are required?**
-  - UNKNOWN: requires owner confirmation
-- **Is face/photo capture required for every request?**
-  - UNKNOWN: requires owner confirmation
-- **Who can view employee photos?**
-  - UNKNOWN: requires owner confirmation
-- **Retention period for employee photos?**
-  - UNKNOWN: requires owner confirmation
-- **How to handle workers without formal documents?**
-  - UNKNOWN: requires owner confirmation
+## อัตลักษณ์พนักงานและการถ่ายภาพ (Employee Identity and Photo Capture)
+- **ข้อมูลพนักงานส่วนใดบ้างที่จำเป็นต้องระบุ?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **จำเป็นต้องถ่ายภาพใบหน้าในทุกๆ การส่งคำขอหรือไม่?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครมีสิทธิ์ดูภาพถ่ายของพนักงานได้บ้าง?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ระยะเวลาในการจัดเก็บภาพถ่ายพนักงานคือเท่าใด?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การจัดการกับคนงานที่ไม่มีเอกสารทางการ (บัตรชมพู/ต่างด้าว)?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Leave Request Workflow
-- **Required fields:**
-  - UNKNOWN: requires owner confirmation
-- **Leave types:**
-  - UNKNOWN: requires owner confirmation
-- **Approval flow:**
-  - UNKNOWN: requires owner confirmation
-- **Emergency leave handling:**
-  - UNKNOWN: requires owner confirmation
-- **Attachment/photo requirement:**
-  - UNKNOWN: requires owner confirmation
-- **Notification recipients:**
-  - UNKNOWN: requires owner confirmation
+## เวิร์กโฟลว์การลา (Leave Request Workflow)
+- **ข้อมูลที่จำเป็น (Required fields):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ประเภทการลา:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ขั้นตอนการอนุมัติ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การจัดการกรณีลาฉุกเฉิน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ความต้องการหลักฐานแนบหรือรูปถ่าย:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ผู้ที่ต้องได้รับแจ้งเตือน (Notification):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Withdrawal / Advance / Material Request Workflow
-- **Types of withdrawal:**
-  - UNKNOWN: requires owner confirmation
-- **Cash limit:**
-  - UNKNOWN: requires owner confirmation
-- **Material categories:**
-  - UNKNOWN: requires owner confirmation
-- **Receipt/photo proof:**
-  - UNKNOWN: requires owner confirmation
-- **Approval thresholds:**
-  - UNKNOWN: requires owner confirmation
-- **Daily/monthly limits:**
-  - UNKNOWN: requires owner confirmation
-- **Audit requirements:**
-  - UNKNOWN: requires owner confirmation
+## เวิร์กโฟลว์การเบิกเงิน / เบิกล่วงหน้า / เบิกวัสดุ (Withdrawal / Advance / Material Request)
+- **ประเภทของการเบิก:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **วงเงินสดขั้นสูง:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **หมวดหมู่ของวัสดุอุปกรณ์:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การส่งหลักฐานใบเสร็จหรือรูปถ่าย:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **เกณฑ์การอนุมัติ (Approval thresholds):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ขีดจำกัดรายวัน/รายเดือน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อกำหนดในการตรวจสอบ (Audit):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Job Application Workflow
-- **Required applicant fields:**
-  - UNKNOWN: requires owner confirmation
-- **Photo requirement:**
-  - UNKNOWN: requires owner confirmation
-- **ID document policy:**
-  - UNKNOWN: requires owner confirmation
-- **Work permit / worker document handling:**
-  - UNKNOWN: requires owner confirmation
-- **Who approves hiring:**
-  - UNKNOWN: requires owner confirmation
-- **Probation status handling:**
-  - UNKNOWN: requires owner confirmation
+## เวิร์กโฟลว์การรับสมัครงาน (Job Application Workflow)
+- **ข้อมูลผู้สมัครที่จำเป็น:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ความต้องการรูปถ่าย:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **นโยบายเกี่ยวกับเอกสารประจำตัว:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การจัดการใบอนุญาตทำงาน / เอกสารแรงงาน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครเป็นผู้อนุมัติการจ้างงาน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การจัดการสถานะทดลองงาน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Complaint Workflow
-- **Complaint categories:**
-  - UNKNOWN: requires owner confirmation
-- **Anonymous complaint allowed?**
-  - UNKNOWN: requires owner confirmation
-- **Escalation path:**
-  - UNKNOWN: requires owner confirmation
-- **SLA / response time:**
-  - UNKNOWN: requires owner confirmation
-- **Who can close complaint?**
-  - UNKNOWN: requires owner confirmation
+## เวิร์กโฟลว์การแจ้งเรื่องร้องเรียน (Complaint Workflow)
+- **หมวดหมู่ของการร้องเรียน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **อนุญาตให้ร้องเรียนแบบไม่ระบุตัวตนหรือไม่?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ลำดับการรายงานปัญหา (Escalation path):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ระยะเวลาดำเนินการ (SLA / response time):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครมีอำนาจปิดเคสการร้องเรียน?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Water Quality Check / QC
-- **What measurements are recorded?**
-  - UNKNOWN: requires owner confirmation
-- **Who records them?**
-  - UNKNOWN: requires owner confirmation
-- **Frequency:**
-  - UNKNOWN: requires owner confirmation
-- **Pass/fail thresholds:**
-  - UNKNOWN: requires owner confirmation
-- **Photo requirement:**
-  - UNKNOWN: requires owner confirmation
-- **Alert recipients:**
-  - UNKNOWN: requires owner confirmation
-- **Corrective action flow:**
-  - UNKNOWN: requires owner confirmation
+## การตรวจสอบคุณภาพน้ำ / QC (Water Quality Check)
+- **ค่าการวัดใดบ้างที่ต้องบันทึก?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครเป็นผู้บันทึกข้อมูล?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ความถี่ในการตรวจสอบ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **เกณฑ์การผ่าน/ไม่ผ่าน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ความต้องการรูปถ่าย:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ผู้รับแจ้งเตือนหากค่าผิดปกติ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ขั้นตอนการแก้ไขหากพบปัญหา (Corrective action):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Production Gauge / Vision
-- **Which camera sees the gauge?**
-  - UNKNOWN: requires owner confirmation
-- **Gauge crop location:**
-  - UNKNOWN: requires owner confirmation
-- **Reading schedule:**
-  - UNKNOWN: requires owner confirmation
-- **What to do if OCR/vision confidence is low?**
-  - UNKNOWN: requires owner confirmation
-- **Who receives report?**
-  - UNKNOWN: requires owner confirmation
-- **Daily production report format:**
-  - UNKNOWN: requires owner confirmation
+## การตรวจวัดการผลิตด้วย Vision System (Production Gauge / Vision)
+- **กล้องตัวไหนที่ส่องมิเตอร์/เกจการผลิต?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ตำแหน่งการ Crop รูปเกจ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ตารางเวลาการอ่านค่า:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **หากระบบ AI (OCR/Vision) มีความเชื่อมั่นต่ำ ควรทำอย่างไร?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครเป็นผู้รับรายงานการผลิต?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **รูปแบบรายงานการผลิตรายวัน:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## IoT / Tuya Devices
-- **Actual devices to be used:**
-  - UNKNOWN: requires owner confirmation
-- **Temperature sensors:**
-  - UNKNOWN: requires owner confirmation
-- **Switches/lights:**
-  - UNKNOWN: requires owner confirmation
-- **Zigbee/WiFi gateway:**
-  - UNKNOWN: requires owner confirmation
-- **Who can control devices:**
-  - UNKNOWN: requires owner confirmation
-- **Manual override policy:**
-  - UNKNOWN: requires owner confirmation
-- **Failure mode if Tuya is unavailable:**
-  - UNKNOWN: requires owner confirmation
+## อุปกรณ์ IoT / Tuya
+- **รายการอุปกรณ์ที่จะใช้งานจริง:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **เซนเซอร์อุณหภูมิ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **สวิตช์ / ไฟ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **Zigbee/WiFi Gateway:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครมีสิทธิ์ควบคุมอุปกรณ์บ้าง:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **นโยบายการควบคุมด้วยมือ (Manual override):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **แผนสำรองหากระบบ Cloud/Tuya ใช้งานไม่ได้:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Vehicle / Repair Department
-- **Vehicle list fields:**
-  - UNKNOWN: requires owner confirmation
-- **Repair ticket fields:**
-  - UNKNOWN: requires owner confirmation
-- **Spare parts withdrawal:**
-  - UNKNOWN: requires owner confirmation
-- **Mechanic assignment:**
-  - UNKNOWN: requires owner confirmation
-- **Approval for repair cost:**
-  - UNKNOWN: requires owner confirmation
-- **Status workflow:**
-  - UNKNOWN: requires owner confirmation
+## แผนกยานพาหนะและการซ่อมบำรุง (Vehicle / Repair Department)
+- **ข้อมูลที่ต้องบันทึกในรายการยานพาหนะ:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลในใบแจ้งซ่อม (Repair ticket):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การเบิกอะไหล่ซ่อม:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การมอบหมายช่างซ่อม:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **การอนุมัติค่าใช้จ่ายในการซ่อม:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ขั้นตอนสถานะงานซ่อม (Status workflow):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## LINE / LIFF Card Requirements
-- **Which workflows must have LIFF cards?**
-  - UNKNOWN: requires owner confirmation
-- **What fields appear on each card?**
-  - UNKNOWN: requires owner confirmation
-- **Required photo buttons:**
-  - UNKNOWN: requires owner confirmation
-- **Confirmation screen requirements:**
-  - UNKNOWN: requires owner confirmation
-- **Thai language wording:**
-  - UNKNOWN: requires owner confirmation
-- **Who receives notification:**
-  - UNKNOWN: requires owner confirmation
+## ข้อกำหนดของ LINE / LIFF Card
+- **เวิร์กโฟลว์ใดบ้างที่ต้องมีหน้าจอ LIFF?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลใดบ้างที่ต้องปรากฏบนการ์ดแต่ละประเภท?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ปุ่มถ่ายภาพที่จำเป็น:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ความต้องการหน้าจอยืนยันก่อนส่ง (Confirmation screen):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **สำนวนภาษาไทยที่ต้องการใช้:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครเป็นผู้รับการแจ้งเตือนจาก LINE:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## ERP / Nakarin Data Model Impact
-- **Which fields become shared standards?**
-  - UNKNOWN: requires owner confirmation
-- **Which fields are Ice Fac Aran specific?**
-  - UNKNOWN: requires owner confirmation
-- **Which fields should be reusable for AM Nexus / 121C / POS / Room Service?**
-  - UNKNOWN: requires owner confirmation
-- **Required audit fields:**
-  - UNKNOWN: requires owner confirmation
-- **Required status fields:**
-  - UNKNOWN: requires owner confirmation
+## ผลกระทบต่อโครงสร้างข้อมูล ERP / Nakarin
+- **ข้อมูลใดบ้างที่จะกลายเป็นมาตรฐานกลาง (Shared standards)?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลใดบ้างที่เป็นเฉพาะของ Ice Fac Aran?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลใดที่ควรออกแบบให้ใช้ซ้ำได้กับ AM Nexus / 121C / POS / Room Service?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลที่จำเป็นสำหรับการตรวจสอบ (Audit fields):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลสถานะที่จำเป็น (Status fields):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## Permission / Audit / Privacy Rules
-- **Who can view requests?**
-  - UNKNOWN: requires owner confirmation
-- **Who can approve?**
-  - UNKNOWN: requires owner confirmation
-- **Who can export reports?**
-  - UNKNOWN: requires owner confirmation
-- **What must be audit-logged?**
-  - UNKNOWN: requires owner confirmation
-- **Photo/data retention policy:**
-  - UNKNOWN: requires owner confirmation
-- **Sensitive data masking policy:**
-  - UNKNOWN: requires owner confirmation
+## กฎการอนุญาต / การตรวจสอบ / ความเป็นส่วนตัว (Permission / Audit / Privacy)
+- **ใครสามารถดูรายการคำขอต่างๆ ได้บ้าง?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครสามารถอนุมัติได้บ้าง?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ใครสามารถส่งออกรายงานได้บ้าง?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **ข้อมูลใดบ้างที่ต้องบันทึกประวัติ (Audit log)?**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **นโยบายการจัดเก็บภาพถ่ายและข้อมูล:**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
+- **นโยบายการปิดบังข้อมูลสำคัญ (Data masking):**
+  - ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน
 
-## MVP Scope Confirmation
-- [ ] Leave request (UNKNOWN: requires owner confirmation)
-- [ ] Withdrawal request (UNKNOWN: requires owner confirmation)
-- [ ] Job application (UNKNOWN: requires owner confirmation)
-- [ ] Complaint (UNKNOWN: requires owner confirmation)
-- [ ] Water QC (UNKNOWN: requires owner confirmation)
-- [ ] Production gauge vision report (UNKNOWN: requires owner confirmation)
-- [ ] Vehicle repair ticket (UNKNOWN: requires owner confirmation)
-- [ ] IoT monitoring (UNKNOWN: requires owner confirmation)
-- [ ] IoT control (UNKNOWN: requires owner confirmation)
-- [ ] Daily owner report (UNKNOWN: requires owner confirmation)
+## การยืนยันขอบเขต MVP (MVP Scope Confirmation)
+- [ ] คำขอลา (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] คำขอเบิกเงิน/ของ (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] การรับสมัครงาน (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] การร้องเรียน (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] การตรวจคุณภาพน้ำ (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] รายงาน Vision มิเตอร์การผลิต (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] ใบแจ้งซ่อมรถ/เครื่องจักร (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] การมอนิเตอร์ IoT (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] การควบคุม IoT (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
+- [ ] รายงานสรุปรายวันสำหรับเจ้าของ (ยังไม่ทราบ: ต้องให้เจ้าของยืนยัน)
 
-## Open Questions
-- All items marked with UNKNOWN above require owner confirmation before implementation.
+## คำถามที่ยังค้างอยู่ (Open Questions)
+- ทุกรายการที่มีเครื่องหมาย "ยังไม่ทราบ" ด้านบน จำเป็นต้องได้รับการยืนยันจากเจ้าของก่อนเริ่มการพัฒนาจริง
