@@ -35,5 +35,9 @@ The infrastructure is split into two distinct layers serving different purposes.
 - Then commit/update/push the parent repository.
 - Never push parent gitlink commits that reference nested commits not available on the nested remote.
 
+## 📦 External Dependencies
+- **VisionLabel**: Local external checkout in `tHe_DuDe_Service/VisionLabel`.
+  - See [docs/VISIONLABEL_LOCAL.md](docs/VISIONLABEL_LOCAL.md) for local fixes and architecture.
+
 ---
-*Last updated: 2026-04-18 by Antigravity AI*
+*Last updated: 2026-04-27 by Antigravity AI*
