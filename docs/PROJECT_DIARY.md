@@ -9,3 +9,17 @@
   - `tHe_DuDe_Service/obsidian_vault/` for runtime/audit knowledge.
 - Hardened privacy guardrails in `nakarin_erp/.gitignore`.
 - Added/updated root foundation docs for operational continuity.
+
+## requirements
+Create a diary template with:
+- Date
+- Goal
+- Context
+- What I did
+- What worked
+- What failed
+- Files changed
+- Commands run
+- AI involvement
+- Decision notes
+- Next actions

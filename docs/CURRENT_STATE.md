@@ -18,3 +18,17 @@ Date: 2026-04-28
 
 1. Complete legacy consumer audit before removing root legacy registry entries.
 2. Keep validator allowlist exceptions explicit and temporary.
+
+## requirements
+Create a practical handoff file with:
+- Project summary
+- Current working state
+- Known good commands
+- Services table
+- Important files
+- Last changes
+- Validation result
+- Known issues
+- Risks
+- Next recommended action
+- Latest handoff note

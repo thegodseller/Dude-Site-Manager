@@ -10,7 +10,7 @@ Generated: 2026-04-28
 
 ### Question
 
-`https://github.com/JacobJandon/OnionClaw`  
+`https://github.com/JacobJandon/OnionClaw`
 กินสเปกเครื่องมากมั๊ย
 
 ### Answer
@@ -82,7 +82,7 @@ TOR_CONTROL_PORT=9051
 
 ### Verdict
 
-OnionClaw does not need high specs if it uses LLM API.  
+OnionClaw does not need high specs if it uses LLM API.
 Dell 3060 / i5 Gen6 RAM 16–32GB can run it comfortably.
 
 But if running full pipeline, scraping many sites, using many TorPool processes, and running local LLM, it becomes heavier and slower.
@@ -213,7 +213,7 @@ Use both.
 
 ### Answer
 
-ดี ใช้ได้ และเหมาะกับ DuDe/Nexus มาก  
+ดี ใช้ได้ และเหมาะกับ DuDe/Nexus มาก
 แต่ต้องกำหนดบทบาทให้ชัด ไม่งั้นจะกลายเป็นความจำซ้ำซ้อน 3 กอง
 
 ### Core roles
@@ -314,7 +314,7 @@ Do not allow every agent to write randomly into every memory system.
 
 ดีมาก และควรทำเป็น standard
 
-Every repo should have memory from day one.  
+Every repo should have memory from day one.
 Do not let code exist without context.
 
 ### Recommended structure
@@ -354,16 +354,16 @@ docs/RUNBOOK.md
 - Expected outcome:
 
 ### What I did
-- 
+-
 
 ### What worked
-- 
+-
 
 ### What failed
-- 
+-
 
 ### Decisions
-- 
+-
 
 ### AI involvement
 - Prompt used:
@@ -373,7 +373,7 @@ docs/RUNBOOK.md
 - Reason:
 
 ### Files changed
-- 
+-
 
 ### Commands run
 
@@ -382,8 +382,8 @@ docs/RUNBOOK.md
 ```
 
 ### Next actions
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
 ```
 
 ### `docs/DECISIONS.md` template
@@ -487,7 +487,7 @@ Diary is system memory.
 
 ### Answer
 
-Do not rely on each IDE or agent remembering.  
+Do not rely on each IDE or agent remembering.
 Make the repo self-documenting.
 
 ### Recommended structure
@@ -666,7 +666,7 @@ Last updated: 2026-04-26
 
 This project exists to:
 
-- 
+-
 
 ## Current Working State
 
@@ -701,11 +701,11 @@ Status:
 
 ## Last Changes
 
-- 
+-
 
 ## Files Changed Recently
 
-- 
+-
 
 ## Validation Run
 
@@ -721,17 +721,17 @@ Status:
 
 ## Known Issues
 
-- 
+-
 
 ## Risks
 
-- 
+-
 
 ## Next Recommended Action
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Handoff Note
 
@@ -739,7 +739,7 @@ Use this section to tell the next AI agent exactly where to continue.
 
 Latest handoff:
 
-- 
+-
 ```
 
 ### `scripts/context_pack.sh`
@@ -816,8 +816,8 @@ Every agent must commit or clearly say it did not commit
 
 ### Question
 
-ที่บอกมาทั้งหมด เยอะเหมือนกัน  
-ผมจะบอกให้ codex ทำให้ยังไงครับ  
+ที่บอกมาทั้งหมด เยอะเหมือนกัน
+ผมจะบอกให้ codex ทำให้ยังไงครับ
 และการเอา dude ไปใช้ในงานที่ต่างกัน แต่ ai ก็ควรรู้จักค่ามาตรฐานของ dude
 
 ### Answer
@@ -1107,12 +1107,12 @@ Do not modify files.
 
 ### Question
 
-`https://github.com/datawhalechina/easy-vibe`  
+`https://github.com/datawhalechina/easy-vibe`
 เหมาะกับผมมั๊ย
 
 ### Answer
 
-เหมาะในฐานะหลักสูตร/คู่มือฝึก AI coding workflow  
+เหมาะในฐานะหลักสูตร/คู่มือฝึก AI coding workflow
 ไม่เหมาะเอามาเป็นแกนของ DuDe
 
 ### Use as reference
@@ -1200,7 +1200,7 @@ Show git diff summary and validation result.
 
 ### Final
 
-Do not clone Easy-Vibe as a base for DuDe.  
+Do not clone Easy-Vibe as a base for DuDe.
 Use it as learning material and documentation inspiration.
 
 ---
@@ -1268,19 +1268,19 @@ repo/
 
 This project exists to:
 
-- 
+-
 
 ## North Star
 
 The project should always move toward:
 
-- 
+-
 
 ## Human Context
 
 The system is designed to help:
 
-- 
+-
 
 ## Principles
 
@@ -1327,27 +1327,27 @@ When choosing between options:
 
 The system may automate:
 
-- 
+-
 
 The system must ask for human approval before:
 
-- 
+-
 
 The system must never:
 
-- 
+-
 
 ## Long-Term Vision
 
 In the long term, this project should become:
 
-- 
+-
 
 ## Current Focus
 
 The current focus is:
 
-- 
+-
 ```
 
 ### DuDe `docs/SOUL.md` draft

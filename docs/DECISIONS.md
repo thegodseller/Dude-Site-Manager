@@ -6,3 +6,6 @@
 2. `nakarin_erp/` remains business/domain/customer source-of-truth.
 3. `tHe_DuDe_Service/obsidian_vault/` remains service-level runtime/audit knowledge.
 4. Legacy skill entries remain until consumer audits are complete.
+
+## requirements:
+- Create an ADR style template.
