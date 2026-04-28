@@ -63,3 +63,25 @@ Information flow:
 - mem0 should not store long logs or raw incident dumps.
 - Obsidian should not receive every raw event; it should receive curated long-term records.
 - Git docs are the source of truth for repo-specific implementation details.
+
+# DuDe Standard
+
+## Standard vs Local Implementation
+
+This file defines the default DuDe standard.
+
+Each repo may adapt the standard for its own use case.
+
+If a repo differs from this standard, the difference must be documented in:
+
+- `docs/DuDe-Architecture-Document.md`
+- `docs/CURRENT_STATE.md`
+- `docs/DECISIONS.md`
+
+Agents must not blindly overwrite local implementation to match this standard.
+
+The correct behavior is:
+
+1. Detect the difference
+2. Document the difference
+3. Ask or propose a migration only if the difference creates risk
