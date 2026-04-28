@@ -49,10 +49,10 @@ Do not choose silently.
 
 ## Current Continuity Note
 
-- Date: 2026-04-26
+- Date: 2026-04-28
 - Assistant: Codex CLI
-- Scope touched: BMAD integration policy for Nakarin ERP
-- Files updated: `nakarin_erp/bmad_bridge/` and root references in `README.md` and `CHANGELOG.md`
-- Open questions: exact BMAD repository paths and artifact templates are `UNKNOWN: requires owner confirmation`
+- Scope touched: BMAD artifact-level enforcement for Nakarin ERP references
+- Files updated: `tHe_DuDe_Service/_bmad/` templates/workflow steps, `scripts/validate_nakarin_erp.sh`, and `nakarin_erp/CHANGELOG.md`
+- Open questions: whether to add runtime linting against generated BMAD output files is `UNKNOWN: requires owner confirmation`
 - Conflicts: none identified in the added policy
-- Next recommended step: enforce exact Nakarin ERP file references in future BMAD PRDs, architecture docs, stories, and QA notes
+- Next recommended step: run one end-to-end BMAD PRD/architecture/story/review cycle and confirm generated artifacts include concrete `nakarin_erp/**` references

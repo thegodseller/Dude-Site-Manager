@@ -26,3 +26,4 @@
 - 2026-04-27: Created `owner_interview_form_th.md` as a practical tool for capturing owner decisions.
 - 2026-04-27: Synchronized RackPeek manual inventory with audited Docker/host services, fixing agent port mismatches and adding database/auxiliary services.
 - 2026-04-27: Decommissioned unused `dude-download-portal` (port 8088) and updated RackPeek inventory to highlight port 11118 as the DuDe Global Control Dashboard.
+- 2026-04-28: Enforced `Nakarin ERP References` requirements in BMAD PRD, architecture, story, and code-review artifacts plus validation checks in `scripts/validate_nakarin_erp.sh`.

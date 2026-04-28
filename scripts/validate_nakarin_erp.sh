@@ -50,6 +50,23 @@ check_dir_exists() {
   fi
 }
 
+check_file_contains() {
+  local path="$1"
+  local pattern="$2"
+  local description="$3"
+
+  if [[ ! -f "$path" ]]; then
+    fail "$path is missing"
+    return
+  fi
+
+  if grep -Fq "$pattern" "$path"; then
+    pass "$description"
+  else
+    fail "$path is missing required text: $pattern"
+  fi
+}
+
 check_business_module() {
   local module="$1"
   local path="nakarin_erp/businesses/$module"
@@ -98,6 +115,12 @@ check_file_nonempty "nakarin_erp/bmad_bridge/bmad_usage_policy.md"
 check_file_nonempty "nakarin_erp/bmad_bridge/story_definition_of_done.md"
 check_file_nonempty "nakarin_erp/bmad_bridge/prd_template_mapping.md"
 check_file_nonempty "nakarin_erp/bmad_bridge/qa_gate_policy.md"
+
+check_file_contains "tHe_DuDe_Service/_bmad/core/tasks/bmad-create-prd/templates/prd-template.md" "## Nakarin ERP References" "PRD template includes Nakarin ERP references section"
+check_file_contains "tHe_DuDe_Service/_bmad/bmm/workflows/3-solutioning/bmad-create-architecture/architecture-decision-template.md" "## Nakarin ERP References" "Architecture template includes Nakarin ERP references section"
+check_file_contains "tHe_DuDe_Service/_bmad/bmm/workflows/4-implementation/bmad-create-story/template.md" "### Nakarin ERP References" "Story template includes Nakarin ERP references section"
+check_file_contains "tHe_DuDe_Service/_bmad/bmm/workflows/4-implementation/bmad-code-review/steps/step-04-present.md" "Nakarin ERP References" "Code review output rules enforce Nakarin ERP references"
+check_file_contains "tHe_DuDe_Service/_bmad/bmm/workflows/2-plan-workflows/bmad-validate-prd/steps-v/step-v-06-traceability-validation.md" "Nakarin ERP References Validation" "PRD validation checks Nakarin ERP references"
 
 check_dir_exists "nakarin_erp/businesses"
 check_business_module "ice_fac_aran"
