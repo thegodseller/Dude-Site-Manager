@@ -51,3 +51,17 @@ If information is missing, write:
 UNKNOWN: requires owner confirmation
 
 Then stop and ask for confirmation before implementation.
+
+## Repository Boundaries
+
+- `nakarin_erp/` is for business, domain, customer, workflow, and operational knowledge.
+- Root `docs/` is for DuDe platform and repository-level documentation.
+- `tHe_DuDe_Service/obsidian_vault` is for service-level runtime, operations, and audit knowledge.
+
+## Privacy and Secret Handling
+
+- Store private business documents only under `nakarin_erp/private/`.
+- Do not commit private documents, raw exports, or secrets.
+- Never commit API keys, `.env` files, tokens, or credentials.
+- Never commit raw employee identifiers or private customer documents.
+- Keep extracted spreadsheets, CSV exports, and ad hoc data dumps out of git history.

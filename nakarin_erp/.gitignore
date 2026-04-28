@@ -1,0 +1,82 @@
+# Private and sensitive files
+private/*
+!private/.gitkeep
+secrets/
+secret/
+credentials/
+.env
+.env.*
+*.env.local
+*.local.env
+
+# Key and certificate files
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.crt
+*.cer
+*.csr
+
+# Local databases
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Backups and temporary snapshots
+backup/
+backups/
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+
+# Archives and exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+*.bz2
+*.xz
+*.xlsx
+*.xls
+*.ods
+*.csv
+*.tsv
+exports/
+export/
+
+# Common secret naming patterns
+*_secret*
+*_secrets*
+*_token*
+*_apikey*
+*_api_key*
+*api_key*
+*access_token*
+*refresh_token*
+*client_secret*
+*password*
+LINE_CHANNEL_ACCESS_TOKEN*
+LINE_CHANNEL_SECRET*
+BLINKO_API_KEY*
+TUYA_CLIENT_SECRET*
+OPENAI_API_KEY*
+GEMINI_API_KEY*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
