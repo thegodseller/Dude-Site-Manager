@@ -1,0 +1,9 @@
+[submodule "tHe_DuDe_Compose/openvino_contrib"]
+	path = tHe_DuDe_Compose/openvino_contrib
+	url = https://github.com/openvinotoolkit/openvino_contrib.git
+[submodule "tHe_DuDe_Service"]
+	path = tHe_DuDe_Service
+	url = https://github.com/thegodseller/DuDe-Service.git
+[submodule "tools/agent-skills"]
+	path = tools/agent-skills
+	url = https://github.com/addyosmani/agent-skills.git
