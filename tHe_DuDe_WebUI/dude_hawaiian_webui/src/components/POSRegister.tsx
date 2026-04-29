@@ -16,6 +16,17 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+interface ShiftData {
+  shift_id: string;
+  employee_id: string;
+  status: 'OPEN' | 'CLOSED';
+  opening_cash: string;
+  actual_cash?: string | null;
+  variance?: string | null;
+  opened_at: string;
+  closed_at?: string | null;
+}
+
 const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true },
   { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true },
@@ -37,6 +48,22 @@ export const POSRegister: React.FC = () => {
   });
   const [isMock, setIsMock] = useState(true);
   const [showModal, setShowModal] = useState<string | null>(null);
+
+  // Shift Management State
+  const [currentShift, setCurrentShift] = useState<ShiftData | null>(null);
+  const [shiftLoading, setShiftLoading] = useState(false);
+  const [shiftError, setShiftError] = useState<string | null>(null);
+  const [employeeId] = useState(() => {
+    let id = localStorage.getItem('dude_pos_dev_employee_id');
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem('dude_pos_dev_employee_id', id);
+    }
+    return id;
+  }); // TODO: Replace with real auth/user management
+
+  const [openingCashInput, setOpeningCashInput] = useState('0');
+  const [actualCashInput, setActualCashInput] = useState('0');
 
   // Health check
   const checkHealth = async () => {
@@ -61,11 +88,85 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchCurrentShift = async () => {
+    setShiftLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/shifts/current?employee_id=${employeeId}`);
+      const data = await res.json();
+      if (data.success && data.shift) {
+        setCurrentShift(data.shift);
+        setActualCashInput(data.shift.opening_cash); // Default actual cash to opening for convenience
+      } else {
+        setCurrentShift(null);
+      }
+    } catch (err) {
+      console.error('Failed to fetch shift:', err);
+      setShiftError('Failed to sync shift status.');
+    } finally {
+      setShiftLoading(false);
+    }
+  };
+
   useEffect(() => {
     checkHealth();
+    fetchCurrentShift();
     const interval = setInterval(checkHealth, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleOpenShift = async () => {
+    setShiftLoading(true);
+    setShiftError(null);
+    try {
+      const res = await fetch('/ag_pos_api/shifts/open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_id: employeeId,
+          opening_cash: parseFloat(openingCashInput)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCurrentShift(data.shift);
+        setShowModal(null);
+      } else {
+        setShiftError(data.message || 'Failed to open shift.');
+      }
+    } catch (err) {
+      setShiftError('Network error opening shift.');
+    } finally {
+      setShiftLoading(false);
+    }
+  };
+
+  const handleCloseShift = async () => {
+    if (!currentShift) return;
+    setShiftLoading(true);
+    setShiftError(null);
+    try {
+      const res = await fetch('/ag_pos_api/shifts/close', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shift_id: currentShift.shift_id,
+          actual_cash: parseFloat(actualCashInput)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCurrentShift(null);
+        setShowModal(null);
+        alert(`Shift Closed. Variance: ${formatCurrency(parseFloat(data.shift.variance || '0'))}`);
+      } else {
+        setShiftError(data.message || 'Failed to close shift.');
+      }
+    } catch (err) {
+      setShiftError('Network error closing shift.');
+    } finally {
+      setShiftLoading(false);
+    }
+  };
 
   // Search logic
   const searchProducts = useCallback(async (q: string = '', bc: string = '') => {
@@ -168,6 +269,10 @@ export const POSRegister: React.FC = () => {
               <div className="status-dot"></div>
               DB: {serviceStatus.db}
             </div>
+            <div className={`status-badge ${currentShift ? 'ok' : 'error'}`} title="Current shift status">
+              <div className="status-dot"></div>
+              Shift: {currentShift ? 'OPEN' : 'NO SHIFT'}
+            </div>
           </div>
         </div>
 
@@ -268,11 +373,11 @@ export const POSRegister: React.FC = () => {
           </div>
 
           <button 
-            className="btn-primary opacity-50 cursor-not-allowed" 
+            className={`btn-primary ${(!currentShift || cart.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`} 
             onClick={() => alert('Checkout is NOT IMPLEMENTED (Infrastructure Only)')}
-            disabled
+            disabled={!currentShift || cart.length === 0}
           >
-            COMPLETE ORDER (N/A)
+            {currentShift ? 'COMPLETE ORDER' : 'OPEN SHIFT TO START'}
           </button>
           <div className="text-[9px] text-center text-slate-600 mt-2">
             Real ticket commitment requires POS-010 implementation.
@@ -285,12 +390,68 @@ export const POSRegister: React.FC = () => {
         <div className="modal-overlay" onClick={() => setShowModal(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h3 className="font-tech text-lg mb-6">SHIFT CONTROL</h3>
-            <div className="flex flex-col gap-4">
-              <button className="btn-primary opacity-50" disabled>OPEN NEW SHIFT (N/A)</button>
-              <button className="payment-btn opacity-50" disabled>CLOSE CURRENT SHIFT (N/A)</button>
-              <div className="text-[10px] text-slate-500 text-center italic">Shift logic is pending business rule confirmation.</div>
-              <button className="mt-4 text-xs text-slate-500 underline" onClick={() => setShowModal(null)}>CLOSE</button>
-            </div>
+            
+            {shiftError && <div className="text-red-500 text-xs mb-4 p-2 bg-red-500/10 border border-red-500/20 rounded">{shiftError}</div>}
+
+            {!currentShift ? (
+              <div className="flex flex-col gap-4">
+                <div className="status-label">Opening Cash (THB)</div>
+                <input 
+                  type="number" 
+                  className="input-glow" 
+                  value={openingCashInput}
+                  onChange={(e) => setOpeningCashInput(e.target.value)}
+                  placeholder="0.00"
+                />
+                <button 
+                  className="btn-primary" 
+                  onClick={handleOpenShift}
+                  disabled={shiftLoading}
+                >
+                  {shiftLoading ? 'OPENING...' : 'OPEN NEW SHIFT'}
+                </button>
+                <div className="text-[10px] text-slate-500 text-center italic">Start your business day with initial drawer cash.</div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-2 text-xs mb-4 bg-slate-800/50 p-3 rounded border border-white/5">
+                  <div className="text-slate-400">Shift ID:</div>
+                  <div className="text-right font-mono">{currentShift.shift_id.slice(0,8)}...</div>
+                  <div className="text-slate-400">Opened At:</div>
+                  <div className="text-right">{new Date(currentShift.opened_at).toLocaleString()}</div>
+                  <div className="text-slate-400">Opening Cash:</div>
+                  <div className="text-right">{formatCurrency(parseFloat(currentShift.opening_cash))}</div>
+                </div>
+
+                <div className="status-label">Counted Cash (THB)</div>
+                <input 
+                  type="number" 
+                  className="input-glow" 
+                  value={actualCashInput}
+                  onChange={(e) => setActualCashInput(e.target.value)}
+                  placeholder="0.00"
+                />
+                
+                {/* Variance Preview */}
+                <div className="flex justify-between items-center text-sm px-2">
+                  <span className="text-slate-400">Estimated Variance:</span>
+                  <span className={parseFloat(actualCashInput) - parseFloat(currentShift.opening_cash) >= 0 ? 'text-green-500' : 'text-red-500'}>
+                    {formatCurrency(parseFloat(actualCashInput) - parseFloat(currentShift.opening_cash))}
+                  </span>
+                </div>
+
+                <button 
+                  className="payment-btn active" 
+                  onClick={handleCloseShift}
+                  disabled={shiftLoading}
+                  style={{borderColor: '#ff3e3e', color: '#ff3e3e', marginTop: '10px'}}
+                >
+                  {shiftLoading ? 'CLOSING...' : 'CLOSE CURRENT SHIFT'}
+                </button>
+                <div className="text-[10px] text-slate-500 text-center italic">Closing will reconcile actual cash with sales data.</div>
+              </div>
+            )}
+            <button className="mt-6 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CANCEL</button>
           </div>
         </div>
       )}
