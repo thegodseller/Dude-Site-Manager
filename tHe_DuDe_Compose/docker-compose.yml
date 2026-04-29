@@ -42,11 +42,20 @@ services:
       dockerfile: Dockerfile.ollama_ov
     container_name: ollama_ov
     restart: always
+    cpus: "4.0"
     environment:
       - GODEBUG=cgocheck=0
       - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_INTEL_GPU=false        
+      - OV_DEVICE=CPU               
+      - OLLAMA_NUM_THREADS=4          
+      - OLLAMA_FLASH_ATTENTION=true   
+      - OLLAMA_KV_CACHE_TYPE=q8_0    
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_KEEP_ALIVE=30s
     devices:
-      - /dev/dri:/dev/dri  # 🚀 iGPU Passthrough
+      - /dev/dri:/dev/dri
     volumes:
       - ./data/ollama:/root/.ollama
     ports:
@@ -161,7 +170,7 @@ services:
     depends_on:
       - ag_boss
     ports:
-      - "11115:8000"
+      - "11117:8000"
     volumes:
       - ../tHe_DuDe_Service/agents/ag_watcher/app:/app/app
     networks:
@@ -215,6 +224,24 @@ services:
       - dude_net
       - dude_dmz
 
+  ag_pos:
+    build:
+      context: ../tHe_DuDe_Service/agents/ag_pos
+      dockerfile: Dockerfile
+    container_name: ag_pos
+    restart: always
+    profiles: ["pos"]
+    env_file: .env
+    ports:
+      - "11116:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - dude_net
+
   ag_butler:
     build:
       context: ../tHe_DuDe_Service/agents/ag_butler
@@ -227,7 +254,7 @@ services:
     depends_on:
       - ag_boss
     ports:
-      - "11116:8000"
+      - "11115:8000"
     networks:
       - dude_net
 
