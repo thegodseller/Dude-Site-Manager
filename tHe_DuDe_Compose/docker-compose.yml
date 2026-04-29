@@ -232,6 +232,8 @@ services:
     restart: always
     profiles: ["pos"]
     env_file: .env
+    depends_on:
+      - db_postgres
     ports:
       - "11116:8000"
     healthcheck:
