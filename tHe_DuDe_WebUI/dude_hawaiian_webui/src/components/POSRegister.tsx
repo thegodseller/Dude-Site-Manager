@@ -8,6 +8,8 @@ interface Product {
   barcode: string | null;
   unit_price: string;
   is_active: boolean;
+  category_name?: string | null;
+  uom?: string | null;
 }
 
 interface CartItem extends Product {
@@ -196,8 +198,8 @@ export const POSRegister: React.FC = () => {
           {products.map(product => (
             <div key={product.product_id} className="product-card" onClick={() => addToCart(product)}>
               <div className="text-sm font-bold truncate">{product.name}</div>
-              <div className="text-[10px] text-slate-500">{product.sku}</div>
-              <div className="product-price">{formatCurrency(parseFloat(product.unit_price))}</div>
+              <div className="text-[10px] text-slate-500">{product.sku} {product.category_name ? `| ${product.category_name}` : ''}</div>
+              <div className="product-price">{formatCurrency(parseFloat(product.unit_price))}{product.uom ? ` / ${product.uom}` : ''}</div>
             </div>
           ))}
           {products.length === 0 && (
@@ -230,7 +232,7 @@ export const POSRegister: React.FC = () => {
               <div>
                 <div className="text-xs font-bold">{item.name}</div>
                 <div className="text-[10px] text-slate-400">
-                  {formatCurrency(parseFloat(item.unit_price))} x {item.quantity}
+                  {formatCurrency(parseFloat(item.unit_price))} x {item.quantity} {item.uom || ''}
                 </div>
               </div>
               <div className="quantity-ctrl">

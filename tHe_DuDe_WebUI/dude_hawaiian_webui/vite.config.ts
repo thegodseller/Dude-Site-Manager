@@ -19,6 +19,16 @@ export default defineConfig({
         target: 'http://localhost:11116',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ag_pos_api/, '/api/pos')
+      },
+      '/ai_gateway_health': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ai_gateway_health/, '/health/readiness')
+      },
+      '/ai_gateway_v1': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ai_gateway_v1/, '/v1')
       }
     }
   }

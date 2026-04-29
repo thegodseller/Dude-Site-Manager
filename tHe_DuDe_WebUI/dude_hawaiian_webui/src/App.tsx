@@ -18,6 +18,7 @@ function App() {
     <div class="flow-col">
       <div class="flow-role r1">SUPER ADMIN<br>Ake</div>
       <div class="flow-item highlight">🌐 All Sites Overview</div>
+      <a href="ai_gateway.html" class="flow-item highlight" style="display:block; text-decoration:none; margin-top:10px; color: #00f3ff; border-color: #00f3ff;">⚡ AI Gateway Console</a>
     </div>
     <div class="flow-col">
       <div class="flow-role r3">MANAGER<br>เจ้าของโรงงาน</div>

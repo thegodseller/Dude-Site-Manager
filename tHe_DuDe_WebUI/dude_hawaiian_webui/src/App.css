@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sarabun:wght@300;400;600;700&family=Bebas+Neue&display=swap');
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -183,7 +185,6 @@
   }
 }
 
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sarabun:wght@300;400;600;700&family=Bebas+Neue&display=swap');
 
   :root {
     --bg:       #080c12;
