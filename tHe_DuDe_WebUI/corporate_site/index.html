@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Godseller | AI Operations for Thai Business</title>
+    <title>The Godseller | The Operating Layer for Thai Business</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
@@ -96,10 +96,30 @@
         
         .overlay-chip { position: absolute; padding: 10px 20px; background: rgba(10,10,12,0.8); backdrop-filter: blur(12px); border: 1px solid var(--card-border); border-radius: 100px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 10px; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .overlay-chip::before { content: ''; width: 8px; height: 8px; background: var(--accent-success); border-radius: 50%; box-shadow: 0 0 12px var(--accent-success); }
-        .o1 { top: 30%; left: -15%; }
-        .o2 { bottom: 20%; right: -5%; }
-        .o3 { top: 10%; right: 10%; color: var(--accent); }
+        .o1 { top: 35%; left: -10%; }
+        .o2 { bottom: 25%; right: -5%; }
+        .o3 { top: 10%; right: 15%; color: var(--accent); }
         .o3::before { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+
+        /* --- Log Overlay --- */
+        .log-overlay {
+            position: absolute;
+            bottom: 5%;
+            left: -5%;
+            width: 280px;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            z-index: 20;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        .log-header { color: var(--secondary); margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; font-weight: 700; }
+        .log-line { margin-bottom: 6px; color: var(--primary); opacity: 0.8; }
+        .log-line span { color: var(--accent-success); font-weight: 700; margin-right: 8px; }
 
         /* --- Trust Bar --- */
         .trust-bar { padding: 48px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); background: rgba(255,255,255,0.01); }
@@ -121,6 +141,9 @@
         .eco-card h3 { font-size: 1.75rem; margin-bottom: 16px; }
         .eco-card p { font-size: 1.05rem; color: var(--secondary); }
         .eco-label { font-size: 0.7rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; display: block; }
+        .eco-img-box { width: 100%; height: 200px; margin-bottom: 24px; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--card-border); }
+        .eco-img-box img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s; }
+        .eco-card:hover .eco-img-box img { opacity: 1; transform: scale(1.05); }
 
         /* --- Flow --- */
         .flow-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
@@ -193,14 +216,14 @@
         <div class="hero">
             <div class="hero-left">
                 <div class="badge">DBD Registered · Since 2017</div>
-                <h1>AI Systems for <br>Real-World Thai <br>Business Operations</h1>
-                <p>We build practical AI, POS, vision, automation, and agent systems that connect daily work, data, and decision-making into one operating layer.</p>
+                <h1>The Operating Layer <br>for Thai Business <br>Infrastructure</h1>
+                <p>We unify your cameras, POS, staff communications, and workflows into a single, intelligent operating layer. Moving Thai businesses from manual chaos to systematic AI oversight.</p>
                 <div class="hero-btns">
                     <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Book Consultation</a>
                     <a href="#ecosystem" class="btn btn-outline">Explore DuDe Ecosystem</a>
                 </div>
                 <div class="proof-chips">
-                    <div class="chip">Local-first</div>
+                    <div class="chip">Edge-First</div>
                     <div class="chip">LINE-ready</div>
                     <div class="chip">POS-ready</div>
                     <div class="chip">Vision-ready</div>
@@ -211,9 +234,19 @@
                     <div class="panel p-main"><img src="assets/hero/op_1.jpeg" alt="Operation"></div>
                     <div class="panel p-sub1"><img src="assets/hero/op_2.jpeg" alt="Factory"></div>
                     <div class="panel p-sub2"><img src="assets/hero/hero_main.png" alt="AI Stack"></div>
-                    <div class="overlay-chip o1">DuDe Online</div>
-                    <div class="overlay-chip o2">POS Active</div>
-                    <div class="overlay-chip o3">Local AI Stack</div>
+                    
+                    <!-- Live System Log Visual -->
+                    <div class="log-overlay">
+                        <div class="log-header">SYSTEM_AUDIT_LOG</div>
+                        <div class="log-line"><span>[OK]</span> EVENT_CAPTURED: CAMERA_SITE_01</div>
+                        <div class="log-line"><span>[OK]</span> AGENT_DECISION: ITEM_COUNT_VERIFIED</div>
+                        <div class="log-line"><span>[OK]</span> LINE_NOTIFY: SHIFT_REPORT_SENT</div>
+                        <div class="log-line animate-pulse"><span>[WAIT]</span> ANALYZING_POS_SYNC...</div>
+                    </div>
+
+                    <div class="overlay-chip o1">DuDe Core Online</div>
+                    <div class="overlay-chip o2">Operations Syncing</div>
+                    <div class="overlay-chip o3">Local Agentic Stack</div>
                 </div>
             </div>
         </div>
@@ -261,19 +294,22 @@
             </div>
             <div class="eco-grid">
                 <div class="eco-card">
-                    <span class="eco-label">Orchestration</span>
+                    <div class="eco-img-box"><img src="assets/hero/hero_boss.png" alt="Boss"></div>
+                    <span class="eco-label">Central Intelligence</span>
                     <h3>DuDe HawaiiaN</h3>
-                    <p>A resilient multi-agent orchestration layer that serves as the brain of your business operations, connecting all agents and business logic.</p>
+                    <p>The orchestrator. A multi-agent framework that codifies your business rules into autonomous actions across all connected hardware.</p>
                 </div>
                 <div class="eco-card">
-                    <span class="eco-label">Retail Intelligence</span>
+                    <div class="eco-img-box"><img src="assets/hero/op_1.jpeg" alt="POS"></div>
+                    <span class="eco-label">Transaction Layer</span>
                     <h3>DuDe_POS</h3>
-                    <p>Professional sales and inventory intelligence. Managed cashier shifts, real-time stock sync, and automated retail audit logs.</p>
+                    <p>Beyond sales: it's an operational sensor. Syncs cashier accountability, shift variance, and stock movement directly into the AI core.</p>
                 </div>
                 <div class="eco-card">
-                    <span class="eco-label">Visual Logic</span>
+                    <div class="eco-img-box"><img src="assets/hero/op_2.jpeg" alt="Vision"></div>
+                    <span class="eco-label">Visual Verification</span>
                     <h3>DuDe_Vision</h3>
-                    <p>Computer vision for real-world monitoring. Automated object counting, event-based alerts, and operational evidence logging.</p>
+                    <p>Turning visual data into logs. Automated shipment counting, zone monitoring, and event-based video evidence for every operation.</p>
                 </div>
                 <div class="eco-card">
                     <span class="eco-label">Workflows</span>
