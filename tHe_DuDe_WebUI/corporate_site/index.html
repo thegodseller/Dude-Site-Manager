@@ -3,664 +3,531 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The God Seller - Futuristic AI Solutions</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>The Godseller | Intelligent AI Solutions & Automation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-purple: #bc13fe;
-            --neon-cyan: #00f3ff;
-            --neon-teal: #00ffaa;
-            --glass-bg: rgba(15, 23, 42, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-        body { 
-            font-family: 'Inter', 'Noto Sans Thai', sans-serif; 
-            background-color: #020617;
-            color: #f8fafc;
-        }
-        h1, h2, h3, .font-tech { font-family: 'Orbitron', sans-serif; }
-        
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --primary: #ffffff;
+            --secondary: #a1a1aa;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --bg: #000000;
+            --card-bg: #09090b;
+            --card-border: #27272a;
+            --font-main: 'Inter', 'Noto Sans Thai', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+            --max-width: 1200px;
         }
 
-        /* 🧠 Floating Sphere Animation */
-        .sphere-container {
-            perspective: 1000px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .sphere {
-            width: 300px;
-            height: 300px;
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg);
+            color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Typography --- */
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 120px 0;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .nav-inner {
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            letter-spacing: -0.02em;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #3b82f6, #000);
-            box-shadow: 0 0 60px rgba(59, 130, 246, 0.5), inset -20px -20px 50px rgba(0,0,0,0.8);
-            position: relative;
-            animation: float 6s ease-in-out infinite, pulse-blue 4s transition infinite;
+            border: 1px solid var(--card-border);
         }
-        .sphere::after {
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--card-border);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- Hero --- */
+        .hero {
+            position: relative;
+            padding-top: 200px;
+            padding-bottom: 120px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1000px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            z-index: -1;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            margin-bottom: 24px;
+            background: linear-gradient(to bottom, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.04em;
         }
-        @keyframes pulse-blue {
-            0%, 100% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.4); }
-            50% { box-shadow: 0 0 80px rgba(59, 130, 246, 0.7); }
-        }
-        .sphere-purple { box-shadow: 0 0 80px rgba(188, 19, 254, 0.7); background: radial-gradient(circle at 30% 30%, #bc13fe, #000); }
-        .sphere-cyan { box-shadow: 0 0 80px rgba(0, 243, 255, 0.7); background: radial-gradient(circle at 30% 30%, #00f3ff, #000); }
 
-        .dropdown:hover .dropdown-menu { display: block; }
-        
-        .neon-text-purple { text-shadow: 0 0 10px var(--neon-purple); color: var(--neon-purple); }
-        .neon-text-cyan { text-shadow: 0 0 10px var(--neon-cyan); color: var(--neon-cyan); }
-        .neon-border-gold { border: 1px solid #D4AF37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
-        
-        /* Agent Card Wave */
-        .wave {
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-btns {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        /* --- Trust Bar --- */
+        .trust-bar {
+            padding: 40px 0;
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .trust-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 32px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .trust-item img {
             height: 40px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            background-size: 200% 100%;
-            animation: wave-move 2s linear infinite;
+            filter: grayscale(1) invert(1);
+            opacity: 0.6;
         }
-        @keyframes wave-move {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+
+        /* --- Product Grid --- */
+        .section-header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: var(--secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .card-link {
+            margin-top: auto;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 80px 0 40px;
+            border-top: 1px solid var(--card-border);
+            background: #020202;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 48px;
+            margin-bottom: 60px;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 24px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--secondary);
+            font-size: 0.8rem;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 3rem; }
+            .hero-btns { flex-direction: column; }
+            .trust-inner { justify-content: center; }
+            .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+        }
+
+        /* --- Micro-animations --- */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="overflow-x-hidden">
-    <!-- Navbar -->
-    <nav class="glass sticky top-0 z-50 py-4 px-6">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-20 h-20 rounded-full border-2 border-[#D4AF37] overflow-hidden">
-                    <img src="/assets/logo-DK_6zJIN.png" class="w-full h-full object-cover">
-                </div>
-                <span class="text-xl font-bold font-tech tracking-wider text-[#D4AF37]">The Godseller</span>
-            </div>
-            
-            <div class="hidden lg:flex space-x-8 font-semibold text-xs tracking-[0.2em] uppercase text-slate-400">
-                <a href="index.html" class="text-white">Home</a>
-                <div class="relative dropdown">
-                    <button class="hover:text-white transition flex items-center">Services <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                    <div class="absolute hidden dropdown-menu pt-4 w-56">
-                        <div class="glass border-t-2 border-[#D4AF37] rounded-b-xl py-2">
-                            <a href="index.html#dude" class="block px-4 py-2 hover:bg-white/5 transition">DuDe_AppsService</a>
-                            <a href="vision.html" class="block px-4 py-2 hover:bg-white/5 transition">DuDe_Vision</a>
-                            <a href="pos.html" class="block px-4 py-2 hover:bg-white/5 transition">DuDe_POS</a>
-                            <a href="room_service.html" class="block px-4 py-2 hover:bg-white/5 transition">DuDe_RoomService</a>
-                            <a href="drive.html" class="block px-4 py-2 hover:bg-white/5 transition">DuDe_Drive</a>
-                            <a href="#product" class="block px-4 py-2 hover:bg-white/5 transition">Product Line</a>
-                        </div>
-                    </div>
-                </div>
-                <a href="pricing.html" class="hover:text-white transition">Pricing</a>
-                <a href="privacy.html" class="hover:text-white transition">Privacy</a>
-                <a href="download.html" class="hover:text-white transition">Download</a>
-                <a href="live_map.html" class="hover:text-cyan-400 transition flex items-center gap-1">
-                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    Live Map
-                </a>
-                <a href="how-to-use.html" class="hover:text-white transition">How to use</a>
-            </div>
+<body>
 
-            <div class="flex items-center space-x-4">
-                <button class="bg-[#D4AF37] text-black px-5 py-1.5 rounded-sm font-bold text-[10px] tracking-widest uppercase hover:bg-yellow-500 transition">EN</button>
-                <a href="https://ui.thegodseller.com" class="border border-white/20 px-5 py-1.5 rounded-sm font-bold text-[10px] tracking-widest uppercase hover:bg-white hover:text-black transition hidden lg:block">Log In</a>
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">
+                <img src="/assets/logo-DK_6zJIN.png" alt="The Godseller Logo">
+                The Godseller
+            </div>
+            <nav class="nav-links">
+                <a href="#hero">Overview</a>
+                <a href="#ecosystem">Ecosystem</a>
+                <a href="#solutions">Solutions</a>
+                <a href="#about">About</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="https://ui.thegodseller.com" class="btn btn-outline">Client Portal</a>
+                <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Let's Talk</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero fade-in">
+            <div class="container">
+                <h1>Next-Gen AI Systems <br>for Modern Business</h1>
+                <p>We build intelligent automation and agentic ecosystems that scale your operations. Bridging the gap between AI research and real-world Thai business success since 2017.</p>
+                <div class="hero-btns">
+                    <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary" style="padding: 16px 32px; font-size: 1rem;">Book a Consultation</a>
+                    <a href="#ecosystem" class="btn btn-outline" style="padding: 16px 32px; font-size: 1rem;">Explore Ecosystem</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="trust-bar">
+            <div class="container trust-inner">
+                <div class="trust-item">
+                    <img src="https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5" alt="DBD Registered">
+                    <span>DBD Registered Since 2017</span>
+                </div>
+                <div class="trust-item">7+ Years of Innovation</div>
+                <div class="trust-item">Trusted by 100+ Businesses</div>
+                <div class="trust-item">Local Expertise · Global Tech</div>
             </div>
         </div>
 
-        <!-- Mobile Menu Dropdown -->
-        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full glass border-t border-white/10 p-6 flex flex-col space-y-4 lg:hidden z-40 bg-[#020617]/90">
-            <a href="index.html" class="text-white block py-2 border-b border-white/5">Home</a>
-            <div class="text-slate-400 py-2 border-b border-white/5">
-                <span class="block mb-2 text-xs uppercase tracking-widest text-[#D4AF37]">Services</span>
-                <div class="pl-4 border-l border-[#D4AF37] space-y-2 text-[10px] tracking-widest uppercase">
-                    <a href="index.html#dude" class="block hover:text-white py-1">DuDe_AppsService</a>
-                    <a href="vision.html" class="block hover:text-white py-1">DuDe_Vision</a>
-                    <a href="pos.html" class="block hover:text-white py-1">DuDe_POS</a>
-                    <a href="room_service.html" class="block hover:text-white py-1">DuDe_RoomService</a>
-                    <a href="drive.html" class="block hover:text-white py-1">DuDe_Drive</a>
-                    <a href="#product" class="block hover:text-white py-1">Product Line</a>
+        <section id="ecosystem">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2>The DuDe Ecosystem</h2>
+                    <p>A unified suite of AI-powered tools designed to manage every facet of your business.</p>
                 </div>
-            </div>
-            <a href="live_map.html" class="text-cyan-400 font-bold block py-2 border-b border-white/5 flex items-center gap-2">
-                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                LIVE MAP
-            </a>
-            <a href="pricing.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Pricing</a>
-            <a href="privacy.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Privacy</a>
-            <a href="download.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">Download</a>
-            <a href="how-to-use.html" class="text-slate-400 hover:text-white block py-2 border-b border-white/5">How to use</a>
-            <a href="https://ui.thegodseller.com" class="text-[#D4AF37] font-bold block py-2 mt-2">Log In</a>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <main class="relative pt-20 pb-40 overflow-hidden">
-        <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-            <div class="z-10">
-                <h1 class="text-5xl lg:text-7xl font-bold mb-8 leading-tight text-white uppercase tracking-tighter">
-                    Smart <span class="text-[#D4AF37]">AI Solutions</span> <br>Provider
-                </h1>
-                <p class="text-xl text-slate-400 mb-12 max-w-xl leading-relaxed">
-                    Experiencing the next generation of business intelligence. <br>
-                    <span class="text-slate-200">The Godseller</span> - นิยามใหม่ของระบบ AI และ Smart Automation ระดับพรีเมียม
-                </p>
-                <div class="flex flex-col sm:flex-row gap-6 mb-12">
-                    <a href="mailto:chanukrit@thegodseller.com" class="bg-[#D4AF37] text-black px-10 py-4 font-bold tracking-widest rounded-sm hover:translate-y-[-2px] transition shadow-[0_0_20px_rgba(212,175,55,0.3)] text-center">CONSULT NOW</a>
-                    <a href="#dude" class="border border-white/20 px-10 py-4 font-bold tracking-widest rounded-sm hover:bg-white/5 transition text-center">PRODUCT LINE</a>
-                </div>
-
-                <!-- 🔍 Futuristic Hybrid Search -->
-                <div class="glass p-2 rounded-full border-white/10 flex items-center max-w-xl group focus-within:border-cyan-500/50 transition">
-                    <div class="px-5 text-slate-500 group-focus-within:text-cyan-400 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <div class="grid">
+                    <div class="card fade-in">
+                        <div class="card-icon">🌊</div>
+                        <h3>DuDe HawaiiaN</h3>
+                        <p>Our core agentic orchestration engine. Modular AI agents (Boss, Butler, Librarian) working in harmony to automate your core infrastructure.</p>
+                        <a href="#" class="card-link">View Framework &rarr;</a>
                     </div>
-                    <input type="text" placeholder="Search AI Entities or Services..." class="bg-transparent border-none outline-none text-sm w-full py-3 text-slate-200 placeholder-slate-600">
-                    <button class="bg-white/5 hover:bg-white/10 text-[10px] tracking-widest font-bold uppercase px-6 py-3 rounded-full border border-white/10 mr-1 transition">Search</button>
-                </div>
-
-                <!-- DBD Logo Section -->
-                <div class="mt-8 flex items-center space-x-6 p-6 glass rounded-2xl border-white/5 w-fit">
-                    <a href='https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' target="_blank">
-                        <img src='https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F08451B58E6B22983FD654010D5AC049C4DE5' alt="DBD Registered" class="h-20" />
-                    </a>
-                    <div class="text-[10px] tracking-[0.2em] uppercase">
-                        <p class="text-slate-400">Certified Partner</p>
-                        <p class="text-[#D4AF37]">DBD Registered Since 07/07/2017</p>
+                    <div class="card fade-in">
+                        <div class="card-icon">👁️</div>
+                        <h3>DuDe_Vision</h3>
+                        <p>Advanced computer vision for industrial and retail environments. Real-time object detection, asset tracking, and security monitoring.</p>
+                        <a href="vision.html" class="card-link">See in Action &rarr;</a>
                     </div>
-                </div>
-
-
-            </div>
-
-            <div class="flex justify-center items-center py-20">
-                <div class="sphere-container relative">
-                    <!-- The Floating Glass Sphere -->
-                    <div id="ai-core" class="sphere"></div>
-                    <!-- Glow effect behind -->
-                    <div class="absolute -inset-10 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
-                    
-                    <!-- Floating indicators -->
-                    <div class="absolute top-0 -right-20 glass p-3 rounded-xl border-cyan-500/30 animate-bounce">
-                        <span class="flex h-2 w-2 rounded-full bg-cyan-400 mr-2 inline-block"></span>
-                        <span class="text-[8px] tracking-widest uppercase text-cyan-400">Ready</span>
+                    <div class="card fade-in">
+                        <div class="card-icon">🛒</div>
+                        <h3>DuDe_POS</h3>
+                        <p>Modern, AI-integrated Point of Sale system. Real-time inventory sync, predictive restock, and seamless cashier shift management.</p>
+                        <a href="pos.html" class="card-link">Explore POS &rarr;</a>
+                    </div>
+                    <div class="card fade-in">
+                        <div class="card-icon">🏨</div>
+                        <h3>DuDe_RoomService</h3>
+                        <p>Hospitality automation. Integrated guest requests, automated housekeeping dispatch, and localized smart room control.</p>
+                        <a href="room_service.html" class="card-link">Learn More &rarr;</a>
+                    </div>
+                    <div class="card fade-in">
+                        <div class="card-icon">🚚</div>
+                        <h3>DuDe_Drive</h3>
+                        <p>Logistics and fleet management. Route optimization, driver performance tracking, and real-time shipment transparency.</p>
+                        <a href="drive.html" class="card-link">View Logistics &rarr;</a>
+                    </div>
+                    <div class="card fade-in">
+                        <div class="card-icon">📱</div>
+                        <h3>DuDe_AppsService</h3>
+                        <p>Custom software development. Building high-performance mobile and web applications tailored to unique business needs.</p>
+                        <a href="#" class="card-link">Custom Projects &rarr;</a>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Decorative backgrounds -->
-        <div class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 -z-10">
-            <div class="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-purple-600 rounded-full blur-[150px]"></div>
-            <div class="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] bg-cyan-600 rounded-full blur-[150px]"></div>
-        </div>
+        <section id="solutions" style="background: #050505;">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2>Modern Solutions</h2>
+                    <p>Tailored AI strategies for every industry scale.</p>
+                </div>
+                <div class="grid">
+                    <div class="card fade-in" style="background: transparent;">
+                        <h3>Enterprise Automation</h3>
+                        <p>Replacing repetitive legacy processes with resilient AI workflows that learn and adapt over time.</p>
+                    </div>
+                    <div class="card fade-in" style="background: transparent;">
+                        <h3>Smart Retail</h3>
+                        <p>Integrating POS, Vision, and Inventory systems into a single source of truth for optimized retail ops.</p>
+                    </div>
+                    <div class="card fade-in" style="background: transparent;">
+                        <h3>Edge Intelligence</h3>
+                        <p>Deploying AI models locally on the edge for real-time response without cloud latency or security risks.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cta" style="text-align: center; border-bottom: 1px solid var(--card-border);">
+            <div class="container">
+                <h2 style="font-size: 3.5rem; margin-bottom: 32px;">Ready to automate?</h2>
+                <p style="color: var(--secondary); margin-bottom: 48px; max-width: 600px; margin-left: auto; margin-right: auto;">Join the growing list of businesses transforming their operations with The Godseller's AI ecosystem.</p>
+                <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary" style="padding: 20px 48px; font-size: 1.125rem;">Start Your Consultation</a>
+            </div>
+        </section>
     </main>
 
-    <!-- Detailed Product Service Section -->
-    <section id="dude" class="py-40 bg-slate-950/50">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
-                <div>
-                    <h2 class="text-4xl lg:text-6xl mb-4 font-tech tracking-tighter">DuDe HawaiiaN</h2>
-                    <p class="text-xl text-[#D4AF37] italic">"ดู๊ดดดด ฮาวาเอี้ยนนนน"</p>
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col" style="grid-column: span 2;">
+                    <div class="logo" style="margin-bottom: 24px;">
+                        <img src="/assets/logo-DK_6zJIN.png" alt="Logo">
+                        The Godseller
+                    </div>
+                    <p style="color: var(--secondary); font-size: 0.9rem; max-width: 300px;">
+                        Providing premium AI solutions and automation for the next generation of business. Born to be a seller since 1977.
+                    </p>
                 </div>
-                <div class="glass px-6 py-3 rounded-full flex items-center text-[10px] tracking-widest text-green-400 uppercase">
-                    <span class="h-2 w-2 bg-green-500 rounded-full mr-3 animate-pulse"></span>
-                    All Systems Operational
+                <div class="footer-col">
+                    <h4>Ecosystem</h4>
+                    <ul>
+                        <li><a href="#">DuDe HawaiiaN</a></li>
+                        <li><a href="vision.html">DuDe_Vision</a></li>
+                        <li><a href="pos.html">DuDe_POS</a></li>
+                        <li><a href="drive.html">DuDe_Drive</a></li>
+                    </ul>
                 </div>
-            </div>
-
-            <!-- Agent Grid -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6" id="agent-grid">
-                <!-- Boss Agent -->
-                <div class="glass p-0 rounded-3xl group overflow-hidden border-orange-500/30 agent-card" data-name="boss">
-                    <div class="bg-orange-500/80 p-6 flex justify-center items-center h-48 relative overflow-hidden">
-                        <img src="/assets/ag_boss-Xzhuosa_.png" class="h-40 object-contain drop-shadow-2xl translate-y-4 group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center space-x-2 mb-2">
-                           <div class="bg-orange-500 p-1.5 rounded-lg text-white">🦅</div>
-                           <h4 class="font-bold text-white tracking-widest text-sm uppercase">The Boss</h4>
-                        </div>
-                        <p class="text-[10px] text-orange-400 font-bold uppercase mb-2">System Orchestrator</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Manages all other agents and ensures system stability.</p>
-                    </div>
-                </div>
-
-                <!-- Butler -->
-                <div class="glass p-0 rounded-3xl group overflow-hidden border-yellow-500/30 agent-card" data-name="butler">
-                    <div class="bg-yellow-600/80 p-6 flex justify-center items-center h-48 relative overflow-hidden">
-                        <img src="/assets/ag_butler-DhS-ZwCE.png" class="h-40 object-contain drop-shadow-2xl translate-y-4 group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center space-x-2 mb-2">
-                           <div class="bg-yellow-600 p-1.5 rounded-lg text-white">🤵</div>
-                           <h4 class="font-bold text-white tracking-widest text-sm uppercase">The Butler</h4>
-                        </div>
-                        <p class="text-[10px] text-yellow-500 font-bold uppercase mb-2">Home Assistant</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Manages IoT devices and daily routines.</p>
-                    </div>
-                </div>
-
-                <!-- Librarian -->
-                <div class="glass p-0 rounded-3xl group overflow-hidden border-cyan-500/30 agent-card" data-name="librarian">
-                    <div class="bg-cyan-600/80 p-6 flex justify-center items-center h-48 relative overflow-hidden">
-                        <img src="/assets/ag_librarian-V-7MzMpg.jpg" class="h-40 object-contain drop-shadow-2xl translate-y-4 group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center space-x-2 mb-2">
-                           <div class="bg-cyan-600 p-1.5 rounded-lg text-white">📚</div>
-                           <h4 class="font-bold text-white tracking-widest text-sm uppercase">The Librarian</h4>
-                        </div>
-                        <p class="text-[10px] text-cyan-400 font-bold uppercase mb-2">Knowledge Manager</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Organizes and retrieves information from knowledge base.</p>
-                    </div>
-                </div>
-
-                <!-- Negotiator -->
-                <div class="glass p-0 rounded-3xl group overflow-hidden border-emerald-500/30 agent-card" data-name="negotiator">
-                    <div class="bg-emerald-600/80 p-6 flex justify-center items-center h-48 relative overflow-hidden">
-                        <img src="/assets/ag_negotiator-Chfort9s.jpg" class="h-40 object-contain drop-shadow-2xl translate-y-4 group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center space-x-2 mb-2">
-                           <div class="bg-emerald-600 p-1.5 rounded-lg text-white">🤝</div>
-                           <h4 class="font-bold text-white tracking-widest text-sm uppercase">The Negotiator</h4>
-                        </div>
-                        <p class="text-[10px] text-emerald-400 font-bold uppercase mb-2">Communication Bridge</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Handles external communications via LINE and other channels.</p>
-                    </div>
-                </div>
-
-                <!-- Watcher -->
-                <div class="glass p-0 rounded-3xl group overflow-hidden border-purple-500/30 agent-card" data-name="watcher">
-                    <div class="bg-purple-600/80 p-6 flex justify-center items-center h-48 relative overflow-hidden">
-                        <img src="/assets/ag_watcher-DMHl75ba.png" class="h-40 object-contain drop-shadow-2xl translate-y-4 group-hover:scale-110 transition duration-500">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center space-x-2 mb-2">
-                           <div class="bg-purple-600 p-1.5 rounded-lg text-white">👁️</div>
-                           <h4 class="font-bold text-white tracking-widest text-sm uppercase">The Watcher</h4>
-                        </div>
-                        <p class="text-[10px] text-purple-400 font-bold uppercase mb-2">Security & Monitoring</p>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Keeps an eye on system health and security events.</p>
-                    </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="refund.html">Terms & Refund</a></li>
+                        <li><a href="mailto:chanukrit@thegodseller.com">Contact</a></li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- 🛠️ Tools & Commands Section -->
-    <section id="tools" class="py-20 bg-slate-900/50 border-t border-white/5">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl lg:text-5xl mb-12 font-tech tracking-tighter text-center">Command Center <span class="text-[#D4AF37]">Tools</span></h2>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- GPS Tool -->
-                <div class="glass p-8 rounded-2xl border-white/5 hover:border-cyan-500/50 transition group">
-                    <div class="text-4xl mb-4">🌍</div>
-                    <h3 class="text-xl font-bold text-white mb-4">GPS & Location</h3>
-                    <p class="text-sm text-slate-400 mb-6 min-h-[40px]">DuDe knows where you are locally.</p>
-                    <div class="bg-black/50 p-4 rounded-lg border border-white/5 font-mono text-xs text-green-400 space-y-2">
-                        <p class="opacity-80">"ตอนนี้ฉันอยู่ที่ไหน"</p>
-                        <p class="opacity-80">"Set location: Bangkok"</p>
-                        <p class="opacity-80">"หาร้านกาแฟใกล้ฉัน"</p>
-                    </div>
-                </div>
-
-                <!-- n8n Automation -->
-                <div class="glass p-8 rounded-2xl border-white/5 hover:border-purple-500/50 transition group">
-                    <div class="text-4xl mb-4">🤖</div>
-                    <h3 class="text-xl font-bold text-white mb-4">n8n Automation</h3>
-                    <p class="text-sm text-slate-400 mb-6 min-h-[40px]">Workflow Automation Engine.</p>
-                    <div class="bg-black/50 p-4 rounded-lg border border-white/5 font-mono text-xs text-purple-400 space-y-2">
-                        <p class="opacity-80">"Start n8n ให้หน่อย"</p>
-                        <p class="opacity-80">"n8n รันอยู่ไหม"</p>
-                        <a href="http://localhost:15678" target="_blank" class="block pt-2 text-[#D4AF37] hover:underline">Open n8n Dashboard &rarr;</a>
-                    </div>
-                </div>
-
-                <!-- SysAdmin -->
-                <div class="glass p-8 rounded-2xl border-white/5 hover:border-orange-500/50 transition group">
-                    <div class="text-4xl mb-4">🛠️</div>
-                    <h3 class="text-xl font-bold text-white mb-4">SysAdmin</h3>
-                    <p class="text-sm text-slate-400 mb-6 min-h-[40px]">Manage Server & Containers.</p>
-                    <div class="bg-black/50 p-4 rounded-lg border border-white/5 font-mono text-xs text-orange-400 space-y-2">
-                        <p class="opacity-80">"เช็ค Disk Space"</p>
-                        <p class="opacity-80">"Restart container vision"</p>
-                        <p class="opacity-80">"Tailscale status"</p>
-                    </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 THE GOD SELLER CORP. ALL RIGHTS RESERVED.</p>
+                <div style="display: flex; gap: 24px;">
+                    <span>Bangkok, Thailand</span>
+                    <span>DBD Registered</span>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-20 border-t border-white/5">
-        <div class="container mx-auto px-6 text-center">
-
-
-            <h2 class="text-2xl font-tech italic text-[#D4AF37] mb-4">The Godseller</h2>
-            <p class="text-xs text-slate-500 tracking-widest uppercase mb-10 text-white font-bold tracking-tighter uppercase italic">Born to be a seller in AD.1977</p>
-            <div class="flex justify-center space-x-12 text-[10px] font-bold tracking-[0.3em] uppercase text-slate-400 flex-wrap gap-y-4">
-                <a href="privacy.html" class="hover:text-white transition">Privacy</a>
-                <a href="refund.html" class="hover:text-white transition">Terms & Refund</a>
-                <a href="mailto:chanukrit@thegodseller.com" class="hover:text-white transition">Complaint Channel</a>
-                <a href="mailto:chanukrit@thegodseller.com" class="hover:text-white transition">Contact</a>
-            </div>
-            <p class="mt-20 text-[8px] text-slate-700 tracking-widest">© 2026 THE GOD SELLER CORP. UNITING INTELLIGENCE.</p>
         </div>
     </footer>
 
     <script>
-        // 🧠 DuDe Core: Interactive State Management
-        const sphere = document.getElementById('ai-core');
-        const container = document.querySelector('.sphere-container');
-        const statusBadge = document.querySelector('.sphere-container .glass');
-        const statusDot = statusBadge.querySelector('span:first-child');
-        const statusText = statusBadge.querySelector('span:last-child');
-        const searchInput = document.querySelector('input[type="text"]');
-
-        // 1. 3D Parallax Effect (Follow Mouse)
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth / 2 - e.pageX) / 25;
-            const y = (window.innerHeight / 2 - e.pageY) / 25;
-            sphere.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-        });
-
-        // 2. Input Reactivity (Simulate "Thinking")
-        searchInput.addEventListener('focus', () => {
-            setAIState('thinking');
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            if(e.target.value.length > 0) {
-                statusText.innerText = "ANALYSING...";
-                sphere.style.animationDuration = "0.5s"; // Pulse faster
-            } else {
-                statusText.innerText = "LISTENING";
-                sphere.style.animationDuration = "4s";
-            }
-        });
-
-        searchInput.addEventListener('blur', () => {
-            setAIState('default');
-            sphere.style.transform = `rotateY(0deg) rotateX(0deg)`; // Reset position
-        });
-
-        // 3. State Manager
-        function setAIState(state) {
-            // Reset classes
-            sphere.classList.remove('sphere-purple', 'sphere-cyan');
-            sphere.style.animationDuration = "6s"; // Default speed
-
-            switch(state) {
-                case 'thinking':
-                    sphere.classList.add('sphere-purple');
-                    statusDot.className = 'flex h-2 w-2 rounded-full bg-purple-500 mr-2 inline-block animate-ping';
-                    statusText.className = 'text-[8px] tracking-widest uppercase text-purple-400 font-bold';
-                    statusText.innerText = "WAKING UP";
-                    break;
-                case 'searching':
-                    sphere.classList.add('sphere-cyan');
-                    statusDot.className = 'flex h-2 w-2 rounded-full bg-cyan-500 mr-2 inline-block animate-pulse';
-                    statusText.innerText = "SEARCHING";
-                    break;
-                default: // Ready
-                    statusDot.className = 'flex h-2 w-2 rounded-full bg-cyan-400 mr-2 inline-block';
-                    statusText.className = 'text-[8px] tracking-widest uppercase text-cyan-400';
-                    statusText.innerText = "READY";
-            }
-        }
-
-        // 4. Search Functionality (Product Filter)
-        const searchBtn = document.querySelector('button.bg-white\\/5'); // Select the search button
-        const agentCards = document.querySelectorAll('.agent-card');
-        const productSection = document.getElementById('dude');
-
-        function performSearch() {
-            const query = searchInput.value.toLowerCase().trim();
-            if (!query) return;
-
-            setAIState('searching');
-            
-            // Scroll to product section
-            productSection.scrollIntoView({ behavior: 'smooth' });
-
-            // Filter cards
-            let found = false;
-            agentCards.forEach(card => {
-                const name = card.dataset.name.toLowerCase();
-                const title = card.querySelector('h4').innerText.toLowerCase();
-                
-                if (name.includes(query) || title.includes(query) || 'all'.includes(query)) {
-                    card.style.display = 'block';
-                    card.classList.add('border-2'); // Highlight found item
-                    found = true;
-                } else {
-                    card.style.display = 'none';
-                    card.classList.remove('border-2');
+        // Simple scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
                 }
             });
-            
-            setTimeout(() => {
-                 setAIState('default');
-                 statusText.innerText = found ? `FOUND ${query.toUpperCase()}` : "NO RESULT";
-            }, 1500);
-        }
+        }, { threshold: 0.1 });
 
-        // Bind Search Events
-        searchBtn.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') performSearch();
+        document.querySelectorAll('section, .card').forEach(el => {
+            observer.observe(el);
         });
-        // 5. Language Toggle System 🇹🇭/🇬🇧
-        const langBtn = document.querySelector('button.bg-\\[\\#D4AF37\\]'); // Select EN button
-        let currentLang = localStorage.getItem('dude_lang') || 'en';
-
-        const translations = {
-            'en': {
-                'nav-home': 'Home', 'nav-service': 'Services', 'nav-pricing': 'Pricing', 'nav-privacy': 'Privacy', 'nav-use': 'How to use', 'nav-login': 'Log In',
-                'hero-h1': 'Smart <span class="text-[#D4AF37]">AI Solutions</span> <br>Provider',
-                'hero-p': 'Experiencing the next generation of business intelligence. <br><span class="text-slate-200">The Godseller</span> - นิยามใหม่ของระบบ AI และ Smart Automation ระดับพรีเมียม',
-                'btn-consult': 'CONSULT NOW', 'btn-product': 'PRODUCT LINE',
-                'search-ph': 'Search AI Entities or Services...', 'btn-search': 'Search',
-                'sphere-ready': 'Ready', 'sphere-waking': 'WAKING UP', 'sphere-search': 'SEARCHING',
-                'agent-boss-desc': 'Manages all other agents and ensures system stability.',
-                'agent-butler-desc': 'Manages IoT devices and daily routines.',
-                'agent-lib-desc': 'Organizes and retrieves information from knowledge base.',
-                'agent-neg-desc': 'Handles external communications via LINE and other channels.',
-                'agent-watch-desc': 'Keeps an eye on system health and security events.'
-            },
-            'th': {
-                'nav-home': 'หน้าแรก', 'nav-service': 'บริการทั้งหมด', 'nav-pricing': 'ราคา', 'nav-privacy': 'ความเป็นส่วนตัว', 'nav-use': 'คู่มือการใช้งาน', 'nav-login': 'เข้าสู่ระบบ',
-                'hero-h1': 'ผู้นำด้าน <span class="text-[#D4AF37]">โซลูชัน AI</span> <br>อัจฉริยะ',
-                'hero-p': 'สัมผัสประสบการณ์แห่งอนาคตของระบบอัจฉริยะทางธุรกิจ <br><span class="text-slate-200">The Godseller</span> - ยกระดับธุรกิจของคุณด้วย AI อัตโนมัติระดับพรีเมียม',
-                'btn-consult': 'ปรึกษาเราทันที', 'btn-product': 'ดูสินค้าทั้งหมด',
-                'search-ph': 'ค้นหาบริการ AI หรือสินค้าที่ต้องการ...', 'btn-search': 'ค้นหา',
-                'sphere-ready': 'พร้อมใช้งาน', 'sphere-waking': 'กำลังตื่น...', 'sphere-search': 'กำลังค้นหา...',
-                'agent-boss-desc': 'ผู้ดูแลระบบและสั่งการ Agent ตัวอื่นๆ ทั้งหมด',
-                'agent-butler-desc': 'ผู้ช่วยส่วนตัว ดูแลบ้านและอุปกรณ์ IoT',
-                'agent-lib-desc': 'บรรณารักษ์ จัดการคลังความรู้และเอกสาร',
-                'agent-neg-desc': 'นักเจรจา ดูแลการสื่อสารผ่าน LINE และช่องทางอื่นๆ',
-                'agent-watch-desc': 'ยามเฝ้าระวัง ดูแลความปลอดภัยของระบบ'
-            }
-        };
-
-        function updateContent(lang) {
-            // Navbar
-            document.querySelector('a[href="index.html"]').innerText = translations[lang]['nav-home'];
-            document.querySelector('.dropdown > button').innerHTML = translations[lang]['nav-service'] + ' <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
-            document.querySelector('a[href="pricing.html"]').innerText = translations[lang]['nav-pricing'];
-            document.querySelector('a[href="privacy.html"]').innerText = translations[lang]['nav-privacy'];
-            document.querySelector('a[href="how-to-use.html"]').innerText = translations[lang]['nav-use'];
-            
-            // Login Btn Text (Only if not logged in)
-            const loginBtn = document.querySelector('a[href="https://ui.thegodseller.com"]');
-            if(loginBtn && !loginBtn.classList.contains('logged-in')) {
-                loginBtn.innerText = translations[lang]['nav-login'];
-            }
-
-            // Hero
-            document.querySelector('h1').innerHTML = translations[lang]['hero-h1'];
-            document.querySelector('p.text-xl').innerHTML = translations[lang]['hero-p'];
-            document.querySelector('a[href="mailto:chanukrit@thegodseller.com"]').innerText = translations[lang]['btn-consult'];
-            document.querySelector('a[href="#dude"]').innerText = translations[lang]['btn-product'];
-
-            // Search
-            document.querySelector('input[type="text"]').placeholder = translations[lang]['search-ph'];
-            document.querySelector('button.bg-white\\/5').innerText = translations[lang]['btn-search'];
-
-            // Sphere
-            document.querySelector('.sphere-container .text-\\[8px\\]').innerText = translations[lang]['sphere-ready'];
-
-            // Agents Descriptions
-            const cards = document.querySelectorAll('.agent-card');
-            cards[0].querySelector('p.text-slate-400').innerText = translations[lang]['agent-boss-desc'];
-            cards[1].querySelector('p.text-slate-400').innerText = translations[lang]['agent-butler-desc'];
-            cards[2].querySelector('p.text-slate-400').innerText = translations[lang]['agent-lib-desc'];
-            cards[3].querySelector('p.text-slate-400').innerText = translations[lang]['agent-neg-desc'];
-            cards[4].querySelector('p.text-slate-400').innerText = translations[lang]['agent-watch-desc'];
-
-            // Button State
-            langBtn.innerText = lang.toUpperCase();
-            localStorage.setItem('dude_lang', lang);
-        }
-
-        langBtn.addEventListener('click', () => {
-            currentLang = currentLang === 'en' ? 'th' : 'en';
-            updateContent(currentLang);
-        });
-
-        // Initialize Language
-        updateContent(currentLang);
-
-
-        // 6. Login Modal System 🔐
-        // Inject Modal HTML
-        const modalHTML = `
-        <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-            <div class="glass p-8 rounded-2xl w-full max-w-md border-[#D4AF37]/30 transform scale-95 transition-transform duration-300">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-tech text-white">ACCESS PORTAL</h3>
-                    <button id="close-modal" class="text-slate-400 hover:text-white">&times;</button>
-                </div>
-                <form id="login-form" class="space-y-6">
-                    <div>
-                        <label class="block text-xs uppercase tracking-widest text-[#D4AF37] mb-2">Identity Code (Email)</label>
-                        <input type="email" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#D4AF37] outline-none transition" placeholder="Enter your ID..." required>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase tracking-widest text-[#D4AF37] mb-2">Access Key (Password)</label>
-                        <input type="password" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#D4AF37] outline-none transition" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="w-full bg-[#D4AF37] text-black font-bold py-4 rounded-lg tracking-widest hover:bg-yellow-400 transition transform hover:scale-[1.02]">
-                        AUTHENTICATE
-                    </button>
-                    <p class="text-center text-xs text-slate-500 cursor-pointer hover:text-[#D4AF37]">Forgot Access Key?</p>
-                </form>
-            </div>
-        </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-        const loginLink = document.querySelector('a[href="https://ui.thegodseller.com"]');
-        const modal = document.getElementById('login-modal');
-        const closeModal = document.getElementById('close-modal');
-        const loginForm = document.getElementById('login-form');
-
-        // Override Login Link
-        loginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if(loginLink.classList.contains('logged-in')) return; // Already logged in
-
-            modal.classList.remove('hidden');
-            // Trigger reflow for transition
-            void modal.offsetWidth; 
-            modal.classList.remove('opacity-0');
-            modal.querySelector('div').classList.remove('scale-95');
-        });
-
-        function hideModal() {
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
-        closeModal.addEventListener('click', hideModal);
-        modal.addEventListener('click', (e) => {
-            if(e.target === modal) hideModal();
-        });
-
-        // Fake Login Logic
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const btn = loginForm.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "VERIFYING BIOMETRICS...";
-            btn.disabled = true;
-
-            setTimeout(() => {
-                hideModal();
-                // Update UI state
-                loginLink.classList.add('logged-in');
-                loginLink.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <div class="w-5 h-5 rounded-full bg-gradient-to-r from-[#D4AF37] to-yellow-200"></div>
-                        <span>P'Ek (Admin)</span>
-                    </div>
-                `;
-                loginLink.classList.remove('border', 'px-5'); // Remove button style
-                loginLink.classList.add('text-[#D4AF37]');
-                
-                // Show toast
-                const toast = document.createElement('div');
-                toast.className = 'fixed bottom-10 right-10 glass px-6 py-4 rounded-xl border-l-4 border-[#D4AF37] slide-in';
-                toast.innerHTML = '<p class="text-[#D4AF37] font-bold">ACCESS GRANTED</p><p class="text-xs text-slate-400">Welcome back, Commander.</p>';
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-
-            }, 1500);
-        });
-    </script>
-    <!-- Mobile Menu Script -->
-    <script>
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
-
-        if (btn && menu) {
-            btn.addEventListener('click', () => {
-                menu.classList.toggle('hidden');
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                    menu.classList.add('hidden');
-                }
-            });
-        }
     </script>
 </body>
 </html>
