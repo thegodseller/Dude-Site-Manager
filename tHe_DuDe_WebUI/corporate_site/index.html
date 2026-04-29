@@ -12,15 +12,14 @@
             --primary: #ffffff;
             --secondary: #a1a1aa;
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 241, 0.15);
-            --bg: #000000;
-            --card-bg: #09090b;
+            --bg: #050505;
+            --card-bg: #0a0a0c;
             --card-border: #1d1d21;
             --dbd-gold: #D4AF37;
             --font-main: 'Inter', 'Noto Sans Thai', sans-serif;
             --font-heading: 'Outfit', sans-serif;
             --font-mono: 'Space Mono', monospace;
-            --max-width: 1300px;
+            --max-width: 1200px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,15 +32,15 @@
         }
 
         /* --- Global --- */
-        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
+        h1, h2, h3, h4, h5 { font-family: var(--font-heading); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
         a { text-decoration: none; color: inherit; transition: all 0.3s ease; }
-        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 32px; }
         section { padding: 120px 0; }
-        .btn { padding: 16px 32px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
+        .btn { padding: 14px 28px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--primary); color: var(--bg); }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.1); }
-        .btn-outline { border: 1px solid var(--card-border); color: var(--primary); background: rgba(255,255,255,0.02); }
-        .btn-outline:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-outline { border: 1px solid var(--card-border); color: var(--primary); }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); }
 
         /* --- Header --- */
         header {
@@ -49,126 +48,94 @@
             top: 0;
             width: 100%;
             z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(5, 5, 5, 0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--card-border);
         }
 
         .nav-inner {
-            height: 80px;
+            height: 72px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo { font-size: 1.3rem; font-weight: 700; font-family: var(--font-heading); display: flex; align-items: center; gap: 12px; }
-        .logo img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--dbd-gold); }
+        .logo { font-size: 1.2rem; font-weight: 700; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px; }
+        .logo img { width: 28px; height: 28px; border-radius: 50%; }
 
-        .nav-links { display: flex; gap: 32px; font-size: 0.85rem; font-weight: 500; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .nav-links { display: flex; gap: 32px; font-size: 0.8rem; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
         .nav-links a:hover { color: var(--primary); }
 
-        .nav-actions { display: flex; gap: 16px; }
-
         /* --- Hero --- */
-        .hero {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 60px;
-            align-items: center;
-            padding-top: 100px;
-            padding-bottom: 120px;
-        }
-
+        .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding-top: 80px; padding-bottom: 80px; }
+        
         .hero-left { display: flex; flex-direction: column; gap: 24px; }
-        .hero-left h1 { font-size: clamp(3rem, 6vw, 4.5rem); }
-        .hero-left p { font-size: 1.2rem; color: var(--secondary); max-width: 600px; }
+        .hero-left h1 { font-size: clamp(2.5rem, 5vw, 4rem); color: var(--primary); }
+        .hero-left p { font-size: 1.125rem; color: var(--secondary); max-width: 500px; }
         
-        .badge { font-size: 0.75rem; font-weight: 700; color: var(--dbd-gold); background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2); padding: 4px 12px; border-radius: 100px; width: fit-content; text-transform: uppercase; letter-spacing: 0.1em; }
-        
-        .proof-chips { display: flex; gap: 12px; margin-top: 10px; }
-        .chip { font-size: 0.7rem; font-weight: 700; color: var(--secondary); background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .hero-right { position: relative; display: flex; justify-content: center; }
+        .hero-card { width: 100%; max-width: 480px; aspect-ratio: 4/3; border-radius: 12px; border: 1px solid var(--card-border); background: var(--card-bg); overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .hero-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
 
-        .hero-right { position: relative; height: 500px; }
-        .collage { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        .collage-img { position: absolute; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.6); transition: all 0.5s ease; }
-        .collage-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.5s; }
-        .collage-img:hover img { opacity: 1; transform: scale(1.05); }
-
-        .img-1 { width: 400px; height: 280px; z-index: 5; transform: rotate(1deg); }
-        .img-2 { width: 320px; height: 220px; bottom: 5%; left: -10%; z-index: 3; transform: rotate(-3deg); }
-        .img-3 { width: 280px; height: 380px; top: -5%; right: -5%; z-index: 2; transform: rotate(4deg); opacity: 0.5; filter: blur(1px); }
-
-        .status-badge {
-            position: absolute;
-            background: rgba(10, 10, 12, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            padding: 10px 20px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 700;
-            color: #4ade80;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 10;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        .status-badge::before { content: ''; width: 8px; height: 8px; background: currentColor; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
-        .s-1 { top: 30%; left: -15%; }
-        .s-2 { bottom: 20%; right: -5%; color: var(--accent); }
+        .proof-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .chip { font-size: 0.75rem; font-weight: 600; color: var(--secondary); display: flex; align-items: center; gap: 8px; }
+        .chip::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
 
         /* --- Trust Bar --- */
-        .trust-bar { padding: 48px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); background: rgba(255,255,255,0.01); }
-        .trust-inner { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; flex-wrap: wrap; gap: 40px; }
+        .trust-bar { padding: 32px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); background: rgba(255,255,255,0.02); }
+        .trust-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 32px; color: var(--secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        /* --- Problem --- */
-        .section-header { margin-bottom: 80px; }
-        .section-header h2 { font-size: 3rem; margin-bottom: 24px; max-width: 900px; }
-        .section-header p { font-size: 1.2rem; color: var(--secondary); max-width: 700px; }
+        /* --- Sections --- */
+        .section-header { margin-bottom: 64px; text-align: center; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 16px; }
+        .section-header p { color: var(--secondary); max-width: 600px; margin: 0 auto; }
 
-        .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
-        .problem-card { padding: 48px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; transition: 0.3s; }
-        .problem-card:hover { border-color: rgba(255,255,255,0.1); }
-        .problem-card h4 { font-size: 1.25rem; margin-bottom: 16px; }
-        .problem-card p { font-size: 1rem; color: var(--secondary); }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .card { padding: 40px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; transition: all 0.3s ease; }
+        .card:hover { border-color: var(--accent); }
+        .card h3 { font-size: 1.5rem; margin-bottom: 12px; }
+        .card p { color: var(--secondary); font-size: 0.95rem; }
 
-        /* --- Ecosystem --- */
-        .eco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 32px; }
-        .eco-card { padding: 48px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; transition: all 0.3s; position: relative; overflow: hidden; }
-        .eco-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-        .eco-card h3 { font-size: 1.75rem; margin-bottom: 16px; }
-        .eco-card p { font-size: 1.05rem; color: var(--secondary); }
-        .eco-label { font-size: 0.7rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: block; }
-        
-        /* --- How it Works --- */
-        .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
-        .how-step { display: flex; flex-direction: column; gap: 20px; }
-        .step-num { font-family: var(--font-mono); font-size: 0.9rem; color: var(--accent); }
-        .how-step h4 { font-size: 1.5rem; }
-        .how-step p { font-size: 1rem; color: var(--secondary); }
+        /* --- Agents --- */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .agent-card { padding: 32px; background: #080808; border: 1px solid var(--card-border); border-radius: 8px; text-align: center; }
+        .agent-avatar { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px; border: 1px solid var(--card-border); overflow: hidden; }
+        .agent-avatar img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+        .agent-card h4 { font-size: 1rem; margin-bottom: 8px; color: var(--primary); }
+        .agent-card p { font-size: 0.8rem; color: var(--secondary); }
 
-        /* --- Media Gallery --- */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; }
-        .gallery-card { border-radius: 16px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 16/10; position: relative; }
-        .gallery-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s; }
-        .gallery-card:hover img { opacity: 1; transform: scale(1.05); }
-        .gallery-label { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        /* --- Use Cases --- */
+        .use-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+        .case-item { padding: 24px; border-radius: 8px; border-left: 2px solid var(--accent); background: rgba(255,255,255,0.01); }
+        .case-item h5 { font-size: 1.1rem; margin-bottom: 8px; }
+        .case-item p { font-size: 0.85rem; color: var(--secondary); }
+
+        /* --- Credentials --- */
+        .cred-grid { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
+        .cred-card { display: flex; align-items: center; gap: 20px; padding: 24px; background: rgba(255,255,255,0.01); border-radius: 8px; border: 1px solid var(--card-border); }
+        .cred-card img { height: 40px; opacity: 0.6; }
+        .cred-info span { font-size: 0.7rem; font-weight: 700; color: var(--dbd-gold); display: block; text-transform: uppercase; }
+        .cred-info p { font-size: 0.9rem; font-weight: 600; color: var(--secondary); }
 
         /* --- Footer --- */
-        footer { padding: 100px 0 40px; border-top: 1px solid var(--card-border); background: #050505; }
-        .f-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; margin-bottom: 64px; }
-        .f-col h5 { margin-bottom: 24px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; }
-        .f-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-        .f-col a { color: var(--secondary); font-size: 0.9rem; }
-        .f-col a:hover { color: var(--primary); }
-        .f-bottom { padding-top: 40px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--secondary); }
+        footer { padding: 80px 0 40px; border-top: 1px solid var(--card-border); }
+        .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 40px; margin-bottom: 40px; }
+        .footer-brand { flex: 1; min-width: 200px; }
+        .footer-brand p { font-size: 0.8rem; color: var(--secondary); margin-top: 16px; max-width: 240px; }
+        .footer-links { display: flex; gap: 64px; }
+        .footer-col h6 { margin-bottom: 16px; font-size: 0.7rem; text-transform: uppercase; color: var(--primary); }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 8px; }
+        .footer-col a { font-size: 0.85rem; color: var(--secondary); }
+        .footer-col a:hover { color: var(--primary); }
+        
+        .footer-bottom { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--secondary); padding-top: 32px; border-top: 1px solid var(--card-border); }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 768px) {
             .hero { grid-template-columns: 1fr; text-align: center; }
             .hero-left { align-items: center; }
-            .hero-right { display: none; }
-            .how-grid { grid-template-columns: 1fr; }
+            .hero-right { order: -1; margin-bottom: 40px; }
+            .footer-inner { flex-direction: column; }
         }
     </style>
 </head>
@@ -181,44 +148,37 @@
                 The Godseller
             </div>
             <nav class="nav-links">
-                <a href="#hero">Overview</a>
+                <a href="#what-we-build">Overview</a>
                 <a href="#ecosystem">Ecosystem</a>
                 <a href="#use-cases">Use Cases</a>
-                <a href="#proof">Proof</a>
-                <a href="#contact">Contact</a>
+                <a href="https://ui.thegodseller.com">Portal</a>
             </nav>
             <div class="nav-actions">
-                <a href="https://ui.thegodseller.com" class="btn btn-outline">Client Portal</a>
                 <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Book Consultation</a>
             </div>
         </div>
     </header>
 
     <main>
-        <section id="hero" class="container">
+        <section class="container">
             <div class="hero">
                 <div class="hero-left">
-                    <div class="badge">DBD Registered · Since 2017</div>
                     <h1>AI Systems for Real-World <br>Thai Business Operations</h1>
-                    <p>We build practical AI, POS, vision, automation, and agent systems that connect daily work, data, and decision-making into one operating layer.</p>
-                    <div class="hero-btns">
+                    <p>The Godseller builds practical AI, POS, vision, automation, and agent systems that connect daily work, data, and decisions into one operating layer.</p>
+                    <div style="display: flex; gap: 16px;">
                         <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Book Consultation</a>
-                        <a href="#ecosystem" class="btn btn-outline">Explore DuDe Ecosystem</a>
+                        <a href="#ecosystem" class="btn btn-outline">Explore DuDe</a>
                     </div>
                     <div class="proof-chips">
-                        <div class="chip">Local-first</div>
+                        <div class="chip">DBD Registered Since 2017</div>
+                        <div class="chip">Local-first AI</div>
                         <div class="chip">LINE-ready</div>
-                        <div class="chip">POS-ready</div>
-                        <div class="chip">Vision-ready</div>
+                        <div class="chip">POS + Vision + Automation</div>
                     </div>
                 </div>
                 <div class="hero-right">
-                    <div class="collage">
-                        <div class="collage-img img-1"><img src="assets/hero/op_1.jpeg" alt="Operation"></div>
-                        <div class="collage-img img-2"><img src="assets/hero/op_2.jpeg" alt="Factory"></div>
-                        <div class="collage-img img-3"><img src="assets/hero/hero_main.png" alt="System"></div>
-                        <div class="status-badge s-1">DuDe Online</div>
-                        <div class="status-badge s-2">Vision Ready</div>
+                    <div class="hero-card">
+                        <img src="assets/hero/hero_main.png" alt="DuDe Infrastructure">
                     </div>
                 </div>
             </div>
@@ -233,191 +193,171 @@
             </div>
         </div>
 
-        <section id="problem">
+        <section id="what-we-build" class="container">
+            <div class="section-header">
+                <h2>The Operating Layer for Business</h2>
+                <p>We solve the chaos of fragmented data by connecting site operations directly to intelligent agents.</p>
+            </div>
+            <div class="grid-3">
+                <div class="card">
+                    <h3>POS Intelligence</h3>
+                    <p>Real-time cashier shifts, stock reconciliation, and transaction audit trails built for actual retail counters.</p>
+                </div>
+                <div class="card">
+                    <h3>Vision Logic</h3>
+                    <p>Turning existing camera feeds into operational events: object detection, entry/exit logs, and instant alerts.</p>
+                </div>
+                <div class="card">
+                    <h3>Agentic Oversight</h3>
+                    <p>Autonomous agents that handle LINE commands, approval flows, and data reporting without human intervention.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ecosystem" style="background: #080808;">
             <div class="container">
                 <div class="section-header">
-                    <h2>Most businesses do not need another chatbot. They need an operating system.</h2>
-                    <p>The real problem is not AI access. It is fragmented operations: LINE chats, paper records, cameras, cashiers, approvals, and reports all living in separate places.</p>
+                    <h2>DuDe Operating Layer</h2>
+                    <p>A unified suite of products working as one ecosystem.</p>
                 </div>
-                <div class="problem-grid">
-                    <div class="problem-card">
-                        <h4>Scattered Data</h4>
-                        <p>LINE, paper, camera footage, Excel sheets, and staff memory are hard to audit.</p>
+                <div class="grid-3">
+                    <div class="card">
+                        <h4 style="color: var(--accent); margin-bottom: 8px;">DuDe HawaiiaN</h4>
+                        <p>The multi-agent orchestration core that manages business rules and coordinates agent actions.</p>
                     </div>
-                    <div class="problem-card">
-                        <h4>Delayed Decisions</h4>
-                        <p>Owners see problems too late because daily operations are not connected in real time.</p>
+                    <div class="card">
+                        <h4 style="color: var(--accent); margin-bottom: 8px;">DuDe_POS</h4>
+                        <p>Modern point of sale with real-time site synchronization and predictive inventory tools.</p>
                     </div>
-                    <div class="problem-card">
-                        <h4>Manual Workflows</h4>
-                        <p>Approvals, shifts, sales, incidents, and reports still depend on people remembering every step.</p>
-                    </div>
-                    <div class="problem-card">
-                        <h4>Disconnected AI</h4>
-                        <p>Generic AI tools can answer questions, but they do not execute business operations.</p>
+                    <div class="card">
+                        <h4 style="color: var(--accent); margin-bottom: 8px;">DuDe_Vision</h4>
+                        <p>Edge AI for real-world monitoring, count verification, and operational evidence logging.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="ecosystem" style="background: #050505;">
+        <section class="container">
+            <div class="section-header">
+                <h2>Agent Roles</h2>
+                <p>Our specialized agents collaborate to manage every facet of your operations.</p>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-card">
+                    <div class="agent-avatar"><img src="assets/hero/hero_boss.png" alt="Boss"></div>
+                    <h4>Boss</h4>
+                    <p>Orchestrates agents and business decisions.</p>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar"><img src="assets/hero/hero_butler.png" alt="Butler"></div>
+                    <h4>Butler</h4>
+                    <p>Executes tasks, IoT actions, and logs.</p>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar"><img src="assets/hero/hero_librarian.png" alt="Librarian"></div>
+                    <h4>Librarian</h4>
+                    <p>Organizes knowledge, SOPs, and memory.</p>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar"><img src="assets/hero/hero_negotiator.png" alt="Negotiator"></div>
+                    <h4>Negotiator</h4>
+                    <p>Handles LINE and customer communication.</p>
+                </div>
+                <div class="agent-card">
+                    <div class="agent-avatar"><img src="assets/hero/hero_watcher.png" alt="Watcher"></div>
+                    <h4>Watcher</h4>
+                    <p>Monitors cameras and operational signals.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="use-cases" class="container">
+            <div class="section-header">
+                <h2>Real-World Deployment</h2>
+                <p>We deploy AI where the work actually happens.</p>
+            </div>
+            <div class="use-case-grid">
+                <div class="case-item">
+                    <h5>Ice Factory Operations</h5>
+                    <p>Automated count verification for delivery shipments using site vision integration.</p>
+                </div>
+                <div class="case-item">
+                    <h5>Minimart / POS</h5>
+                    <p>Shift-based cashier accountability and inventory management across multiple locations.</p>
+                </div>
+                <div class="case-item">
+                    <h5>Warehouse Monitoring</h5>
+                    <p>Real-time entry/exit logging and event-based alerts for industrial security.</p>
+                </div>
+                <div class="case-item">
+                    <h5>Service Automation</h5>
+                    <p>Automating customer service requests from LINE directly into the task queue.</p>
+                </div>
+            </div>
+        </section>
+
+        <section style="background: #080808;">
             <div class="container">
                 <div class="section-header">
-                    <h2 style="font-size: 3.5rem;">The DuDe Ecosystem</h2>
-                    <p>A practical AI operating layer for businesses that need more than a chatbot: POS, vision, workflow automation, memory, alerts, approvals, and reporting.</p>
+                    <h2>Proof & Credentials</h2>
                 </div>
-                <div class="eco-grid">
-                    <div class="eco-card">
-                        <span class="eco-label">Orchestration</span>
-                        <h3>DuDe HawaiiaN</h3>
-                        <p>Multi-agent orchestration for business operations. Boss, Butler, Librarian, Watcher, and Negotiator work together as one operating layer.</p>
+                <div class="cred-grid">
+                    <div class="cred-card">
+                        <div class="cred-info">
+                            <span>Established 2017</span>
+                            <p>DBD Registered Entity</p>
+                        </div>
                     </div>
-                    <div class="eco-card">
-                        <span class="eco-label">Operations</span>
-                        <h3>DuDe_POS</h3>
-                        <p>Sales, cashier shift, product catalog, stock workflow, and retail operations built for real counters.</p>
-                    </div>
-                    <div class="eco-card">
-                        <span class="eco-label">Intelligence</span>
-                        <h3>DuDe_Vision</h3>
-                        <p>Camera intelligence for alerts, object detection, site monitoring, and operational evidence.</p>
-                    </div>
-                    <div class="eco-card">
-                        <span class="eco-label">Automation</span>
-                        <h3>DuDe_AppsService</h3>
-                        <p>Custom business apps, internal tools, dashboards, and workflow automation.</p>
-                    </div>
-                    <div class="eco-card">
-                        <span class="eco-label">Logistics</span>
-                        <h3>DuDe_Drive</h3>
-                        <p>Fleet, delivery, logistics, route visibility, and driver operation support.</p>
-                    </div>
-                    <div class="eco-card">
-                        <span class="eco-label">Service</span>
-                        <h3>DuDe_RoomService</h3>
-                        <p>Hospitality workflow automation for service requests, housekeeping, and guest operations.</p>
+                    <div class="cred-card">
+                        <img src="assets/hero/google_ai.png" alt="Google AI">
+                        <div class="cred-info">
+                            <span>Verified Learning</span>
+                            <p>Google AI Professional</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="how-it-works">
-            <div class="container">
-                <div class="section-header">
-                    <h2>How DuDe Turns Events Into Action</h2>
-                </div>
-                <div class="how-grid">
-                    <div class="how-step">
-                        <div class="step-num">01</div>
-                        <h4>Capture Events</h4>
-                        <p>Messages, POS actions, forms, cameras, IoT sensors, and scheduled jobs become structured events.</p>
-                    </div>
-                    <div class="how-step">
-                        <div class="step-num">02</div>
-                        <h4>Decide With Context</h4>
-                        <p>Agents use business rules, memory, SOPs, and history to understand what should happen next.</p>
-                    </div>
-                    <div class="how-step">
-                        <div class="step-num">03</div>
-                        <h4>Execute and Log</h4>
-                        <p>DuDe sends alerts, creates records, asks for approval, updates dashboards, and keeps an audit trail.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="proof" style="background: #050505;">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Visual Proof</h2>
-                </div>
-                <div class="gallery-grid">
-                    <div class="gallery-card">
-                        <img src="assets/hero/op_1.jpeg" alt="Real Deployment">
-                        <div class="gallery-label">Real deployment media</div>
-                    </div>
-                    <div class="gallery-card">
-                        <img src="assets/hero/op_2.jpeg" alt="Command Center">
-                        <div class="gallery-label">Operations command center</div>
-                    </div>
-                    <div class="gallery-card">
-                        <img src="assets/hero/hero_main.png" alt="POS Workflow">
-                        <div class="gallery-label">POS workflow</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="use-cases">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Operational Use Cases</h2>
-                </div>
-                <div class="problem-grid">
-                    <div class="problem-card">
-                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Ice factory operations</h5>
-                        <p>Automated count and verification of shipments using Vision integration.</p>
-                    </div>
-                    <div class="problem-card">
-                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Minimart / POS</h5>
-                        <p>Accountability and real-time inventory alerts across multiple sites.</p>
-                    </div>
-                    <div class="problem-card">
-                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Warehouse monitoring</h5>
-                        <p>Site visibility and automated logging for large industrial spaces.</p>
-                    </div>
-                    <div class="problem-card">
-                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Service business automation</h5>
-                        <p>End-to-end task tracking from LINE to report.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="cta" style="text-align: center; background: linear-gradient(180deg, #000, #0a0a0c); padding: 160px 0;">
-            <div class="container">
-                <h2 style="font-size: 3.5rem; margin-bottom: 40px;">Ready to turn daily operations <br>into an AI-powered system?</h2>
-                <div style="display: flex; justify-content: center; gap: 20px;">
-                    <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary" style="padding: 20px 48px;">Book Consultation</a>
-                    <a href="https://ui.thegodseller.com" class="btn btn-outline" style="padding: 20px 48px;">Client Portal</a>
-                </div>
-            </div>
+        <section class="container" style="text-align: center; border-bottom: 1px solid var(--card-border);">
+            <h2 style="font-size: 3rem; margin-bottom: 32px;">Ready to automate?</h2>
+            <p style="color: var(--secondary); margin-bottom: 48px;">Consult our experts to design your AI operating layer.</p>
+            <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary" style="padding: 20px 48px;">Start Your Consultation</a>
         </section>
     </main>
 
     <footer>
         <div class="container">
-            <div class="f-grid">
-                <div class="f-col" style="grid-column: span 2;">
-                    <div class="logo" style="margin-bottom: 24px;">
-                        <img src="assets/hero/logo.png" alt="Logo">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <img src="assets/hero/logo.png" alt="The Godseller">
                         The Godseller
                     </div>
-                    <p style="color: var(--secondary); font-size: 0.9rem; max-width: 320px;">
-                        Smart AI Solutions Provider. Born to be a seller since 1977. DBD Registered Since 07/07/2017.
-                    </p>
+                    <p>Smart AI Solutions Provider. Bridging the gap between data and real-world action since 2017.</p>
                 </div>
-                <div class="f-col">
-                    <h5>Products</h5>
-                    <ul>
-                        <li><a href="#">DuDe HawaiiaN</a></li>
-                        <li><a href="#">DuDe_POS</a></li>
-                        <li><a href="#">DuDe_Vision</a></li>
-                        <li><a href="#">DuDe_Drive</a></li>
-                    </ul>
-                </div>
-                <div class="f-col">
-                    <h5>Contact</h5>
-                    <ul>
-                        <li><a href="mailto:chanukrit@thegodseller.com">Email Us</a></li>
-                        <li><a href="https://ui.thegodseller.com">Portal</a></li>
-                        <li><a href="privacy.html">Privacy</a></li>
-                    </ul>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h6>Ecosystem</h6>
+                        <ul>
+                            <li><a href="#">DuDe HawaiiaN</a></li>
+                            <li><a href="#">DuDe_POS</a></li>
+                            <li><a href="#">DuDe_Vision</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h6>Company</h6>
+                        <ul>
+                            <li><a href="privacy.html">Privacy</a></li>
+                            <li><a href="refund.html">Refund</a></li>
+                            <li><a href="mailto:chanukrit@thegodseller.com">Contact</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="f-bottom">
+            <div class="footer-bottom">
                 <p>&copy; 2026 THE GOD SELLER CORP. ALL RIGHTS RESERVED.</p>
-                <p>BUILT IN THAILAND</p>
+                <p>BANGKOK, THAILAND</p>
             </div>
         </div>
     </footer>
@@ -434,7 +374,7 @@
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('section, .problem-card, .eco-card, .gallery-card').forEach(el => {
+        document.querySelectorAll('section, .card, .agent-card').forEach(el => {
             el.style.opacity = 0;
             el.style.transform = 'translateY(20px)';
             el.style.transition = 'all 0.8s ease-out';
