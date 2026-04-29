@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Godseller | The Operating Layer for Thai Business</title>
+    <title>The Godseller | AI Systems for Thai Business Operations</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
@@ -11,17 +11,16 @@
         :root {
             --primary: #ffffff;
             --secondary: #a1a1aa;
-            --accent: #3b82f6; /* Premium Blue */
-            --accent-success: #10b981;
-            --accent-glow: rgba(59, 130, 246, 0.15);
-            --bg: #020203;
-            --card-bg: #0a0a0c;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 241, 0.15);
+            --bg: #000000;
+            --card-bg: #09090b;
             --card-border: #1d1d21;
             --dbd-gold: #D4AF37;
             --font-main: 'Inter', 'Noto Sans Thai', sans-serif;
             --font-heading: 'Outfit', sans-serif;
             --font-mono: 'Space Mono', monospace;
-            --max-width: 1400px;
+            --max-width: 1300px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,15 +33,15 @@
         }
 
         /* --- Global --- */
-        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
         a { text-decoration: none; color: inherit; transition: all 0.3s ease; }
         .container { max-width: var(--max-width); margin: 0 auto; padding: 0 40px; }
-        section { padding: 140px 0; }
-        .btn { padding: 16px 32px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
+        section { padding: 120px 0; }
+        .btn { padding: 16px 32px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
         .btn-primary { background: var(--primary); color: var(--bg); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.15); }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.1); }
         .btn-outline { border: 1px solid var(--card-border); color: var(--primary); background: rgba(255,255,255,0.02); }
-        .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: var(--secondary); transform: translateY(-2px); }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
 
         /* --- Header --- */
         header {
@@ -50,143 +49,126 @@
             top: 0;
             width: 100%;
             z-index: 1000;
-            background: rgba(2, 2, 3, 0.8);
-            backdrop-filter: blur(30px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--card-border);
         }
 
         .nav-inner {
-            height: 84px;
+            height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo { font-size: 1.4rem; font-weight: 700; font-family: var(--font-heading); display: flex; align-items: center; gap: 14px; }
-        .logo img { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--dbd-gold); }
+        .logo { font-size: 1.3rem; font-weight: 700; font-family: var(--font-heading); display: flex; align-items: center; gap: 12px; }
+        .logo img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--dbd-gold); }
 
-        .nav-links { display: flex; gap: 40px; font-size: 0.8rem; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.1em; }
+        .nav-links { display: flex; gap: 32px; font-size: 0.85rem; font-weight: 500; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
         .nav-links a:hover { color: var(--primary); }
 
-        .nav-actions { display: flex; gap: 16px; align-items: center; }
+        .nav-actions { display: flex; gap: 16px; }
 
         /* --- Hero --- */
-        .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 80px; align-items: center; padding-top: 80px; padding-bottom: 80px; }
-        
-        .hero-left { display: flex; flex-direction: column; gap: 32px; }
-        .badge { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dbd-gold); background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.2); padding: 6px 14px; border-radius: 100px; width: fit-content; }
-        
-        .hero h1 { font-size: clamp(3rem, 6vw, 4.5rem); line-height: 1.05; }
-        .hero p { font-size: 1.25rem; color: var(--secondary); max-width: 600px; }
-        
-        .proof-chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
-        .chip { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 16px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); color: var(--secondary); display: flex; align-items: center; gap: 8px; }
-        .chip::before { content: ''; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
-
-        .hero-right { position: relative; height: 600px; }
-        .collage-wrapper { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        
-        .panel { position: absolute; border-radius: 20px; border: 1px solid var(--card-border); overflow: hidden; background: #000; box-shadow: 0 40px 100px rgba(0,0,0,0.8); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        .panel img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.5s; }
-        .panel:hover img { opacity: 1; }
-
-        .p-main { width: 440px; height: 320px; z-index: 5; transform: rotate(1deg); }
-        .p-sub1 { width: 360px; height: 240px; bottom: 5%; left: -10%; z-index: 3; transform: rotate(-4deg); }
-        .p-sub2 { width: 300px; height: 400px; top: -5%; right: -5%; z-index: 2; transform: rotate(3deg); filter: blur(1px); opacity: 0.5; }
-        
-        .overlay-chip { position: absolute; padding: 10px 20px; background: rgba(10,10,12,0.8); backdrop-filter: blur(12px); border: 1px solid var(--card-border); border-radius: 100px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 10px; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .overlay-chip::before { content: ''; width: 8px; height: 8px; background: var(--accent-success); border-radius: 50%; box-shadow: 0 0 12px var(--accent-success); }
-        .o1 { top: 35%; left: -10%; }
-        .o2 { bottom: 25%; right: -5%; }
-        .o3 { top: 10%; right: 15%; color: var(--accent); }
-        .o3::before { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
-
-        /* --- Log Overlay --- */
-        .log-overlay {
-            position: absolute;
-            bottom: 5%;
-            left: -5%;
-            width: 280px;
-            background: rgba(0,0,0,0.9);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
-            font-family: var(--font-mono);
-            font-size: 9px;
-            z-index: 20;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
+        .hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 60px;
+            align-items: center;
+            padding-top: 100px;
+            padding-bottom: 120px;
         }
-        .log-header { color: var(--secondary); margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; font-weight: 700; }
-        .log-line { margin-bottom: 6px; color: var(--primary); opacity: 0.8; }
-        .log-line span { color: var(--accent-success); font-weight: 700; margin-right: 8px; }
+
+        .hero-left { display: flex; flex-direction: column; gap: 24px; }
+        .hero-left h1 { font-size: clamp(3rem, 6vw, 4.5rem); }
+        .hero-left p { font-size: 1.2rem; color: var(--secondary); max-width: 600px; }
+        
+        .badge { font-size: 0.75rem; font-weight: 700; color: var(--dbd-gold); background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2); padding: 4px 12px; border-radius: 100px; width: fit-content; text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        .proof-chips { display: flex; gap: 12px; margin-top: 10px; }
+        .chip { font-size: 0.7rem; font-weight: 700; color: var(--secondary); background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .hero-right { position: relative; height: 500px; }
+        .collage { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .collage-img { position: absolute; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.6); transition: all 0.5s ease; }
+        .collage-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.5s; }
+        .collage-img:hover img { opacity: 1; transform: scale(1.05); }
+
+        .img-1 { width: 400px; height: 280px; z-index: 5; transform: rotate(1deg); }
+        .img-2 { width: 320px; height: 220px; bottom: 5%; left: -10%; z-index: 3; transform: rotate(-3deg); }
+        .img-3 { width: 280px; height: 380px; top: -5%; right: -5%; z-index: 2; transform: rotate(4deg); opacity: 0.5; filter: blur(1px); }
+
+        .status-badge {
+            position: absolute;
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #4ade80;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .status-badge::before { content: ''; width: 8px; height: 8px; background: currentColor; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
+        .s-1 { top: 30%; left: -15%; }
+        .s-2 { bottom: 20%; right: -5%; color: var(--accent); }
 
         /* --- Trust Bar --- */
         .trust-bar { padding: 48px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); background: rgba(255,255,255,0.01); }
-        .trust-grid { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; flex-wrap: wrap; gap: 40px; }
+        .trust-inner { display: flex; justify-content: space-between; align-items: center; color: var(--secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; flex-wrap: wrap; gap: 40px; }
 
         /* --- Problem --- */
-        .problem-header h2 { font-size: clamp(2rem, 4vw, 3rem); max-width: 900px; margin-bottom: 24px; }
-        .problem-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; }
-        .problem-card { padding: 48px; background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%); border: 1px solid var(--card-border); border-radius: 16px; transition: 0.3s; }
+        .section-header { margin-bottom: 80px; }
+        .section-header h2 { font-size: 3rem; margin-bottom: 24px; max-width: 900px; }
+        .section-header p { font-size: 1.2rem; color: var(--secondary); max-width: 700px; }
+
+        .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
+        .problem-card { padding: 48px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; transition: 0.3s; }
         .problem-card:hover { border-color: rgba(255,255,255,0.1); }
-        .problem-card h4 { font-size: 1.25rem; margin-bottom: 16px; color: var(--primary); }
+        .problem-card h4 { font-size: 1.25rem; margin-bottom: 16px; }
         .problem-card p { font-size: 1rem; color: var(--secondary); }
 
         /* --- Ecosystem --- */
-        .eco-header { text-align: center; margin-bottom: 80px; }
-        .eco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 32px; }
-        .eco-card { padding: 56px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; position: relative; transition: all 0.4s; overflow: hidden; }
-        .eco-card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+        .eco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 32px; }
+        .eco-card { padding: 48px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; transition: all 0.3s; position: relative; overflow: hidden; }
+        .eco-card:hover { border-color: var(--accent); transform: translateY(-4px); }
         .eco-card h3 { font-size: 1.75rem; margin-bottom: 16px; }
         .eco-card p { font-size: 1.05rem; color: var(--secondary); }
-        .eco-label { font-size: 0.7rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; display: block; }
-        .eco-img-box { width: 100%; height: 200px; margin-bottom: 24px; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--card-border); }
-        .eco-img-box img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s; }
-        .eco-card:hover .eco-img-box img { opacity: 1; transform: scale(1.05); }
+        .eco-label { font-size: 0.7rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: block; }
+        
+        /* --- How it Works --- */
+        .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+        .how-step { display: flex; flex-direction: column; gap: 20px; }
+        .step-num { font-family: var(--font-mono); font-size: 0.9rem; color: var(--accent); }
+        .how-step h4 { font-size: 1.5rem; }
+        .how-step p { font-size: 1rem; color: var(--secondary); }
 
-        /* --- Flow --- */
-        .flow-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
-        .flow-step { position: relative; }
-        .step-num { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); margin-bottom: 20px; display: block; }
-        .flow-step h4 { font-size: 1.5rem; margin-bottom: 16px; }
-        .flow-step p { font-size: 1rem; color: var(--secondary); }
-
-        /* --- Gallery --- */
-        .gallery { padding-bottom: 100px; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 32px; }
-        .gallery-item { border-radius: 24px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 16/9; position: relative; background: #000; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: 0.6s; }
-        .gallery-item:hover img { opacity: 0.9; transform: scale(1.05); }
-        .gallery-meta { position: absolute; bottom: 32px; left: 32px; z-index: 5; }
-        .gallery-meta span { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary); background: rgba(0,0,0,0.6); padding: 6px 16px; border-radius: 6px; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); }
-
-        /* --- Use Cases --- */
-        .use-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-        .case-card { padding: 40px; border-radius: 16px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.01); transition: 0.3s; }
-        .case-card:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.03); }
-        .case-card h5 { font-size: 1.2rem; color: var(--accent); margin-bottom: 12px; }
-        .case-card p { font-size: 0.95rem; color: var(--secondary); }
+        /* --- Media Gallery --- */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; }
+        .gallery-card { border-radius: 16px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 16/10; position: relative; }
+        .gallery-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s; }
+        .gallery-card:hover img { opacity: 1; transform: scale(1.05); }
+        .gallery-label { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
 
         /* --- Footer --- */
-        footer { padding: 120px 0 60px; border-top: 1px solid var(--card-border); background: #000; }
-        .f-main { display: flex; justify-content: space-between; gap: 80px; margin-bottom: 80px; flex-wrap: wrap; }
-        .f-brand { flex: 2; min-width: 300px; }
-        .f-brand .logo { margin-bottom: 32px; }
-        .f-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; flex: 3; }
-        .f-col h6 { margin-bottom: 24px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); }
-        .f-col ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+        footer { padding: 100px 0 40px; border-top: 1px solid var(--card-border); background: #050505; }
+        .f-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; margin-bottom: 64px; }
+        .f-col h5 { margin-bottom: 24px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .f-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
         .f-col a { color: var(--secondary); font-size: 0.9rem; }
         .f-col a:hover { color: var(--primary); }
-        .f-end { display: flex; justify-content: space-between; align-items: center; padding-top: 48px; border-top: 1px solid var(--card-border); font-size: 0.8rem; color: var(--secondary); }
+        .f-bottom { padding-top: 40px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--secondary); }
 
-        @media (max-width: 1100px) {
-            .hero { grid-template-columns: 1fr; text-align: center; gap: 100px; }
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; text-align: center; }
             .hero-left { align-items: center; }
-            .hero-right { height: 400px; margin-top: 40px; }
-            .collage-wrapper { transform: scale(0.85); }
-            .flow-container { grid-template-columns: 1fr; gap: 48px; }
-            .nav-links { display: none; }
+            .hero-right { display: none; }
+            .how-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -212,276 +194,236 @@
         </div>
     </header>
 
-    <section id="hero" class="container">
-        <div class="hero">
-            <div class="hero-left">
-                <div class="badge">DBD Registered · Since 2017</div>
-                <h1>The Operating Layer <br>for Thai Business <br>Infrastructure</h1>
-                <p>We unify your cameras, POS, staff communications, and workflows into a single, intelligent operating layer. Moving Thai businesses from manual chaos to systematic AI oversight.</p>
-                <div class="hero-btns">
-                    <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Book Consultation</a>
-                    <a href="#ecosystem" class="btn btn-outline">Explore DuDe Ecosystem</a>
-                </div>
-                <div class="proof-chips">
-                    <div class="chip">Edge-First</div>
-                    <div class="chip">LINE-ready</div>
-                    <div class="chip">POS-ready</div>
-                    <div class="chip">Vision-ready</div>
-                </div>
-            </div>
-            <div class="hero-right">
-                <div class="collage-wrapper">
-                    <div class="panel p-main"><img src="assets/hero/op_1.jpeg" alt="Operation"></div>
-                    <div class="panel p-sub1"><img src="assets/hero/op_2.jpeg" alt="Factory"></div>
-                    <div class="panel p-sub2"><img src="assets/hero/hero_main.png" alt="AI Stack"></div>
-                    
-                    <!-- Live System Log Visual -->
-                    <div class="log-overlay">
-                        <div class="log-header">SYSTEM_AUDIT_LOG</div>
-                        <div class="log-line"><span>[OK]</span> EVENT_CAPTURED: CAMERA_SITE_01</div>
-                        <div class="log-line"><span>[OK]</span> AGENT_DECISION: ITEM_COUNT_VERIFIED</div>
-                        <div class="log-line"><span>[OK]</span> LINE_NOTIFY: SHIFT_REPORT_SENT</div>
-                        <div class="log-line animate-pulse"><span>[WAIT]</span> ANALYZING_POS_SYNC...</div>
+    <main>
+        <section id="hero" class="container">
+            <div class="hero">
+                <div class="hero-left">
+                    <div class="badge">DBD Registered · Since 2017</div>
+                    <h1>AI Systems for Real-World <br>Thai Business Operations</h1>
+                    <p>We build practical AI, POS, vision, automation, and agent systems that connect daily work, data, and decision-making into one operating layer.</p>
+                    <div class="hero-btns">
+                        <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Book Consultation</a>
+                        <a href="#ecosystem" class="btn btn-outline">Explore DuDe Ecosystem</a>
                     </div>
-
-                    <div class="overlay-chip o1">DuDe Core Online</div>
-                    <div class="overlay-chip o2">Operations Syncing</div>
-                    <div class="overlay-chip o3">Local Agentic Stack</div>
+                    <div class="proof-chips">
+                        <div class="chip">Local-first</div>
+                        <div class="chip">LINE-ready</div>
+                        <div class="chip">POS-ready</div>
+                        <div class="chip">Vision-ready</div>
+                    </div>
                 </div>
+                <div class="hero-right">
+                    <div class="collage">
+                        <div class="collage-img img-1"><img src="assets/hero/op_1.jpeg" alt="Operation"></div>
+                        <div class="collage-img img-2"><img src="assets/hero/op_2.jpeg" alt="Factory"></div>
+                        <div class="collage-img img-3"><img src="assets/hero/hero_main.png" alt="System"></div>
+                        <div class="status-badge s-1">DuDe Online</div>
+                        <div class="status-badge s-2">Vision Ready</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="trust-bar">
+            <div class="container trust-inner">
+                <span>DBD Registered Since 07/07/2017</span>
+                <span>Built in Thailand</span>
+                <span>Local-first AI Systems</span>
+                <span>Business Automation + POS + Vision</span>
             </div>
         </div>
-    </section>
 
-    <div class="trust-bar">
-        <div class="container trust-grid">
-            <span>DBD Registered Since 07/07/2017</span>
-            <span>Built in Thailand</span>
-            <span>Local-first AI Systems</span>
-            <span>Business Automation + POS + Vision</span>
-        </div>
-    </div>
+        <section id="problem">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Most businesses do not need another chatbot. They need an operating system.</h2>
+                    <p>The real problem is not AI access. It is fragmented operations: LINE chats, paper records, cameras, cashiers, approvals, and reports all living in separate places.</p>
+                </div>
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <h4>Scattered Data</h4>
+                        <p>LINE, paper, camera footage, Excel sheets, and staff memory are hard to audit.</p>
+                    </div>
+                    <div class="problem-card">
+                        <h4>Delayed Decisions</h4>
+                        <p>Owners see problems too late because daily operations are not connected in real time.</p>
+                    </div>
+                    <div class="problem-card">
+                        <h4>Manual Workflows</h4>
+                        <p>Approvals, shifts, sales, incidents, and reports still depend on people remembering every step.</p>
+                    </div>
+                    <div class="problem-card">
+                        <h4>Disconnected AI</h4>
+                        <p>Generic AI tools can answer questions, but they do not execute business operations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <section id="problem">
-        <div class="container">
-            <div class="problem-header">
-                <h2>Most businesses do not need another chatbot. <br>They need an operating system.</h2>
+        <section id="ecosystem" style="background: #050505;">
+            <div class="container">
+                <div class="section-header">
+                    <h2 style="font-size: 3.5rem;">The DuDe Ecosystem</h2>
+                    <p>A practical AI operating layer for businesses that need more than a chatbot: POS, vision, workflow automation, memory, alerts, approvals, and reporting.</p>
+                </div>
+                <div class="eco-grid">
+                    <div class="eco-card">
+                        <span class="eco-label">Orchestration</span>
+                        <h3>DuDe HawaiiaN</h3>
+                        <p>Multi-agent orchestration for business operations. Boss, Butler, Librarian, Watcher, and Negotiator work together as one operating layer.</p>
+                    </div>
+                    <div class="eco-card">
+                        <span class="eco-label">Operations</span>
+                        <h3>DuDe_POS</h3>
+                        <p>Sales, cashier shift, product catalog, stock workflow, and retail operations built for real counters.</p>
+                    </div>
+                    <div class="eco-card">
+                        <span class="eco-label">Intelligence</span>
+                        <h3>DuDe_Vision</h3>
+                        <p>Camera intelligence for alerts, object detection, site monitoring, and operational evidence.</p>
+                    </div>
+                    <div class="eco-card">
+                        <span class="eco-label">Automation</span>
+                        <h3>DuDe_AppsService</h3>
+                        <p>Custom business apps, internal tools, dashboards, and workflow automation.</p>
+                    </div>
+                    <div class="eco-card">
+                        <span class="eco-label">Logistics</span>
+                        <h3>DuDe_Drive</h3>
+                        <p>Fleet, delivery, logistics, route visibility, and driver operation support.</p>
+                    </div>
+                    <div class="eco-card">
+                        <span class="eco-label">Service</span>
+                        <h3>DuDe_RoomService</h3>
+                        <p>Hospitality workflow automation for service requests, housekeeping, and guest operations.</p>
+                    </div>
+                </div>
             </div>
-            <div class="problem-cards">
-                <div class="problem-card">
-                    <h4>Data Scattered</h4>
-                    <p>Critical business data is often fragmented across LINE chats, paper logs, CCTV feeds, and isolated spreadsheets.</p>
-                </div>
-                <div class="problem-card">
-                    <h4>Blind Operations</h4>
-                    <p>Owners and managers struggle to maintain real-time visibility over site operations and staff performance.</p>
-                </div>
-                <div class="problem-card">
-                    <h4>Auditing Gaps</h4>
-                    <p>Staff workflows and transaction records are difficult to verify without manual, high-latency oversight.</p>
-                </div>
-                <div class="problem-card">
-                    <h4>Isolated Tools</h4>
-                    <p>Standard AI tools fail to connect with local cameras, POS hardware, or regional communication platforms like LINE.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="ecosystem" style="background: #050507;">
-        <div class="container">
-            <div class="eco-header">
-                <h2 style="font-size: 3.5rem;">The DuDe Ecosystem</h2>
-            </div>
-            <div class="eco-grid">
-                <div class="eco-card">
-                    <div class="eco-img-box"><img src="assets/hero/hero_boss.png" alt="Boss"></div>
-                    <span class="eco-label">Central Intelligence</span>
-                    <h3>DuDe HawaiiaN</h3>
-                    <p>The orchestrator. A multi-agent framework that codifies your business rules into autonomous actions across all connected hardware.</p>
+        <section id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How DuDe Turns Events Into Action</h2>
                 </div>
-                <div class="eco-card">
-                    <div class="eco-img-box"><img src="assets/hero/op_1.jpeg" alt="POS"></div>
-                    <span class="eco-label">Transaction Layer</span>
-                    <h3>DuDe_POS</h3>
-                    <p>Beyond sales: it's an operational sensor. Syncs cashier accountability, shift variance, and stock movement directly into the AI core.</p>
-                </div>
-                <div class="eco-card">
-                    <div class="eco-img-box"><img src="assets/hero/op_2.jpeg" alt="Vision"></div>
-                    <span class="eco-label">Visual Verification</span>
-                    <h3>DuDe_Vision</h3>
-                    <p>Turning visual data into logs. Automated shipment counting, zone monitoring, and event-based video evidence for every operation.</p>
-                </div>
-                <div class="eco-card">
-                    <span class="eco-label">Workflows</span>
-                    <h3>DuDe_AppsService</h3>
-                    <p>Custom software development for internal tools and business-specific automation workflows tailored to your unique requirements.</p>
-                </div>
-                <div class="eco-card">
-                    <span class="eco-label">Logistics</span>
-                    <h3>DuDe_Drive</h3>
-                    <p>Real-time logistics support and fleet operation monitoring. Full transparency for routes, deliveries, and driver performance.</p>
-                </div>
-                <div class="eco-card">
-                    <span class="eco-label">Hospitality</span>
-                    <h3>DuDe_RoomService</h3>
-                    <p>Seamless service automation for guest operations and hospitality dispatch cycles, bridging digital requests to physical actions.</p>
+                <div class="how-grid">
+                    <div class="how-step">
+                        <div class="step-num">01</div>
+                        <h4>Capture Events</h4>
+                        <p>Messages, POS actions, forms, cameras, IoT sensors, and scheduled jobs become structured events.</p>
+                    </div>
+                    <div class="how-step">
+                        <div class="step-num">02</div>
+                        <h4>Decide With Context</h4>
+                        <p>Agents use business rules, memory, SOPs, and history to understand what should happen next.</p>
+                    </div>
+                    <div class="how-step">
+                        <div class="step-num">03</div>
+                        <h4>Execute and Log</h4>
+                        <p>DuDe sends alerts, creates records, asks for approval, updates dashboards, and keeps an audit trail.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="how-it-works">
-        <div class="container">
-            <div class="section-header" style="margin-bottom: 100px;">
-                <h2 style="font-size: 3rem;">How It Works</h2>
-            </div>
-            <div class="flow-container">
-                <div class="flow-step">
-                    <span class="step-num">01 / DATA INGESTION</span>
-                    <h4>Capture Events</h4>
-                    <p>System ingests real-time events from LINE messages, POS transactions, camera feeds, IoT sensors, and manual forms.</p>
+        <section id="proof" style="background: #050505;">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Visual Proof</h2>
                 </div>
-                <div class="flow-step">
-                    <span class="step-num">02 / AGENTIC LOGIC</span>
-                    <h4>Decide with Context</h4>
-                    <p>Autonomous DuDe agents process events using long-term memory and your specific business rules to detect patterns and anomalies.</p>
-                </div>
-                <div class="flow-step">
-                    <span class="step-num">03 / AUTOMATED ACTION</span>
-                    <h4>Execute and Log</h4>
-                    <p>The system triggers automated alerts, approval requests, and detailed performance reports while maintaining immutable audit logs.</p>
+                <div class="gallery-grid">
+                    <div class="gallery-card">
+                        <img src="assets/hero/op_1.jpeg" alt="Real Deployment">
+                        <div class="gallery-label">Real deployment media</div>
+                    </div>
+                    <div class="gallery-card">
+                        <img src="assets/hero/op_2.jpeg" alt="Command Center">
+                        <div class="gallery-label">Operations command center</div>
+                    </div>
+                    <div class="gallery-card">
+                        <img src="assets/hero/hero_main.png" alt="POS Workflow">
+                        <div class="gallery-label">POS workflow</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="proof" class="gallery">
-        <div class="container">
-            <div class="section-header" style="margin-bottom: 64px;">
-                <h2>Visual Proof</h2>
+        <section id="use-cases">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Operational Use Cases</h2>
+                </div>
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Ice factory operations</h5>
+                        <p>Automated count and verification of shipments using Vision integration.</p>
+                    </div>
+                    <div class="problem-card">
+                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Minimart / POS</h5>
+                        <p>Accountability and real-time inventory alerts across multiple sites.</p>
+                    </div>
+                    <div class="problem-card">
+                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Warehouse monitoring</h5>
+                        <p>Site visibility and automated logging for large industrial spaces.</p>
+                    </div>
+                    <div class="problem-card">
+                        <h5 style="color: var(--accent); margin-bottom: 12px; font-size: 1.1rem;">Service business automation</h5>
+                        <p>End-to-end task tracking from LINE to report.</p>
+                    </div>
+                </div>
             </div>
-            <div class="gallery-grid">
-                <div class="gallery-item">
-                    <img src="assets/hero/op_1.jpeg" alt="Deployment">
-                    <div class="gallery-meta"><span>Real Deployment Media</span></div>
-                </div>
-                <div class="gallery-item">
-                    <img src="assets/hero/op_2.jpeg" alt="Command Center">
-                    <div class="gallery-meta"><span>Operations Command Center</span></div>
-                </div>
-                <div class="gallery-item">
-                    <img src="assets/hero/hero_main.png" alt="POS Workflow">
-                    <div class="gallery-meta"><span>POS & Inventory Workflow</span></div>
-                </div>
-                <div class="gallery-item">
-                    <img src="assets/hero/hero_boss.png" alt="AI Agent">
-                    <div class="gallery-meta"><span>AI Agent Infrastructure</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="use-cases" style="background: #020203;">
-        <div class="container">
-            <div class="section-header" style="margin-bottom: 64px;">
-                <h2>Operational Use Cases</h2>
-            </div>
-            <div class="use-case-grid">
-                <div class="case-card">
-                    <h5>Ice Factory Operations</h5>
-                    <p>Automated shipment verification and delivery tracking using camera-based object counting.</p>
-                </div>
-                <div class="case-card">
-                    <h5>Minimart / POS</h5>
-                    <p>Multi-site sales consolidation, shift accountability, and real-time stock discrepancy alerts.</p>
-                </div>
-                <div class="case-card">
-                    <h5>Warehouse Monitoring</h5>
-                    <p>AI-driven camera monitoring for inventory movement, perimeter security, and event-based logging.</p>
-                </div>
-                <div class="case-card">
-                    <h5>Service Business Automation</h5>
-                    <p>Unified booking, dispatching, and customer reporting via automated LINE and CRM workflows.</p>
-                </div>
-                <div class="case-card">
-                    <h5>Hospitality Workflow</h5>
-                    <p>Integrating guest requests directly into housekeeping and maintenance task queues with real-time feedback.</p>
-                </div>
-                <div class="case-card">
-                    <h5>AI Agent Operations</h5>
-                    <p>Deploying specialized autonomous agents to manage complex datasets and cross-platform communication.</p>
+        <section id="cta" style="text-align: center; background: linear-gradient(180deg, #000, #0a0a0c); padding: 160px 0;">
+            <div class="container">
+                <h2 style="font-size: 3.5rem; margin-bottom: 40px;">Ready to turn daily operations <br>into an AI-powered system?</h2>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary" style="padding: 20px 48px;">Book Consultation</a>
+                    <a href="https://ui.thegodseller.com" class="btn btn-outline" style="padding: 20px 48px;">Client Portal</a>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section id="cta" style="text-align: center; padding: 200px 0;">
-        <div class="container">
-            <h2 style="font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: 40px;">Ready to turn daily operations <br>into an AI-powered system?</h2>
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary" style="padding: 20px 48px; font-size: 1.1rem;">Book Consultation</a>
-                <a href="https://ui.thegodseller.com" class="btn btn-outline" style="padding: 20px 48px; font-size: 1.1rem;">Client Portal</a>
-            </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <footer>
         <div class="container">
-            <div class="f-main">
-                <div class="f-brand">
-                    <div class="logo">
+            <div class="f-grid">
+                <div class="f-col" style="grid-column: span 2;">
+                    <div class="logo" style="margin-bottom: 24px;">
                         <img src="assets/hero/logo.png" alt="Logo">
                         The Godseller
                     </div>
-                    <p style="color: var(--secondary); font-size: 1rem; max-width: 360px;">
-                        Smart AI Solutions Provider. We bridge the gap between business operations and intelligent automation.
+                    <p style="color: var(--secondary); font-size: 0.9rem; max-width: 320px;">
+                        Smart AI Solutions Provider. Born to be a seller since 1977. DBD Registered Since 07/07/2017.
                     </p>
-                    <p style="color: var(--dbd-gold); font-size: 0.85rem; margin-top: 24px; font-weight: 700;">DBD Registered Since 07/07/2017</p>
                 </div>
-                <div class="f-links">
-                    <div class="f-col">
-                        <h6>Products</h6>
-                        <ul>
-                            <li><a href="#">DuDe HawaiiaN</a></li>
-                            <li><a href="#">DuDe_POS</a></li>
-                            <li><a href="#">DuDe_Vision</a></li>
-                            <li><a href="#">DuDe_Drive</a></li>
-                        </ul>
-                    </div>
-                    <div class="f-col">
-                        <h6>Resources</h6>
-                        <ul>
-                            <li><a href="mailto:chanukrit@thegodseller.com">Consultation</a></li>
-                            <li><a href="https://ui.thegodseller.com">Client Portal</a></li>
-                            <li><a href="#">LINE Official</a></li>
-                        </ul>
-                    </div>
-                    <div class="f-col">
-                        <h6>Legal</h6>
-                        <ul>
-                            <li><a href="privacy.html">Privacy Policy</a></li>
-                            <li><a href="refund.html">Terms & Refund</a></li>
-                        </ul>
-                    </div>
+                <div class="f-col">
+                    <h5>Products</h5>
+                    <ul>
+                        <li><a href="#">DuDe HawaiiaN</a></li>
+                        <li><a href="#">DuDe_POS</a></li>
+                        <li><a href="#">DuDe_Vision</a></li>
+                        <li><a href="#">DuDe_Drive</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h5>Contact</h5>
+                    <ul>
+                        <li><a href="mailto:chanukrit@thegodseller.com">Email Us</a></li>
+                        <li><a href="https://ui.thegodseller.com">Portal</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="f-end">
+            <div class="f-bottom">
                 <p>&copy; 2026 THE GOD SELLER CORP. ALL RIGHTS RESERVED.</p>
-                <div style="display: flex; gap: 32px;">
-                    <span>BUILT IN THAILAND</span>
-                    <span>LOCAL-FIRST AI STACK</span>
-                </div>
+                <p>BUILT IN THAILAND</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Reveal animation on scroll
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
+        // Simple scroll reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -490,24 +432,13 @@
                     observer.unobserve(entry.target);
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
-        document.querySelectorAll('section, .problem-card, .eco-card, .flow-step, .gallery-item, .case-card').forEach(el => {
+        document.querySelectorAll('section, .problem-card, .eco-card, .gallery-card').forEach(el => {
             el.style.opacity = 0;
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.8s ease-out';
             observer.observe(el);
-        });
-
-        // Simple smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
         });
     </script>
 </body>
