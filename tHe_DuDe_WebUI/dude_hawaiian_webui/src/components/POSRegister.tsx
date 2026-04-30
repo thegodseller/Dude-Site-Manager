@@ -239,11 +239,11 @@ export const POSRegister: React.FC = () => {
   const updateQuantity = (id: string, delta: number) => {
     setCart(prev => prev.map(item => {
       if (item.product_id === id) {
-        const newQty = Math.max(0, item.quantity + delta);
+        const newQty = Math.max(1, item.quantity + delta);
         return { ...item, quantity: newQty };
       }
       return item;
-    }).filter(item => item.quantity > 0));
+    }));
   };
 
   const handleCheckout = async () => {
@@ -252,33 +252,54 @@ export const POSRegister: React.FC = () => {
     setCheckoutLoading(true);
     setCheckoutError(null);
     try {
+      const ticketItems = cart.map(item => {
+        const unitPrice = parseFloat(item.unit_price);
+        return {
+          product_id: item.product_id,
+          qty: item.quantity,
+          unit_price: unitPrice,
+          master_price: unitPrice
+        };
+      });
+
       const res = await fetch('/ag_pos_api/tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           shift_id: currentShift.shift_id,
-          items: cart.map(item => ({
-            product_id: item.product_id,
-            sku: item.sku,
-            name: item.name,
-            quantity: item.quantity,
-            unit_price: item.unit_price
-          })),
-          payment_method: paymentMethod,
-          is_tax_invoice: isVat
+          vat_mode: isVat ? 'VAT' : 'NO_VAT',
+          vat_calc_mode: 'EXCLUSIVE',
+          vat_rate: isVat ? 7 : 0,
+          items: ticketItems,
+          payment: {
+            method: paymentMethod,
+            amount: total
+          }
         })
       });
       
-      const data = await res.json();
+      const data = await res.json().catch(() => ({
+        success: false,
+        message: res.statusText || 'Checkout failed'
+      }));
       if (data.success) {
-        setLastTicket(data.ticket);
+        setLastTicket(data.ticket ?? {
+          ticket_id: data.ticket_id,
+          ticket_no: data.ticket_no,
+          total_amount: data.total_amount,
+          status: data.status
+        });
         setCart([]);
         setShowModal('ticket_success');
       } else {
         // Detailed error handling
-        let msg = data.message || 'Checkout failed';
-        if (res.status === 409) msg = `Conflict: ${msg}`;
+        const detail = Array.isArray(data.detail)
+          ? data.detail.map((entry: { msg?: string }) => entry.msg || 'Invalid checkout data').join('; ')
+          : data.detail;
+        let msg = data.message || detail || 'Checkout failed';
         if (res.status === 400) msg = `Invalid Data: ${msg}`;
+        if (res.status === 404) msg = `Not Found: ${msg}`;
+        if (res.status === 409) msg = `Conflict: ${msg}`;
         setCheckoutError(msg);
         setShowModal('error');
       }
@@ -395,7 +416,7 @@ export const POSRegister: React.FC = () => {
                 </div>
               </div>
               <div className="quantity-ctrl">
-                <button className="btn-icon" onClick={() => updateQuantity(item.product_id, -1)}>-</button>
+                <button className="btn-icon" onClick={() => updateQuantity(item.product_id, -1)} disabled={item.quantity <= 1}>-</button>
                 <span className="text-xs w-4 text-center">{item.quantity}</span>
                 <button className="btn-icon" onClick={() => updateQuantity(item.product_id, 1)}>+</button>
               </div>
