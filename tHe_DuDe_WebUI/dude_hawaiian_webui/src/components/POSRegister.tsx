@@ -397,6 +397,23 @@ export const POSRegister: React.FC = () => {
   const [isInventoryLoading, setIsInventoryLoading] = useState(false);
   const [inventoryError, setInventoryError] = useState<string | null>(null);
 
+  // Product Catalog State
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [isCatalogLoading, setIsCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [productFormData, setProductFormData] = useState({
+    sku: '',
+    barcode: '',
+    name: '',
+    category_name: '',
+    uom: 'pcs',
+    unit_price: '',
+    on_hand_qty: '0',
+    allow_negative_stock: false
+  });
+
   // Health check
   const checkHealth = async () => {
     try {
@@ -1139,6 +1156,89 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const handleCreateProduct = async () => {
+    if (!currentCashier) return;
+    setIsCatalogLoading(true);
+    setCatalogError(null);
+    try {
+      const res = await fetch(`/ag_pos_api/products?employee_id=${currentCashier.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...productFormData,
+          unit_price: parseFloat(productFormData.unit_price),
+          on_hand_qty: parseFloat(productFormData.on_hand_qty)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsAddingProduct(false);
+        setProductFormData({
+          sku: '', barcode: '', name: '', category_name: '', uom: 'pcs', unit_price: '', on_hand_qty: '0', allow_negative_stock: false
+        });
+        searchProducts(catalogSearch);
+      } else {
+        setCatalogError(data.detail || data.message || 'Creation failed');
+      }
+    } catch (err) {
+      setCatalogError('Network error');
+    } finally {
+      setIsCatalogLoading(false);
+    }
+  };
+
+  const handleUpdateProduct = async () => {
+    if (!editingProduct || !currentCashier) return;
+    setIsCatalogLoading(true);
+    setCatalogError(null);
+    try {
+      const res = await fetch(`/ag_pos_api/products/${editingProduct.product_id}?employee_id=${currentCashier.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: productFormData.name,
+          category_name: productFormData.category_name,
+          barcode: productFormData.barcode,
+          uom: productFormData.uom,
+          unit_price: parseFloat(productFormData.unit_price),
+          allow_negative_stock: productFormData.allow_negative_stock
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingProduct(null);
+        searchProducts(catalogSearch);
+      } else {
+        setCatalogError(data.detail || data.message || 'Update failed');
+      }
+    } catch (err) {
+      setCatalogError('Network error');
+    } finally {
+      setIsCatalogLoading(false);
+    }
+  };
+
+  const handleDeactivateProduct = async (productId: string) => {
+    if (!currentCashier) return;
+    if (!window.confirm('Are you sure you want to deactivate this product? It will no longer be sellable, but historical data will be preserved.')) return;
+    
+    setIsCatalogLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/products/${productId}/deactivate?employee_id=${currentCashier.id}`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingProduct(null);
+        searchProducts(catalogSearch);
+      }
+    } catch (err) {
+      console.error('Deactivation failed:', err);
+    } finally {
+      setIsCatalogLoading(false);
+    }
+  };
+
   const getEventColor = (type: string) => {
     if (type.includes('VOID')) return 'inactive';
     if (type.includes('DEACTIVATED')) return 'inactive';
@@ -1314,6 +1414,9 @@ export const POSRegister: React.FC = () => {
               <button className="payment-btn" style={{flex: 1}} onClick={() => {
                 setShowModal('inventory');
               }}>INVENTORY</button>
+              <button className="payment-btn" style={{flex: 1}} onClick={() => {
+                setShowModal('catalog');
+              }}>PRODUCTS</button>
             </>
           )}
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
@@ -2548,6 +2651,203 @@ export const POSRegister: React.FC = () => {
             </div>
 
             <button className="mt-6 text-xs text-slate-500 underline block w-full text-center" onClick={() => { setShowModal(null); setSelectedInventoryProduct(null); }}>CLOSE INVENTORY</button>
+          </div>
+        </div>
+      )}
+      {showModal === 'catalog' && (
+        <div className="modal-overlay" onClick={() => { setShowModal(null); setEditingProduct(null); setIsAddingProduct(false); }}>
+          <div className="modal" style={{maxWidth: '1200px', width: '95%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-lg uppercase tracking-wider">Product Catalog</h3>
+              <div className="flex gap-4 w-1/3">
+                <input 
+                  type="text" 
+                  className="input-glow text-xs" 
+                  placeholder="SEARCH CATALOG..." 
+                  value={catalogSearch}
+                  onChange={e => setCatalogSearch(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') searchProducts(catalogSearch); }}
+                />
+                <button className="payment-btn text-[10px] px-4" onClick={() => {
+                  setIsAddingProduct(true);
+                  setEditingProduct(null);
+                  setProductFormData({
+                    sku: '', barcode: '', name: '', category_name: '', uom: 'pcs', unit_price: '', on_hand_qty: '0', allow_negative_stock: false
+                  });
+                }}>ADD NEW</button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-8 h-[70vh]">
+              {/* Product List */}
+              <div className="col-span-2 flex flex-col space-y-4">
+                <div className="flex-1 overflow-y-auto bg-black/20 rounded border border-white/5">
+                  <table className="staff-table">
+                    <thead>
+                      <tr>
+                        <th>SKU</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map(p => (
+                        <tr key={p.product_id}>
+                          <td className="text-[9px] font-mono">{p.sku}</td>
+                          <td className="text-[10px] font-bold">{p.name}</td>
+                          <td className="text-[9px] text-slate-400">{p.category_name}</td>
+                          <td className="text-[10px] font-mono">{formatCurrency(parseFloat(p.unit_price))}</td>
+                          <td className="text-[10px]">{p.on_hand_qty} {p.uom}</td>
+                          <td>
+                            <button className="text-[9px] text-orange-500 underline" onClick={() => {
+                              setEditingProduct(p);
+                              setIsAddingProduct(false);
+                              setProductFormData({
+                                sku: p.sku,
+                                barcode: p.barcode || '',
+                                name: p.name,
+                                category_name: p.category_name || '',
+                                uom: p.uom || 'pcs',
+                                unit_price: p.unit_price,
+                                on_hand_qty: String(p.on_hand_qty),
+                                allow_negative_stock: allowsNegativeStock(p)
+                              });
+                            }}>EDIT</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Form Side */}
+              <div className="bg-white/5 p-6 rounded border border-white/10 overflow-y-auto">
+                {(isAddingProduct || editingProduct) ? (
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-4">
+                      {isAddingProduct ? 'Create New Product' : 'Edit Product'}
+                    </h4>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-[9px] text-slate-500 block mb-1">SKU (Unique Identifier)</label>
+                        <input 
+                          type="text" 
+                          className="input-glow text-xs" 
+                          disabled={!isAddingProduct}
+                          value={productFormData.sku}
+                          onChange={e => setProductFormData({...productFormData, sku: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-slate-500 block mb-1">BARCODE</label>
+                        <input 
+                          type="text" 
+                          className="input-glow text-xs"
+                          value={productFormData.barcode}
+                          onChange={e => setProductFormData({...productFormData, barcode: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-slate-500 block mb-1">PRODUCT NAME</label>
+                        <input 
+                          type="text" 
+                          className="input-glow text-xs"
+                          value={productFormData.name}
+                          onChange={e => setProductFormData({...productFormData, name: e.target.value})}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[9px] text-slate-500 block mb-1">CATEGORY</label>
+                          <input 
+                            type="text" 
+                            className="input-glow text-xs"
+                            value={productFormData.category_name}
+                            onChange={e => setProductFormData({...productFormData, category_name: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[9px] text-slate-500 block mb-1">UOM</label>
+                          <input 
+                            type="text" 
+                            className="input-glow text-xs"
+                            value={productFormData.uom}
+                            onChange={e => setProductFormData({...productFormData, uom: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[9px] text-slate-500 block mb-1">UNIT PRICE</label>
+                          <input 
+                            type="number" 
+                            className="input-glow text-xs font-mono"
+                            value={productFormData.unit_price}
+                            onChange={e => setProductFormData({...productFormData, unit_price: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[9px] text-slate-500 block mb-1">INITIAL STOCK</label>
+                          <input 
+                            type="number" 
+                            className="input-glow text-xs font-mono"
+                            disabled={!isAddingProduct}
+                            value={productFormData.on_hand_qty}
+                            onChange={e => setProductFormData({...productFormData, on_hand_qty: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 py-2">
+                        <input 
+                          type="checkbox" 
+                          id="allow_neg"
+                          checked={productFormData.allow_negative_stock}
+                          onChange={e => setProductFormData({...productFormData, allow_negative_stock: e.target.checked})}
+                        />
+                        <label htmlFor="allow_neg" className="text-[10px] text-slate-400">ALLOW NEGATIVE STOCK</label>
+                      </div>
+                    </div>
+
+                    {catalogError && <div className="text-[10px] text-red-500 italic">{catalogError}</div>}
+
+                    <div className="pt-4 flex flex-col gap-2">
+                      <button 
+                        className="payment-btn w-full" 
+                        disabled={isCatalogLoading}
+                        onClick={isAddingProduct ? handleCreateProduct : handleUpdateProduct}
+                      >
+                        {isCatalogLoading ? 'SAVING...' : (isAddingProduct ? 'CREATE PRODUCT' : 'SAVE CHANGES')}
+                      </button>
+                      
+                      {editingProduct && (
+                        <button 
+                          className="payment-btn w-full bg-red-900/20 border-red-900/50 text-red-500"
+                          onClick={() => handleDeactivateProduct(editingProduct.product_id)}
+                        >
+                          DEACTIVATE
+                        </button>
+                      )}
+                      
+                      <button className="text-[10px] text-slate-500 underline mt-2" onClick={() => {
+                        setEditingProduct(null);
+                        setIsAddingProduct(false);
+                      }}>CANCEL</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-600 text-xs text-center">
+                    <div className="opacity-50">Select a product to edit or click 'ADD NEW' to expand the catalog.</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button className="mt-6 text-xs text-slate-500 underline block w-full text-center" onClick={() => { setShowModal(null); setEditingProduct(null); setIsAddingProduct(false); }}>CLOSE CATALOG</button>
           </div>
         </div>
       )}
