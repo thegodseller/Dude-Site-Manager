@@ -189,6 +189,8 @@ const DEMO_VOID_TICKET = {
   status: 'VOIDED'
 };
 
+const AUTHORIZED_VOID_ROLES = ['MANAGER', 'ADMIN', 'SUPERVISOR', 'OWNER'];
+
 const buildDemoCart = (items: CartItem[]): CartItem[] => (
   items.map(item => ({ ...normalizeProduct(item), quantity: item.quantity }))
 );
@@ -286,6 +288,13 @@ export const POSRegister: React.FC = () => {
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [receiptLoading, setReceiptLoading] = useState(false);
   const [receiptError, setReceiptError] = useState<string | null>(null);
+
+  // Manager Override State
+  const [showOverrideModal, setShowOverrideModal] = useState(false);
+  const [overrideManagerId, setOverrideManagerId] = useState<string | null>(null);
+  const [overridePin, setOverridePin] = useState('');
+  const [overrideLoading, setOverrideLoading] = useState(false);
+  const [overrideError, setOverrideError] = useState<string | null>(null);
 
   // Health check
   const checkHealth = async () => {
@@ -721,16 +730,38 @@ export const POSRegister: React.FC = () => {
     window.print();
   };
 
-  const handleVoid = async () => {
-    if (!lastTicket || !currentShift || isScreenshotMode) return;
+  const handleVoid = async (overrideEmpId?: string) => {
+    if (!lastTicket || (!currentShift && !isScreenshotMode)) return;
+
+    // Screenshot Mode deterministic behavior
+    if (isScreenshotMode) {
+      setLastTicket(prev => prev ? { ...prev, status: 'VOIDED' } : null);
+      setShowModal('void_success_real');
+      return;
+    }
+
     if (lastTicket.status === 'VOIDED') return;
+
+    // RBAC Check
+    const effectiveEmpId = overrideEmpId || currentCashier?.id;
+    const effectiveRole = overrideEmpId 
+      ? employees.find(e => e.id === overrideEmpId)?.role 
+      : currentCashier?.role;
+
+    if (!AUTHORIZED_VOID_ROLES.includes(effectiveRole?.toUpperCase() || '')) {
+      setShowOverrideModal(true);
+      return;
+    }
 
     setVoidLoading(true);
     try {
       const res = await fetch(`/ag_pos_api/tickets/${lastTicket.ticket_id}/void`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: voidReason, employee_id: currentCashier?.id })
+        body: JSON.stringify({ 
+          reason: voidReason + (overrideEmpId ? ' (Manager Override)' : ''), 
+          employee_id: effectiveEmpId 
+        })
       });
 
       const data = await res.json();
@@ -746,6 +777,39 @@ export const POSRegister: React.FC = () => {
       alert('Network error during void request.');
     } finally {
       setVoidLoading(false);
+    }
+  };
+
+  const handleManagerOverride = async () => {
+    if (!overrideManagerId || overridePin.length < 4) {
+      setOverrideError('Select manager and enter valid PIN');
+      return;
+    }
+    setOverrideLoading(true);
+    setOverrideError(null);
+    try {
+      const res = await fetch('/ag_pos_api/employees/session/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employee_id: overrideManagerId, pin_code: overridePin })
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        const manager = data.employee;
+        if (AUTHORIZED_VOID_ROLES.includes(manager.role.toUpperCase())) {
+          setShowOverrideModal(false);
+          setOverridePin('');
+          await handleVoid(manager.id);
+        } else {
+          setOverrideError('Selected employee is not authorized for voids');
+        }
+      } else {
+        setOverrideError(data.message || 'Invalid Manager PIN');
+      }
+    } catch (err) {
+      setOverrideError('Network error during override verification');
+    } finally {
+      setOverrideLoading(false);
     }
   };
 
@@ -1400,50 +1464,72 @@ export const POSRegister: React.FC = () => {
         </div>
       )}
 
-      {/* Cashier Login Overlay */}
-      {!currentCashier && !isScreenshotMode && (
-        <div className="cashier-login-overlay">
+      {/* Manager Override Modal */}
+      {showOverrideModal && (
+        <div className="cashier-login-overlay" style={{ zIndex: 1100 }}>
           <div className="login-card">
-            <h2 className="font-tech text-2xl text-orange-500 mb-2">POS SYSTEM</h2>
-            <p className="text-slate-400 text-xs mb-8 tracking-widest">SECURE ACCESS REQUIRED</p>
+            <h2 className="font-tech text-xl text-orange-500 mb-2">MANAGER OVERRIDE</h2>
+            <p className="text-slate-400 text-[10px] mb-6 tracking-widest uppercase">Authorization required for void / refund</p>
             
-            {loginError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{loginError}</div>}
+            {overrideError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{overrideError}</div>}
 
             <div className="cashier-select-grid">
-              {employees.map(emp => (
+              {employees.filter(e => AUTHORIZED_VOID_ROLES.includes(e.role.toUpperCase())).map(emp => (
                 <div 
                   key={emp.id} 
-                  className={`cashier-option ${selectedCashierId === emp.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedCashierId(emp.id)}
+                  className={`cashier-option ${overrideManagerId === emp.id ? 'selected' : ''}`}
+                  onClick={() => setOverrideManagerId(emp.id)}
                 >
                   <span className="cashier-name">{emp.display_name}</span>
                   <span className="cashier-role">{emp.role}</span>
                 </div>
               ))}
-              {employees.length === 0 && <div className="text-slate-600 text-xs py-10">No active employees found</div>}
+              {employees.filter(e => AUTHORIZED_VOID_ROLES.includes(e.role.toUpperCase())).length === 0 && 
+                <div className="text-slate-600 text-xs py-10">No authorized managers available</div>
+              }
             </div>
 
-            {selectedCashierId && (
+            <div className="status-label mt-6 mb-2">VOID REASON</div>
+            <input 
+              type="text" 
+              className="input-glow w-full mb-6" 
+              value={voidReason}
+              onChange={(e) => setVoidReason(e.target.value)}
+              placeholder="e.g. Manager override required"
+            />
+
+            {overrideManagerId && (
               <div className="pin-input-container">
                 <div className="pin-display">
-                  {pin.split('').map((_, i) => <span key={i}>*</span>)}
+                  {overridePin.split('').map((_, i) => <span key={i}>*</span>)}
                 </div>
                 <div className="pin-pad">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-                    <button key={n} className="pin-btn" onClick={() => setPin(p => (p + n).slice(0, 6))}>{n}</button>
+                    <button key={n} className="pin-btn" onClick={() => setOverridePin(p => (p + n).slice(0, 6))}>{n}</button>
                   ))}
-                  <button className="pin-btn clear" onClick={() => setPin('')}>C</button>
-                  <button className="pin-btn" onClick={() => setPin(p => (p + '0').slice(0, 6))}>0</button>
+                  <button className="pin-btn clear" onClick={() => setOverridePin('')}>C</button>
+                  <button className="pin-btn" onClick={() => setOverridePin(p => (p + '0').slice(0, 6))}>0</button>
                   <button 
                     className="pin-btn submit" 
-                    onClick={handleCashierLogin}
-                    disabled={loginLoading || pin.length < 4}
+                    onClick={handleManagerOverride}
+                    disabled={overrideLoading || overridePin.length < 4}
                   >
-                    {loginLoading ? '...' : 'ENTER'}
+                    {overrideLoading ? '...' : 'APPROVE'}
                   </button>
                 </div>
               </div>
             )}
+            
+            <button 
+              className="cancel-override"
+              onClick={() => {
+                setShowOverrideModal(false);
+                setOverridePin('');
+                setOverrideError(null);
+              }}
+            >
+              CANCEL OVERRIDE
+            </button>
           </div>
         </div>
       )}

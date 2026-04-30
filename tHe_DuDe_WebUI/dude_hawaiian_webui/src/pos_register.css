@@ -1145,3 +1145,27 @@ body {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
 }
+
+.cancel-override {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+
+.cancel-override:hover {
+  color: white;
+}
+
+.meta-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
