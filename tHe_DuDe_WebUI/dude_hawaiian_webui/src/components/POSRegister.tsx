@@ -414,6 +414,16 @@ export const POSRegister: React.FC = () => {
     allow_negative_stock: false
   });
 
+  // Low Stock Dashboard State
+  const [lowStockItems, setLowStockItems] = useState<LowStockItem[]>([]);
+  const [isLowStockLoading, setIsLowStockLoading] = useState(false);
+  const [lowStockError, setLowStockError] = useState<string | null>(null);
+  const [editingReorderProduct, setEditingReorderProduct] = useState<LowStockItem | null>(null);
+  const [reorderFormData, setReorderFormData] = useState({
+    reorder_point: '',
+    reorder_qty: ''
+  });
+
   // Health check
   const checkHealth = async () => {
     try {
@@ -1239,6 +1249,50 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchLowStock = async () => {
+    setIsLowStockLoading(true);
+    setLowStockError(null);
+    try {
+      const res = await fetch('/ag_pos_api/inventory/low-stock');
+      const data = await res.json();
+      if (data.success) {
+        setLowStockItems(data.items);
+      } else {
+        setLowStockError(data.message || 'Failed to fetch low stock alerts');
+      }
+    } catch (err) {
+      setLowStockError('Network error');
+    } finally {
+      setIsLowStockLoading(false);
+    }
+  };
+
+  const handleUpdateReorderSettings = async () => {
+    if (!editingReorderProduct || !currentCashier) return;
+    setIsLowStockLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/products/${editingReorderProduct.product_id}/reorder-settings?employee_id=${currentCashier.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reorder_point: parseFloat(reorderFormData.reorder_point),
+          reorder_qty: parseFloat(reorderFormData.reorder_qty)
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingReorderProduct(null);
+        fetchLowStock();
+      } else {
+        setLowStockError(data.detail || data.message || 'Update failed');
+      }
+    } catch (err) {
+      setLowStockError('Network error');
+    } finally {
+      setIsLowStockLoading(false);
+    }
+  };
+
   const getEventColor = (type: string) => {
     if (type.includes('VOID')) return 'inactive';
     if (type.includes('DEACTIVATED')) return 'inactive';
@@ -1414,6 +1468,12 @@ export const POSRegister: React.FC = () => {
               <button className="payment-btn" style={{flex: 1}} onClick={() => {
                 setShowModal('inventory');
               }}>INVENTORY</button>
+              <button className="payment-btn" style={{flex: 1, position: 'relative'}} onClick={() => {
+                setShowModal('lowstock');
+                fetchLowStock();
+              }}>
+                LOW STOCK
+              </button>
               <button className="payment-btn" style={{flex: 1}} onClick={() => {
                 setShowModal('catalog');
               }}>PRODUCTS</button>
@@ -2848,6 +2908,147 @@ export const POSRegister: React.FC = () => {
             </div>
 
             <button className="mt-6 text-xs text-slate-500 underline block w-full text-center" onClick={() => { setShowModal(null); setEditingProduct(null); setIsAddingProduct(false); }}>CLOSE CATALOG</button>
+          </div>
+        </div>
+      )}
+      {showModal === 'lowstock' && (
+        <div className="modal-overlay" onClick={() => { setShowModal(null); setEditingReorderProduct(null); }}>
+          <div className="modal" style={{maxWidth: '1200px', width: '95%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-4">
+                <h3 className="font-tech text-lg uppercase tracking-wider">Inventory Low Stock Dashboard</h3>
+                {isLowStockLoading && <div className="text-[10px] text-orange-500 animate-pulse">REFRESHING...</div>}
+              </div>
+              <button className="payment-btn text-[10px] px-4" onClick={fetchLowStock} disabled={isLowStockLoading}>REFRESH LIST</button>
+            </div>
+
+            <div className="grid grid-cols-4 gap-8 h-[70vh]">
+              {/* Alert List */}
+              <div className="col-span-3 flex flex-col space-y-4">
+                <div className="flex-1 overflow-y-auto bg-black/20 rounded border border-white/5">
+                  <table className="staff-table">
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>On Hand</th>
+                        <th>Threshold</th>
+                        <th>Reorder</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lowStockItems.length === 0 && !isLowStockLoading && (
+                        <tr>
+                          <td colSpan={7} className="text-center py-10 text-slate-500 text-xs italic">
+                            All products are above reorder thresholds. Inventory is healthy.
+                          </td>
+                        </tr>
+                      )}
+                      {lowStockItems.map(item => (
+                        <tr key={item.product_id} className={item.stock_status === 'OUT_OF_STOCK' ? 'bg-red-500/5' : ''}>
+                          <td>
+                            <span className={`px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest ${
+                              item.stock_status === 'OUT_OF_STOCK' ? 'bg-red-500 text-white' : 
+                              item.stock_status === 'LOW_STOCK' ? 'bg-orange-500 text-black' : 'bg-green-500 text-white'
+                            }`}>
+                              {item.stock_status.replace(/_/g, ' ')}
+                            </span>
+                          </td>
+                          <td className="text-[10px] font-bold">{item.name}</td>
+                          <td className="text-[9px] font-mono text-slate-400">{item.sku}</td>
+                          <td className={`text-[10px] font-mono ${parseFloat(item.on_hand_qty) <= 0 ? 'text-red-500' : ''}`}>
+                            {item.on_hand_qty} {item.uom}
+                          </td>
+                          <td className="text-[10px] font-mono text-slate-400">{item.reorder_point}</td>
+                          <td className="text-[10px] font-mono text-slate-400">{item.reorder_qty}</td>
+                          <td className="flex gap-2">
+                            <button className="text-[9px] text-blue-400 underline" onClick={() => {
+                              setEditingReorderProduct(item);
+                              setReorderFormData({
+                                reorder_point: item.reorder_point,
+                                reorder_qty: item.reorder_qty
+                              });
+                            }}>SETTINGS</button>
+                            <button className="text-[9px] text-orange-500 underline" onClick={() => {
+                              // Link to inventory modal for this product
+                              const prod = products.find(p => p.product_id === item.product_id);
+                              if (prod) {
+                                setSelectedInventoryProduct(prod);
+                                setShowModal('inventory');
+                                fetchStockLedger(prod.product_id);
+                              } else {
+                                alert('Product not found in current view. Please use Inventory Management.');
+                              }
+                            }}>RESTOCK</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Settings Editor */}
+              <div className="bg-white/5 p-6 rounded border border-white/10 overflow-y-auto">
+                {editingReorderProduct ? (
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-[10px] text-orange-500 font-tech uppercase mb-1">Editing Thresholds</h4>
+                      <div className="text-xs font-bold truncate">{editingReorderProduct.name}</div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-[9px] text-slate-500 block mb-1">REORDER POINT (Alert Threshold)</label>
+                        <input 
+                          type="number" 
+                          className="input-glow text-xs font-mono"
+                          value={reorderFormData.reorder_point}
+                          onChange={e => setReorderFormData({...reorderFormData, reorder_point: e.target.value})}
+                        />
+                        <div className="text-[8px] text-slate-500 mt-1 italic leading-tight">
+                          System will alert when stock level falls to or below this point.
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[9px] text-slate-500 block mb-1">REORDER QUANTITY (Target)</label>
+                        <input 
+                          type="number" 
+                          className="input-glow text-xs font-mono"
+                          value={reorderFormData.reorder_qty}
+                          onChange={e => setReorderFormData({...reorderFormData, reorder_qty: e.target.value})}
+                        />
+                        <div className="text-[8px] text-slate-500 mt-1 italic leading-tight">
+                          Suggested quantity to order when restock is triggered.
+                        </div>
+                      </div>
+                    </div>
+
+                    {lowStockError && <div className="text-[10px] text-red-500 italic">{lowStockError}</div>}
+
+                    <div className="flex flex-col gap-2">
+                      <button 
+                        className="payment-btn w-full" 
+                        disabled={isLowStockLoading}
+                        onClick={handleUpdateReorderSettings}
+                      >
+                        {isLowStockLoading ? 'SAVING...' : 'UPDATE SETTINGS'}
+                      </button>
+                      <button className="text-[10px] text-slate-500 underline" onClick={() => setEditingReorderProduct(null)}>CANCEL</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-slate-600 text-xs text-center">
+                    <div className="opacity-50">Select a product's 'SETTINGS' to adjust its inventory alert thresholds.</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button className="mt-6 text-xs text-slate-500 underline block w-full text-center" onClick={() => { setShowModal(null); setEditingReorderProduct(null); }}>CLOSE DASHBOARD</button>
           </div>
         </div>
       )}
