@@ -563,4 +563,87 @@ else
     exit 1
 fi
 
+# 14. Inventory Adjustment Tests
+echo "--- Inventory Adjustment Tests ---"
+PROD_LEDG_ID=$PROD_ICE_ID
+STOCK_BEFORE_ADJ=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
+
+echo -n "Restock Adjustment (+10): "
+ADJ_RESP=$(curl -s -X POST "$POS_URL/api/pos/inventory/adjust" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"product_id\": \"$PROD_LEDG_ID\",
+        \"qty_delta\": 10.0,
+        \"reason\": \"Validation restock\",
+        \"employee_id\": \"$TEST_MANAGER_ID\"
+    }")
+if echo "$ADJ_RESP" | grep -q '"status":"ok"' && echo "$ADJ_RESP" | grep -q '"qty_delta":10.0'; then
+    echo "PASS"
+else
+    echo "FAIL: $ADJ_RESP"
+    exit 1
+fi
+
+echo -n "Verify Stock Increased: "
+STOCK_AFTER_POS=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
+EXPECTED_POS=$(python3 -c "print(float('$STOCK_BEFORE_ADJ') + 10)")
+if [ "$STOCK_AFTER_POS" = "$EXPECTED_POS" ] || [ "$(printf \"%.0f\" \"$STOCK_AFTER_POS\")" = "$(printf \"%.0f\" \"$EXPECTED_POS\")" ]; then
+    echo "PASS ($STOCK_AFTER_POS)"
+else
+    echo "FAIL: Got $STOCK_AFTER_POS, Expected $EXPECTED_POS"
+    exit 1
+fi
+
+echo -n "Negative Adjustment (-5): "
+ADJ_NEG_RESP=$(curl -s -X POST "$POS_URL/api/pos/inventory/adjust" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"product_id\": \"$PROD_LEDG_ID\",
+        \"qty_delta\": -5.0,
+        \"reason\": \"Validation reduction\",
+        \"employee_id\": \"$TEST_MANAGER_ID\"
+    }")
+if echo "$ADJ_NEG_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $ADJ_NEG_RESP"
+    exit 1
+fi
+
+echo -n "Excessive Negative Rejection (allow_negative=false): "
+# Ice is allow_negative=false by default in seeds
+LARGE_NEG=$(python3 -c "print(-(float('$STOCK_AFTER_POS') + 100))")
+ERR_ADJ=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/inventory/adjust" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"product_id\": \"$PROD_LEDG_ID\",
+        \"qty_delta\": $LARGE_NEG,
+        \"reason\": \"Illegal reduction\",
+        \"employee_id\": \"$TEST_MANAGER_ID\"
+    }")
+if [ "$ERR_ADJ" = "500" ]; then
+    echo "PASS"
+else
+    echo "FAIL: Got $ERR_ADJ, Expected 500"
+    exit 1
+fi
+
+echo -n "Verify Ledger Entry: "
+LEDGER_RESP=$(curl -s -X GET "$POS_URL/api/pos/inventory/ledger?product_id=$PROD_LEDG_ID&limit=5")
+if echo "$LEDGER_RESP" | grep -q 'Validation restock' && echo "$LEDGER_RESP" | grep -q 'Validation reduction'; then
+    echo "PASS"
+else
+    echo "FAIL: $LEDGER_RESP"
+    exit 1
+fi
+
+echo -n "Verify Audit Log (INVENTORY_ADJUSTED): "
+AUDIT_ADJ_RESP=$(curl -s -X GET "$POS_URL/api/pos/audit-log?limit=15")
+if echo "$AUDIT_ADJ_RESP" | grep -q 'INVENTORY_ADJUSTED'; then
+    echo "PASS"
+else
+    echo "FAIL"
+    exit 1
+fi
+
 echo "--- ALL POS API TESTS PASSED ---"
