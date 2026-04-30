@@ -82,6 +82,10 @@
         /* --- Trust Bar --- */
         .trust-bar { padding: 40px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); }
         .trust-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 40px; color: var(--secondary); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+        .dbd-registered-badge { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 12px; background: rgba(212, 175, 55, 0.06); padding: 8px 12px; }
+        .dbd-registered-badge img { display: block; max-height: 42px; max-width: 180px; object-fit: contain; }
+        .trust-inner .dbd-registered-badge { padding: 6px 10px; background: rgba(255,255,255,0.03); }
+        .trust-inner .dbd-registered-badge img { max-height: 34px; max-width: 150px; }
 
         /* --- Sections --- */
         .section-header { margin-bottom: 100px; text-align: center; }
@@ -93,6 +97,24 @@
         .card:hover { border-color: #444; }
         .card h3 { font-size: 1.75rem; margin-bottom: 16px; letter-spacing: -0.02em; }
         .card p { color: var(--secondary); font-size: 1rem; line-height: 1.6; }
+
+        /* --- POS Showcase --- */
+        .pos-showcase { margin-top: 56px; padding: 40px; border: 1px solid var(--card-border); border-radius: 28px; background: radial-gradient(circle at 15% 5%, rgba(0, 112, 243, 0.16), transparent 28%), radial-gradient(circle at 88% 12%, rgba(212, 175, 55, 0.1), transparent 24%), #050505; }
+        .pos-showcase-main { display: grid; grid-template-columns: 0.78fr 1.32fr; gap: 36px; align-items: center; margin-bottom: 28px; }
+        .pos-eyebrow { color: var(--dbd-gold); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 14px; display: block; }
+        .pos-showcase-copy h3 { font-size: 3.2rem; margin-bottom: 20px; }
+        .pos-showcase-copy p { color: var(--secondary); font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px; }
+        .pos-feature-list { list-style: none; display: grid; gap: 10px; }
+        .pos-feature-list li { color: var(--primary); font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
+        .pos-feature-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px rgba(0, 112, 243, 0.8); flex: 0 0 auto; }
+        .pos-showcase-visual, .pos-shot-card { overflow: hidden; border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; background: #070707; margin: 0; }
+        .pos-showcase-visual img, .pos-shot-card img { width: 100%; display: block; object-fit: cover; }
+        .pos-showcase-visual img { aspect-ratio: 16 / 9; }
+        .pos-showcase-visual figcaption, .pos-shot-card figcaption { color: var(--secondary); font-size: 0.76rem; padding: 14px 16px; border-top: 1px solid var(--card-border); }
+        .pos-shot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+        .pos-shot-card img { aspect-ratio: 16 / 9; }
+        .pos-shot-card h4 { font-size: 1rem; letter-spacing: -0.01em; margin: 16px 16px 8px; }
+        .pos-shot-card p { color: var(--secondary); font-size: 0.86rem; line-height: 1.5; margin: 0 16px 18px; }
 
         /* --- Agents --- */
         .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
@@ -109,11 +131,15 @@
         .case-item p { font-size: 0.95rem; color: var(--secondary); }
 
         /* --- Credentials --- */
-        .cred-grid { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
-        .cred-card { display: flex; align-items: center; gap: 20px; padding: 24px; border-radius: 12px; border: 1px solid var(--card-border); }
-        .cred-card img { height: 40px; opacity: 0.6; }
-        .cred-info span { font-size: 0.7rem; font-weight: 700; color: var(--dbd-gold); display: block; text-transform: uppercase; }
-        .cred-info p { font-size: 0.9rem; font-weight: 600; color: var(--secondary); }
+        .proof-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+        .proof-card { min-height: 260px; padding: 24px; border: 1px solid var(--card-border); border-radius: 20px; background: #030303; display: flex; flex-direction: column; justify-content: space-between; gap: 22px; }
+        .proof-card:first-child { border-color: rgba(212, 175, 55, 0.35); }
+        .proof-card img { width: 100%; max-height: 112px; object-fit: contain; border-radius: 10px; background: rgba(255,255,255,0.03); }
+        .proof-card .dbd-registered-badge { align-self: flex-start; }
+        .proof-card .dbd-registered-badge img { width: auto; max-width: 180px; background: transparent; }
+        .proof-card span { font-size: 0.7rem; font-weight: 700; color: var(--dbd-gold); display: block; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+        .proof-card h3 { font-size: 1.08rem; letter-spacing: -0.01em; margin-bottom: 8px; }
+        .proof-card p { color: var(--secondary); font-size: 0.9rem; line-height: 1.55; }
 
         /* --- Footer --- */
         footer { padding: 80px 0 40px; border-top: 1px solid var(--card-border); }
@@ -133,6 +159,11 @@
             .hero { grid-template-columns: 1fr; text-align: center; }
             .hero-left { align-items: center; }
             .hero-right { order: -1; margin-bottom: 40px; }
+            .trust-inner { justify-content: center; text-align: center; gap: 20px; }
+            .pos-showcase { padding: 24px; }
+            .pos-showcase-main { grid-template-columns: 1fr; }
+            .pos-showcase-copy h3 { font-size: 2.4rem; }
+            .pos-shot-grid, .proof-grid { grid-template-columns: 1fr; }
             .footer-inner { flex-direction: column; }
         }
     </style>
@@ -184,6 +215,9 @@
 
         <div class="trust-bar">
             <div class="container trust-inner">
+                <a href="https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=07BEDE618D50DB3692ADFA2CE05F084577658794E8BD1BC7B2B07313842EB7EB" target="_blank" rel="noopener noreferrer" class="dbd-registered-badge">
+                    <img src="https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F084577658794E8BD1BC7B2B07313842EB7EB" alt="DBD Registered verification for The Godseller" loading="lazy">
+                </a>
                 <span>DBD Registered Since 07/07/2017</span>
                 <span>Built in Thailand</span>
                 <span>Local-first AI Systems</span>
@@ -224,14 +258,46 @@
                         <p>The multi-agent orchestration core that manages business rules and coordinates agent actions.</p>
                     </div>
                     <div class="card">
-                        <h4 style="color: var(--accent); margin-bottom: 8px;">DuDe_POS</h4>
-                        <p>Modern point of sale with real-time site synchronization and predictive inventory tools.</p>
-                    </div>
-                    <div class="card">
                         <h4 style="color: var(--accent); margin-bottom: 8px;">DuDe_Vision</h4>
                         <p>Edge AI for real-world monitoring, count verification, and operational evidence logging.</p>
                     </div>
                 </div>
+                <article class="pos-showcase" aria-labelledby="dude-pos-heading">
+                    <div class="pos-showcase-main">
+                        <div class="pos-showcase-copy">
+                            <span class="pos-eyebrow">REAL-WORLD POS</span>
+                            <h3 id="dude-pos-heading">DuDe_POS</h3>
+                            <p>Modern point of sale built for real Thai operations — live inventory, shift control, ticket recording, and audit-safe correction flows.</p>
+                            <ul class="pos-feature-list">
+                                <li>Live product and stock visibility</li>
+                                <li>Shift-aware cashier workflow</li>
+                                <li>Ticket and payment recording</li>
+                                <li>Refund and void audit trail</li>
+                            </ul>
+                        </div>
+                        <figure class="pos-showcase-visual">
+                            <img src="assets/ecosystems/DuDe_POS/pos_main.png" alt="DuDe_POS live register with product grid, shift status, current order, and checkout total" loading="lazy">
+                            <figcaption>Live register with shift-aware checkout</figcaption>
+                        </figure>
+                    </div>
+                    <div class="pos-shot-grid">
+                        <figure class="pos-shot-card">
+                            <img src="assets/ecosystems/DuDe_POS/pos_stock.png" alt="DuDe_POS inventory-aware checkout showing stock limit and stock badges" loading="lazy">
+                            <h4>Inventory-aware checkout</h4>
+                            <p>Stock limits, low-stock states, and out-of-stock protection.</p>
+                        </figure>
+                        <figure class="pos-shot-card">
+                            <img src="assets/ecosystems/DuDe_POS/pos_success.png" alt="DuDe_POS ticket committed receipt showing completed sale and ledger status" loading="lazy">
+                            <h4>Ticket committed in real time</h4>
+                            <p>Every sale records ticket, payment, inventory, and ledger state.</p>
+                        </figure>
+                        <figure class="pos-shot-card">
+                            <img src="assets/ecosystems/DuDe_POS/pos_void.png" alt="DuDe_POS audit-safe void workflow showing restored stock and audit log status" loading="lazy">
+                            <h4>Audit-safe corrections</h4>
+                            <p>Controlled void flow with stock restoration and traceable audit log.</p>
+                        </figure>
+                    </div>
+                </article>
             </div>
         </section>
 
@@ -298,22 +364,59 @@
             <div class="container">
                 <div class="section-header">
                     <h2>Proof & Credentials</h2>
-                    <p>DBD registration proves long-term business continuity. Google AI learning proof supports our practical AI implementation capability.</p>
+                    <p>Long-term business continuity, verified learning, and practical implementation capability.</p>
                 </div>
-                <div class="cred-grid">
-                    <div class="cred-card">
-                        <div class="cred-info">
-                            <span>Established 2017</span>
-                            <p>DBD Registered Entity</p>
+                <div class="proof-grid">
+                    <article class="proof-card">
+                        <a href="https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=07BEDE618D50DB3692ADFA2CE05F084577658794E8BD1BC7B2B07313842EB7EB" target="_blank" rel="noopener noreferrer" class="dbd-registered-badge">
+                            <img src="https://dbdregistered.dbd.go.th/api/public/bannerreg?param=07BEDE618D50DB3692ADFA2CE05F084577658794E8BD1BC7B2B07313842EB7EB" alt="DBD Registered verification for The Godseller" loading="lazy">
+                        </a>
+                        <div>
+                            <span>DBD Registered</span>
+                            <h3>Verified electronic commerce registration for The Godseller.</h3>
+                            <p>Public registration badge linked to the official DBD verification record.</p>
                         </div>
-                    </div>
-                    <div class="cred-card">
-                        <img src="assets/hero/google_ai.png" alt="Google AI">
-                        <div class="cred-info">
-                            <span>Verified Learning</span>
-                            <p>Google AI Professional</p>
+                    </article>
+                    <article class="proof-card">
+                        <img src="assets/proof_credentials/google_ai.png" alt="Google AI Professional Certificate proof" loading="lazy">
+                        <div>
+                            <span>Google AI Professional Certificate</span>
+                            <h3>Practical AI workflow, content, data, communication, and app-building capability.</h3>
+                            <p>Verified learning aligned with real automation and AI implementation work.</p>
                         </div>
-                    </div>
+                    </article>
+                    <article class="proof-card">
+                        <img src="assets/proof_credentials/mikrotik_mtcna.png" alt="MikroTik MTCNA technical certificate" loading="lazy">
+                        <div>
+                            <span>Technical Certificates</span>
+                            <h3>Networking and infrastructure implementation proof.</h3>
+                            <p>MikroTik MTCNA foundation for practical network operations.</p>
+                        </div>
+                    </article>
+                    <article class="proof-card">
+                        <img src="assets/proof_credentials/ruijie_engineer_junior.jpg" alt="Ruijie junior engineer certificate" loading="lazy">
+                        <div>
+                            <span>Technical Certificates</span>
+                            <h3>Site networking and system deployment capability.</h3>
+                            <p>Ruijie engineer proof for real-world network implementation.</p>
+                        </div>
+                    </article>
+                    <article class="proof-card">
+                        <img src="assets/proof_credentials/superai_1.png" alt="SuperAI technical certificate" loading="lazy">
+                        <div>
+                            <span>AI Implementation</span>
+                            <h3>Applied AI learning and automation readiness.</h3>
+                            <p>SuperAI proof supporting practical AI system delivery.</p>
+                        </div>
+                    </article>
+                    <article class="proof-card">
+                        <img src="assets/proof_credentials/dsd_mikrotik.jpg" alt="Department of Skill Development MikroTik certificate" loading="lazy">
+                        <div>
+                            <span>Technical Certificates</span>
+                            <h3>Networking, infrastructure, automation, and system implementation proof.</h3>
+                            <p>Additional skills certificate for resilient business systems work.</p>
+                        </div>
+                    </article>
                 </div>
             </div>
         </section>
