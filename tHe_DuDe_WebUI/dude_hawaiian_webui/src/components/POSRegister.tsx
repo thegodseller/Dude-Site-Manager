@@ -2124,8 +2124,8 @@ export const POSRegister: React.FC = () => {
                       <td>
                         <div className="flex gap-2">
                           <button className="text-[9px] underline text-orange-500" onClick={() => {
-                            fetchReceiptData(ticket.id);
-                            setShowModal('receipt');
+                            fetchReceipt(ticket.id);
+                            setShowModal('receipt_preview');
                           }}>VIEW</button>
                           {ticket.status === 'CONFIRMED' && AUTHORIZED_VOID_ROLES.includes(currentCashier?.role.toUpperCase() || '') && (
                             <button className="text-[9px] underline text-red-500" onClick={() => {
