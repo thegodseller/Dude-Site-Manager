@@ -18,6 +18,13 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+interface Employee {
+  id: string;
+  display_name: string;
+  role: string;
+  is_active: boolean;
+}
+
 interface ShiftData {
   id?: string;
   shift_id: string;
@@ -142,6 +149,13 @@ const DEMO_SHIFT: ShiftData = {
   opened_at: '2026-04-30T09:00:00.000Z'
 };
 
+const DEMO_CASHIER: Employee = {
+  id: 'demo-cashier-id',
+  display_name: 'Demo Cashier / POS Operator',
+  role: 'CASHIER',
+  is_active: true
+};
+
 const DEMO_CART_MAIN: CartItem[] = [
   { ...DEMO_PRODUCTS[4], quantity: 2 },
   { ...DEMO_PRODUCTS[1], quantity: 2 },
@@ -227,14 +241,18 @@ export const POSRegister: React.FC = () => {
   ));
   const [shiftLoading, setShiftLoading] = useState(false);
   const [shiftError, setShiftError] = useState<string | null>(null);
-  const [employeeId] = useState(() => {
-    let id = localStorage.getItem('dude_pos_dev_employee_id');
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem('dude_pos_dev_employee_id', id);
-    }
-    return id;
-  }); // TODO: Replace with real auth/user management
+
+  // Cashier Session State
+  const [currentCashier, setCurrentCashier] = useState<Employee | null>(() => {
+    if (isScreenshotMode) return DEMO_CASHIER;
+    const stored = localStorage.getItem('dude_pos_active_cashier');
+    return stored ? JSON.parse(stored) : null;
+  });
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedCashierId, setSelectedCashierId] = useState<string | null>(null);
+  const [pin, setPin] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const [openingCashInput, setOpeningCashInput] = useState('0');
   const [actualCashInput, setActualCashInput] = useState(() => (
@@ -292,14 +310,26 @@ export const POSRegister: React.FC = () => {
     }
   };
 
-  const fetchCurrentShift = async () => {
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch('/ag_pos_api/employees');
+      const data = await res.json();
+      if (data.success) {
+        setEmployees(data.items || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch employees:', err);
+    }
+  };
+
+  const fetchCurrentShift = async (empId: string) => {
     setShiftLoading(true);
     try {
-      const res = await fetch(`/ag_pos_api/shifts/current?employee_id=${employeeId}`);
+      const res = await fetch(`/ag_pos_api/shifts/current?employee_id=${empId}`);
       const data = await res.json();
       if (data.success && data.shift) {
         setCurrentShift(normalizeShift(data.shift));
-        setActualCashInput(data.shift.opening_cash); // Default actual cash to opening for convenience
+        setActualCashInput(data.shift.opening_cash);
         fetchShiftSummary(data.shift.shift_id || data.shift.id);
       } else {
         setCurrentShift(null);
@@ -312,12 +342,67 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const handleCashierLogin = async () => {
+    if (!selectedCashierId || pin.length < 4) return;
+    setLoginLoading(true);
+    setLoginError(null);
+    try {
+      const res = await fetch('/ag_pos_api/employees/session/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employee_id: selectedCashierId, pin_code: pin })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const cashier = data.employee;
+        setCurrentCashier(cashier);
+        localStorage.setItem('dude_pos_active_cashier', JSON.stringify(cashier));
+        setPin('');
+        fetchCurrentShift(cashier.id);
+      } else {
+        setLoginError(data.message || 'Login failed. Check PIN.');
+      }
+    } catch (err) {
+      setLoginError('Network error during login.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleEndSession = async () => {
+    if (!currentCashier) return;
+    if (currentShift) {
+      alert('Close active shift before ending session.');
+      return;
+    }
+    
+    try {
+      await fetch('/ag_pos_api/employees/session/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employee_id: currentCashier.id })
+      });
+    } catch (err) {
+      console.error('End session call failed:', err);
+    }
+
+    setCurrentCashier(null);
+    localStorage.removeItem('dude_pos_active_cashier');
+    setSelectedCashierId(null);
+    setPin('');
+    setProducts([]);
+    setCart([]);
+    fetchEmployees();
+  };
+
   useEffect(() => {
     if (isScreenshotMode) {
       setServiceStatus({ backend: 'ok', db: 'ok', catalog: 'ready' });
       setIsMock(false);
       setPaymentMethod(shotMode === 'success' ? 'PROMPTPAY' : 'CASH');
       setCurrentShift(DEMO_SHIFT);
+      setCurrentCashier(DEMO_CASHIER);
+      // ... rest of shotMode logic
 
       if (shotMode === 'main' || shotMode === 'success' || shotMode === 'void') {
         setProducts(DEMO_PRODUCTS.map(product => normalizeProduct(product)));
@@ -363,10 +448,14 @@ export const POSRegister: React.FC = () => {
     }
 
     checkHealth();
-    fetchCurrentShift();
+    if (currentCashier) {
+      fetchCurrentShift(currentCashier.id);
+    } else {
+      fetchEmployees();
+    }
     const interval = setInterval(checkHealth, 30000);
     return () => clearInterval(interval);
-  }, [isScreenshotMode, shotMode]);
+  }, [isScreenshotMode, shotMode, currentCashier?.id]);
 
   const handleOpenShift = async () => {
     if (isScreenshotMode) return;
@@ -377,7 +466,7 @@ export const POSRegister: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          employee_id: employeeId,
+          employee_id: currentCashier?.id,
           opening_cash: parseFloat(openingCashInput)
         })
       });
@@ -547,7 +636,8 @@ export const POSRegister: React.FC = () => {
           payment: {
             method: paymentMethod,
             amount: total
-          }
+          },
+          employee_id: currentCashier?.id
         })
       });
       
@@ -640,7 +730,7 @@ export const POSRegister: React.FC = () => {
       const res = await fetch(`/ag_pos_api/tickets/${lastTicket.ticket_id}/void`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: voidReason })
+        body: JSON.stringify({ reason: voidReason, employee_id: currentCashier?.id })
       });
 
       const data = await res.json();
@@ -699,6 +789,18 @@ export const POSRegister: React.FC = () => {
               <div className="status-dot"></div>
               Shift: {currentShift ? 'OPEN' : 'NO SHIFT'}
             </div>
+            {currentCashier && (
+              <div className="cashier-header-info">
+                <div className="cashier-avatar">{currentCashier.display_name.charAt(0)}</div>
+                <div className="cashier-meta">
+                  <span className="name">{currentCashier.display_name}</span>
+                  <span className="role">{currentCashier.role}</span>
+                </div>
+                {!isScreenshotMode && (
+                  <button className="end-session-btn" onClick={handleEndSession}>End Session</button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -1294,6 +1396,54 @@ export const POSRegister: React.FC = () => {
               <button className="btn-secondary" style={{flex: 1}} onClick={() => setShowModal(null)}>CLOSE</button>
               <button className="btn-primary" style={{flex: 2}} onClick={handlePrint}>PRINT RECEIPT</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cashier Login Overlay */}
+      {!currentCashier && !isScreenshotMode && (
+        <div className="cashier-login-overlay">
+          <div className="login-card">
+            <h2 className="font-tech text-2xl text-orange-500 mb-2">POS SYSTEM</h2>
+            <p className="text-slate-400 text-xs mb-8 tracking-widest">SECURE ACCESS REQUIRED</p>
+            
+            {loginError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{loginError}</div>}
+
+            <div className="cashier-select-grid">
+              {employees.map(emp => (
+                <div 
+                  key={emp.id} 
+                  className={`cashier-option ${selectedCashierId === emp.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedCashierId(emp.id)}
+                >
+                  <span className="cashier-name">{emp.display_name}</span>
+                  <span className="cashier-role">{emp.role}</span>
+                </div>
+              ))}
+              {employees.length === 0 && <div className="text-slate-600 text-xs py-10">No active employees found</div>}
+            </div>
+
+            {selectedCashierId && (
+              <div className="pin-input-container">
+                <div className="pin-display">
+                  {pin.split('').map((_, i) => <span key={i}>*</span>)}
+                </div>
+                <div className="pin-pad">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                    <button key={n} className="pin-btn" onClick={() => setPin(p => (p + n).slice(0, 6))}>{n}</button>
+                  ))}
+                  <button className="pin-btn clear" onClick={() => setPin('')}>C</button>
+                  <button className="pin-btn" onClick={() => setPin(p => (p + '0').slice(0, 6))}>0</button>
+                  <button 
+                    className="pin-btn submit" 
+                    onClick={handleCashierLogin}
+                    disabled={loginLoading || pin.length < 4}
+                  >
+                    {loginLoading ? '...' : 'ENTER'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
