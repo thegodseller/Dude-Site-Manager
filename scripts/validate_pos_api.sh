@@ -739,4 +739,90 @@ else
     exit 1
 fi
 
+# 16. Low Stock / Reorder Alert Tests
+echo "--- Low Stock / Reorder Alert Tests ---"
+REORDER_PROD_SKU="REORDER-$(date +%s)"
+CREATE_REORDER_RESP=$(curl -s -X POST "$POS_URL/api/pos/products" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"sku\": \"$REORDER_PROD_SKU\",
+        \"name\": \"Reorder Test Product\",
+        \"category_name\": \"Test\",
+        \"uom\": \"unit\",
+        \"unit_price\": 10.0,
+        \"on_hand_qty\": 100.0,
+        \"allow_negative_stock\": false
+    }")
+REORDER_PROD_ID=$(echo "$CREATE_REORDER_RESP" | jq -r '.product_id')
+
+echo -n "Set Reorder Settings (Point: 50, Qty: 100): "
+REORDER_SET_RESP=$(curl -s -X PATCH "$POS_URL/api/pos/products/$REORDER_PROD_ID/reorder-settings" \
+    -H "Content-Type: application/json" \
+    -d "{\"reorder_point\": 50.0, \"reorder_qty\": 100.0}")
+if echo "$REORDER_SET_RESP" | grep -q '"success":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $REORDER_SET_RESP"
+    exit 1
+fi
+
+echo -n "Adjust Stock Below Threshold (to 40): "
+ADJUST_DOWN_RESP=$(curl -s -X POST "$POS_URL/api/pos/inventory/adjust" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"product_id\": \"$REORDER_PROD_ID\",
+        \"qty_delta\": -60.0,
+        \"reason\": \"Test Depletion\",
+        \"employee_id\": \"$TEST_CASHIER_ID\"
+    }")
+if echo "$ADJUST_DOWN_RESP" | grep -q '"success":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $ADJUST_DOWN_RESP"
+    exit 1
+fi
+
+echo -n "Verify Low Stock Alert: "
+LOW_STOCK_RESP=$(curl -s "$POS_URL/api/pos/inventory/low-stock")
+if echo "$LOW_STOCK_RESP" | grep -q "$REORDER_PROD_SKU" && echo "$LOW_STOCK_RESP" | grep -q "LOW_STOCK"; then
+    echo "PASS"
+else
+    echo "FAIL: Product not in low stock list: $LOW_STOCK_RESP"
+    exit 1
+fi
+
+echo -n "Restock Above Threshold (to 140): "
+RESTOCK_UP_RESP=$(curl -s -X POST "$POS_URL/api/pos/inventory/adjust" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"product_id\": \"$REORDER_PROD_ID\",
+        \"qty_delta\": 100.0,
+        \"reason\": \"Test Restock\",
+        \"employee_id\": \"$TEST_CASHIER_ID\"
+    }")
+if echo "$RESTOCK_UP_RESP" | grep -q '"success":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $RESTOCK_UP_RESP"
+    exit 1
+fi
+
+echo -n "Verify Low Stock Clear: "
+LOW_STOCK_CLEAR_RESP=$(curl -s "$POS_URL/api/pos/inventory/low-stock")
+if ! echo "$LOW_STOCK_CLEAR_RESP" | grep -q "$REORDER_PROD_SKU"; then
+    echo "PASS"
+else
+    echo "FAIL: Product still in low stock list"
+    exit 1
+fi
+
+echo -n "Verify Reorder Audit: "
+AUDIT_REORDER_RESP=$(curl -s -X GET "$POS_URL/api/pos/audit-log?limit=10")
+if echo "$AUDIT_REORDER_RESP" | grep -q 'PRODUCT_REORDER_SETTINGS_UPDATED'; then
+    echo "PASS"
+else
+    echo "FAIL"
+    exit 1
+fi
+
 echo "--- ALL POS API TESTS PASSED ---"
