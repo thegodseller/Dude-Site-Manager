@@ -285,6 +285,29 @@ else
     exit 1
 fi
 
+# 8.2.1 Create Second Ticket (For History/Report Tests)
+echo -n "Create Second Ticket (Confirmed): "
+TKT2_RESP=$(curl -s -X POST "$POS_URL/api/pos/tickets" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"shift_id\": \"$SHIFT_ID\",
+        \"vat_mode\": \"NO_VAT\",
+        \"vat_calc_mode\": \"EXCLUSIVE\",
+        \"vat_rate\": 0,
+        \"items\": [
+            {\"product_id\": \"$PROD_ICE_ID\", \"qty\": 1, \"unit_price\": 25.00, \"master_price\": 25.00}
+        ],
+        \"payment\": {\"method\": \"CASH\", \"amount\": 25.00},
+        \"employee_id\": \"$TEST_EMPLOYEE_ID\"
+    }")
+if echo "$TKT2_RESP" | grep -q '"status":"ok"'; then
+    TICKET2_ID=$(echo "$TKT2_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['ticket_id'])")
+    echo "PASS (ID: $TICKET2_ID)"
+else
+    echo "FAIL: $TKT2_RESP"
+    exit 1
+fi
+
 # 8.2.0 Fetch Receipt (Confirmed)
 echo -n "Fetch Receipt (Confirmed): "
 REC_CONF_RESP=$(curl -s -X GET "$POS_URL/api/pos/tickets/$TICKET_ID/receipt")
@@ -302,7 +325,7 @@ CHECK_CREATE=$(echo "$SUMM_RESP" | python3 -c "
 import sys, json; 
 data = json.load(sys.stdin); 
 s = data.get('summary', {}); 
-ok = s.get('confirmed_ticket_count') == 1 and float(s.get('net_sales', 0)) == 60.0;
+ok = s.get('confirmed_ticket_count') == 2 and float(s.get('net_sales', 0)) == 85.0;
 print('PASS' if ok else f'FAIL: {json.dumps(data)}');
 ")
 if [ "$CHECK_CREATE" = "PASS" ]; then
@@ -315,7 +338,7 @@ fi
 # 8.3 Verify Stock Deduction
 echo -n "Verify Stock Deduction: "
 STOCK_AFTER=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
-EXPECTED_STOCK=$(python3 -c "print(float('$STOCK_BEFORE') - 2)")
+EXPECTED_STOCK=$(python3 -c "print(float('$STOCK_BEFORE') - 3)")
 
 if [ "$STOCK_AFTER" = "$EXPECTED_STOCK" ] || [ "$(printf \"%.0f\" \"$STOCK_AFTER\")" = "$(printf \"%.0f\" \"$EXPECTED_STOCK\")" ]; then
     echo "PASS (Before: $STOCK_BEFORE, After: $STOCK_AFTER)"
@@ -389,7 +412,7 @@ CHECK_VOID=$(echo "$SUMM_VOID_RESP" | python3 -c "
 import sys, json; 
 data = json.load(sys.stdin); 
 s = data.get('summary', {}); 
-ok = s.get('confirmed_ticket_count') == 0 and s.get('voided_ticket_count') == 1 and float(s.get('net_sales', 0)) == 0.0;
+ok = s.get('confirmed_ticket_count') == 1 and s.get('voided_ticket_count') == 1 and float(s.get('net_sales', 0)) == 25.0;
 print('PASS' if ok else f'FAIL: {json.dumps(data)}');
 ")
 if [ "$CHECK_VOID" = "PASS" ]; then
@@ -412,10 +435,11 @@ fi
 # 8.7 Verify Stock Restored
 echo -n "Verify Stock Restored: "
 STOCK_RESTORED=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
-if [ "$STOCK_RESTORED" = "$STOCK_BEFORE" ] || [ "$(printf \"%.0f\" \"$STOCK_RESTORED\")" = "$(printf \"%.0f\" \"$STOCK_BEFORE\")" ]; then
+EXPECTED_RESTORED=$(python3 -c "print(float('$STOCK_BEFORE') - 1)")
+if [ "$STOCK_RESTORED" = "$EXPECTED_RESTORED" ] || [ "$(printf \"%.0f\" \"$STOCK_RESTORED\")" = "$(printf \"%.0f\" \"$EXPECTED_RESTORED\")" ]; then
     echo "PASS (Restored to: $STOCK_RESTORED)"
 else
-    echo "FAIL (Expected: $STOCK_BEFORE, Got: $STOCK_RESTORED)"
+    echo "FAIL (Expected: $EXPECTED_RESTORED, Got: $STOCK_RESTORED)"
     exit 1
 fi
 
@@ -433,11 +457,11 @@ fi
 
 # 9. Close Shift with Sales (Adjusted for Void)
 echo "--- Re-testing Close Shift (After Void) ---"
-echo -n "Close Shift (Expected 0.00 sales after void): "
-# Opening 500 + Sale 60 - Void 60 = 500
+echo -n "Close Shift (Expected 25.00 sales after void): "
+# Opening 500 + T1 60 + T2 25 - Void T1 60 = 525
 CLOSE_RESP=$(curl -s -X POST "$POS_URL/api/pos/shifts/close" \
     -H "Content-Type: application/json" \
-    -d "{\"shift_id\": \"$SHIFT_ID\", \"actual_cash\": 500.00}")
+    -d "{\"shift_id\": \"$SHIFT_ID\", \"actual_cash\": 525.00}")
 VARIANCE=$(echo "$CLOSE_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['shift']['variance'])")
 if [ "$VARIANCE" = "0.0" ] || [ "$VARIANCE" = "0.00" ] || [ "$VARIANCE" = "0" ]; then
     echo "PASS"
@@ -453,7 +477,7 @@ CHECK_CLOSE=$(echo "$SUMM_CLOSE_RESP" | python3 -c "
 import sys, json; 
 data = json.load(sys.stdin); 
 s = data.get('summary', {}); 
-ok = s.get('status') == 'CLOSED' and float(s.get('net_sales', 0)) == 0.0;
+ok = s.get('status') == 'CLOSED' and float(s.get('net_sales', 0)) == 25.0;
 print('PASS' if ok else f'FAIL: {json.dumps(data)}');
 ")
 if [ "$CHECK_CLOSE" = "PASS" ]; then
@@ -514,6 +538,28 @@ if echo "$HISTORY_RESP" | grep -q '"status":"ok"'; then
     if curl -s -X GET "$POS_URL/api/pos/tickets?q=$TICKET_NO" | grep -q "$TICKET_NO"; then echo "PASS"; else echo "FAIL"; exit 1; fi
 else
     echo "FAIL: $HISTORY_RESP"
+    exit 1
+fi
+
+# 13. Daily Report Tests
+echo "--- Daily Report Tests ---"
+TODAY=$(date +%Y-%m-%d)
+echo -n "Fetch Daily Report ($TODAY): "
+REPORT_RESP=$(curl -s -X GET "$POS_URL/api/pos/reports/daily?date=$TODAY")
+if echo "$REPORT_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+    
+    echo -n "  Verify Net Sales Calculation: "
+    NET_SALES=$(echo "$REPORT_RESP" | jq -r '.net_sales')
+    if [ "$NET_SALES" != "0.00" ]; then echo "PASS ($NET_SALES)"; else echo "FAIL ($NET_SALES)"; exit 1; fi
+    
+    echo -n "  Verify Top Items Included: "
+    if echo "$REPORT_RESP" | jq -e '.top_items | length > 0' > /dev/null; then echo "PASS"; else echo "FAIL"; exit 1; fi
+    
+    echo -n "  Verify Cashier Summary Included: "
+    if echo "$REPORT_RESP" | jq -e '.cashier_summary | length > 0' > /dev/null; then echo "PASS"; else echo "FAIL"; exit 1; fi
+else
+    echo "FAIL: $REPORT_RESP"
     exit 1
 fi
 
