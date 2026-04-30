@@ -58,12 +58,14 @@ interface ShiftSummary {
 
 interface ReceiptData {
   business_name: string;
+  ticket_id: string;
   ticket_no: string;
-  created_at: string;
   status: string;
-  is_voided: boolean;
+  created_at: string;
+  shift_id: string;
   employee_id: string;
   items: Array<{
+    product_id: string;
     name: string;
     qty: number;
     unit_price: string;
@@ -76,6 +78,18 @@ interface ReceiptData {
     method: string;
     amount: string;
   };
+  is_voided: boolean;
+}
+
+interface AuditLogEntry {
+  id: string;
+  event_type: string;
+  actor_employee_id: string | null;
+  target_type: string | null;
+  target_id: string | null;
+  reason: string | null;
+  metadata: any;
+  created_at: string;
 }
 
 const MOCK_PRODUCTS: Product[] = [
@@ -304,6 +318,13 @@ export const POSRegister: React.FC = () => {
   const [staffForm, setStaffForm] = useState({ display_name: '', role: 'CASHIER', pin_code: '' });
   const [isResettingPin, setIsResettingPin] = useState(false);
   const [newPinInput, setNewPinInput] = useState('');
+
+  // Audit Log State
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+  const [auditLimit, setAuditLimit] = useState(50);
+  const [isAuditLoading, setIsAuditLoading] = useState(false);
+  const [auditError, setAuditError] = useState<string | null>(null);
+  const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
   // Health check
   const checkHealth = async () => {
@@ -935,6 +956,44 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  // Audit Log Functions
+  const fetchAuditLogs = async (limit = auditLimit) => {
+    setIsAuditLoading(true);
+    setAuditError(null);
+    try {
+      const res = await fetch(`/ag_pos_api/audit-log?limit=${limit}`);
+      const data = await res.json();
+      if (data.success) {
+        setAuditLogs(data.logs);
+      } else {
+        setAuditError(data.message || 'Failed to fetch audit logs');
+      }
+    } catch (err) {
+      setAuditError('Network error while fetching audit logs');
+    } finally {
+      setIsAuditLoading(false);
+    }
+  };
+
+  const getEventColor = (type: string) => {
+    if (type.includes('VOID')) return 'inactive';
+    if (type.includes('DEACTIVATED')) return 'inactive';
+    if (type.includes('CREATED') || type.includes('OPENED')) return 'active';
+    return '';
+  };
+
+  const sanitizeMetadata = (meta: any) => {
+    if (!meta) return {};
+    const sanitized = { ...meta };
+    const suspiciousKeys = ['pin', 'pin_code', 'pin_code_hash', 'pin_hash', 'salt', 'pin_salt'];
+    suspiciousKeys.forEach(key => {
+      if (key in sanitized) {
+        sanitized[key] = '***REDACTED***';
+      }
+    });
+    return sanitized;
+  };
+
   // Calculations with formatting
   const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.unit_price) * item.quantity), 0);
   const vatAmount = isVat ? subtotal * 0.07 : 0;
@@ -1071,10 +1130,16 @@ export const POSRegister: React.FC = () => {
 
         {!isScreenshotMode && <div className="mt-auto pt-10 flex gap-4">
           {AUTHORIZED_VOID_ROLES.includes(currentCashier?.role.toUpperCase() || '') && (
-            <button className="payment-btn" style={{flex: 1}} onClick={() => {
-              fetchStaff();
-              setShowModal('staff');
-            }}>STAFF</button>
+            <>
+              <button className="payment-btn" style={{flex: 1}} onClick={() => {
+                fetchStaff();
+                setShowModal('staff');
+              }}>STAFF</button>
+              <button className="payment-btn" style={{flex: 1}} onClick={() => {
+                fetchAuditLogs();
+                setShowModal('audit');
+              }}>AUDIT</button>
+            </>
           )}
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
             if (currentShift) {
@@ -1837,6 +1902,95 @@ export const POSRegister: React.FC = () => {
               </div>
             )}
             <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE MANAGEMENT</button>
+          </div>
+        </div>
+      )}
+      {showModal === 'audit' && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" style={{maxWidth: '1000px', width: '95%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-lg uppercase tracking-wider">Operational Audit Log</h3>
+              <div className="flex gap-4">
+                <select 
+                  className="input-glow text-xs"
+                  value={auditLimit}
+                  onChange={e => {
+                    const newLimit = Number(e.target.value);
+                    setAuditLimit(newLimit);
+                    fetchAuditLogs(newLimit);
+                  }}
+                >
+                  <option value={25}>25 ROWS</option>
+                  <option value={50}>50 ROWS</option>
+                  <option value={100}>100 ROWS</option>
+                </select>
+                <button className="action-btn-sm" onClick={() => fetchAuditLogs()}>REFRESH</button>
+              </div>
+            </div>
+
+            {auditError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{auditError}</div>}
+
+            <div className="overflow-x-auto max-h-[60vh]">
+              <table className="staff-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Event</th>
+                    <th>Actor</th>
+                    <th>Target</th>
+                    <th>Reason</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isAuditLoading && (
+                    <tr>
+                      <td colSpan={6} className="text-center py-10 text-slate-500">LOADING LOGS...</td>
+                    </tr>
+                  )}
+                  {!isAuditLoading && auditLogs.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="text-center py-10 text-slate-500">NO AUDIT LOGS FOUND</td>
+                    </tr>
+                  )}
+                  {auditLogs.map(log => (
+                    <React.Fragment key={log.id}>
+                      <tr className="cursor-pointer hover:bg-white/5" onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}>
+                        <td className="text-[10px] text-slate-500">{new Date(log.created_at).toLocaleString()}</td>
+                        <td><span className={`status-pill ${getEventColor(log.event_type)}`}>{log.event_type}</span></td>
+                        <td className="text-[10px]">{employees.find(e => e.id === log.actor_employee_id)?.display_name || log.actor_employee_id || '-'}</td>
+                        <td className="text-[10px]">{log.target_type} ({log.target_id?.slice(0,8)})</td>
+                        <td className="text-[10px] truncate max-w-[150px]">{log.reason || '-'}</td>
+                        <td><button className="text-[9px] underline">{expandedLogId === log.id ? 'HIDE' : 'VIEW'}</button></td>
+                      </tr>
+                      {expandedLogId === log.id && (
+                        <tr>
+                          <td colSpan={6} className="bg-black/20 p-4 rounded-lg">
+                            <div className="grid grid-cols-2 gap-4 text-[10px]">
+                              <div>
+                                <div className="meta-label">Metadata</div>
+                                <pre className="font-mono text-slate-400 bg-black/40 p-2 rounded max-h-[200px] overflow-auto">
+                                  {JSON.stringify(sanitizeMetadata(log.metadata), null, 2)}
+                                </pre>
+                              </div>
+                              <div className="text-left">
+                                <div className="meta-label">Context</div>
+                                <div className="space-y-1">
+                                  <div><span className="text-slate-500">Log ID:</span> {log.id}</div>
+                                  <div><span className="text-slate-500">Target ID:</span> {log.target_id}</div>
+                                  <div><span className="text-slate-500">Actor ID:</span> {log.actor_employee_id || 'System'}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE LOG</button>
           </div>
         </div>
       )}
