@@ -1127,7 +1127,7 @@ export const POSRegister: React.FC = () => {
           on_hand_qty: data.new_qty
         });
         setAdjustQtyDelta('');
-        fetchProducts(inventorySearch);
+        searchProducts(inventorySearch);
         fetchStockLedger(selectedInventoryProduct.product_id);
       } else {
         setInventoryError(data.detail || data.message || 'Adjustment failed');
@@ -2422,7 +2422,7 @@ export const POSRegister: React.FC = () => {
                   placeholder="SEARCH PRODUCT..." 
                   value={inventorySearch}
                   onChange={e => setInventorySearch(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') fetchProducts(inventorySearch); }}
+                  onKeyDown={e => { if (e.key === 'Enter') searchProducts(inventorySearch); }}
                 />
               </div>
             </div>
