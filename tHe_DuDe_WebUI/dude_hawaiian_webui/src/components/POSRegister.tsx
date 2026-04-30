@@ -82,7 +82,22 @@ const normalizeShift = (shift: ShiftData): ShiftData => ({
   shift_id: shift.shift_id || shift.id || ''
 });
 
+const DEMO_PRODUCTS: Product[] = [
+  { product_id: 'd1', name: 'น้ำแข็งหลอดใหญ่ 10kg', sku: 'ICE-L-10', barcode: '885001', unit_price: '45.00', is_active: true, on_hand_qty: 42, allow_negative_stock: false, category_name: 'Ice' },
+  { product_id: 'd2', name: 'น้ำแข็งหลอดเล็ก 5kg', sku: 'ICE-S-05', barcode: '885002', unit_price: '25.00', is_active: true, on_hand_qty: 18, allow_negative_stock: false, category_name: 'Ice' },
+  { product_id: 'd3', name: 'น้ำแข็งป่นถุงกลาง', sku: 'ICE-P-08', barcode: '885003', unit_price: '35.00', is_active: true, on_hand_qty: 0, allow_negative_stock: false, category_name: 'Ice' },
+  { product_id: 'd4', name: 'น้ำดื่ม Dude Pure 600ml', sku: 'WAT-600', barcode: '885004', unit_price: '10.00', is_active: true, on_hand_qty: 120, allow_negative_stock: true, category_name: 'Beverage' },
+  { product_id: 'd5', name: 'น้ำดื่ม Dude Pure 1500ml', sku: 'WAT-1500', barcode: '885005', unit_price: '20.00', is_active: true, on_hand_qty: 4, allow_negative_stock: false, category_name: 'Beverage' },
+  { product_id: 'd6', name: 'ถุงบรรจุน้ำแข็ง (L)', sku: 'PKG-L', barcode: '885006', unit_price: '5.00', is_active: true, on_hand_qty: 500, allow_negative_stock: true, category_name: 'Packaging' },
+  { product_id: 'd7', name: 'ค่าจัดส่ง (Delivery)', sku: 'SVC-DEL', barcode: null, unit_price: '50.00', is_active: true, on_hand_qty: 999, allow_negative_stock: true, category_name: 'Service' },
+  { product_id: 'd8', name: 'คูลเลอร์เก็บความเย็น', sku: 'ACC-CLR', barcode: '885008', unit_price: '450.00', is_active: true, on_hand_qty: 3, allow_negative_stock: false, category_name: 'Accessory' },
+];
+
 export const POSRegister: React.FC = () => {
+  const [params] = useState(() => new URLSearchParams(window.location.search));
+  const isScreenshotMode = params.get('screenshot') === '1';
+  const shotMode = params.get('shot') || 'main';
+
   const [query, setQuery] = useState('');
   const [barcode, setBarcode] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
@@ -167,13 +182,58 @@ export const POSRegister: React.FC = () => {
   };
 
   useEffect(() => {
+    if (isScreenshotMode) {
+      setServiceStatus({ backend: 'ok', db: 'ok', catalog: 'ready' });
+      setCurrentShift({
+        shift_id: 'demo-shift-2026',
+        employee_id: 'demo-admin',
+        status: 'OPEN',
+        opening_cash: '1000.00',
+        opened_at: new Date().toISOString()
+      });
+
+      if (shotMode === 'main' || shotMode === 'success' || shotMode === 'void') {
+        setProducts(DEMO_PRODUCTS);
+        setCart([
+          { ...DEMO_PRODUCTS[0], quantity: 2 },
+          { ...DEMO_PRODUCTS[1], quantity: 1 },
+          { ...DEMO_PRODUCTS[3], quantity: 6 },
+        ]);
+        if (shotMode === 'success') {
+          setLastTicket({
+            ticket_id: 'demo-tk-128',
+            ticket_no: 'POS-2026-000128',
+            total_amount: '120.00',
+            status: 'COMPLETED'
+          });
+          setShowModal('ticket_success');
+        }
+        if (shotMode === 'void') {
+          setLastTicket({
+            ticket_id: 'demo-tk-128',
+            ticket_no: 'POS-2026-000128',
+            total_amount: '120.00',
+            status: 'VOIDED'
+          });
+          setShowModal('void_success');
+        }
+      } else if (shotMode === 'stock') {
+        setProducts(DEMO_PRODUCTS);
+        const lowStockItem = DEMO_PRODUCTS[4]; // WAT-1500 (Qty 4)
+        setCart([{ ...lowStockItem, quantity: 4 }]);
+        setCartWarning({ product_id: lowStockItem.product_id, message: 'Stock limit reached. Reduce quantity or restock product.' });
+      }
+      return;
+    }
+
     checkHealth();
     fetchCurrentShift();
     const interval = setInterval(checkHealth, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isScreenshotMode, shotMode]);
 
   const handleOpenShift = async () => {
+    if (isScreenshotMode) return;
     setShiftLoading(true);
     setShiftError(null);
     try {
@@ -200,6 +260,7 @@ export const POSRegister: React.FC = () => {
   };
 
   const handleCloseShift = async () => {
+    if (isScreenshotMode) return;
     if (!currentShift) return;
     setShiftLoading(true);
     setShiftError(null);
@@ -320,6 +381,7 @@ export const POSRegister: React.FC = () => {
   };
 
   const handleCheckout = async () => {
+    if (isScreenshotMode) return;
     if (!currentShift?.shift_id || cart.length === 0) return;
     
     setCheckoutLoading(true);
@@ -405,6 +467,9 @@ export const POSRegister: React.FC = () => {
     <div className="pos-container">
       {/* Main Panel */}
       <div className="main-panel">
+        {isScreenshotMode && (
+          <div className="demo-badge">DEMO CAPTURE MODE: {shotMode.toUpperCase()}</div>
+        )}
         <div className="pos-header">
           <div className="flex flex-col">
             <h2 className="font-tech text-xl text-glow text-orange-500">POS REGISTER v0.2</h2>
@@ -696,6 +761,32 @@ export const POSRegister: React.FC = () => {
               {checkoutError}
             </div>
             <button className="btn-primary w-full" onClick={() => setShowModal(null)}>DISMISS</button>
+          </div>
+        </div>
+      )}
+
+      {showModal === 'void_success' && lastTicket && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-slate-500/20 border border-slate-500 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500 font-bold text-2xl">↺</div>
+              <h3 className="font-tech text-xl text-slate-400 uppercase">Void / Refund Ready</h3>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 text-sm bg-slate-800/50 p-4 rounded border border-white/5 mb-2">
+              <div className="text-slate-400">Ticket No:</div>
+              <div className="text-right font-mono font-bold text-slate-500">{lastTicket.ticket_no}</div>
+              <div className="text-slate-400">Status:</div>
+              <div className="text-right"><span className="px-2 py-0.5 bg-red-500/20 text-red-500 rounded text-[10px] uppercase">{lastTicket.status}</span></div>
+              <div className="text-slate-400">Reason:</div>
+              <div className="text-right text-slate-300">Cashier correction</div>
+            </div>
+
+            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded mb-6 text-[10px] text-blue-400 text-center uppercase tracking-widest">
+              Stock Restored • Ledger Updated • Audit Logged
+            </div>
+
+            <button className="btn-primary w-full" onClick={() => setShowModal(null)}>BACK TO REGISTER</button>
           </div>
         </div>
       )}
