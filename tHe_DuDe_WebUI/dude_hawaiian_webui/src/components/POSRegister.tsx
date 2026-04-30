@@ -49,6 +49,28 @@ interface ShiftSummary {
   top_items: Array<{ name: string; quantity: number; total: string }>;
 }
 
+interface ReceiptData {
+  business_name: string;
+  ticket_no: string;
+  created_at: string;
+  status: string;
+  is_voided: boolean;
+  employee_id: string;
+  items: Array<{
+    name: string;
+    qty: number;
+    unit_price: string;
+    line_total: string;
+  }>;
+  subtotal: string;
+  vat_amount: string;
+  total_amount: string;
+  payment: {
+    method: string;
+    amount: string;
+  };
+}
+
 const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true, on_hand_qty: 10, allow_negative_stock: false },
   { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true, on_hand_qty: 2, allow_negative_stock: false },
@@ -241,6 +263,11 @@ export const POSRegister: React.FC = () => {
   const [shiftSummary, setShiftSummary] = useState<ShiftSummary | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
+
+  // Receipt State
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [receiptLoading, setReceiptLoading] = useState(false);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
 
   // Health check
   const checkHealth = async () => {
@@ -581,6 +608,29 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchReceipt = async (ticketId: string) => {
+    if (isScreenshotMode) return;
+    setReceiptLoading(true);
+    setReceiptError(null);
+    try {
+      const res = await fetch(`/ag_pos_api/tickets/${ticketId}/receipt`);
+      const data = await res.json();
+      if (data.success) {
+        setReceiptData(data.receipt);
+      } else {
+        setReceiptError(data.message || 'Failed to load receipt');
+      }
+    } catch (err) {
+      setReceiptError('Network error');
+    } finally {
+      setReceiptLoading(false);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleVoid = async () => {
     if (!lastTicket || !currentShift || isScreenshotMode) return;
     if (lastTicket.status === 'VOIDED') return;
@@ -598,6 +648,7 @@ export const POSRegister: React.FC = () => {
         setLastTicket(prev => prev ? { ...prev, status: 'VOIDED' } : null);
         setShowModal('void_success_real');
         if (currentShift) fetchShiftSummary(currentShift.shift_id);
+        if (showModal === 'receipt_preview' && lastTicket) fetchReceipt(lastTicket.ticket_id);
       } else {
         alert(`Void Failed: ${data.message || 'Unknown error'}`);
       }
@@ -962,7 +1013,12 @@ export const POSRegister: React.FC = () => {
               </div>
               <div className="receipt-actions">
                 <button className="btn-primary" onClick={() => setShowModal(null)}>New Order</button>
-                <button className="btn-secondary" onClick={() => setShowModal(null)}>View Ticket</button>
+                <button className="btn-secondary" onClick={() => {
+                  if (lastTicket) {
+                    fetchReceipt(lastTicket.ticket_id);
+                    setShowModal('receipt_preview');
+                  }
+                }}>View Receipt</button>
               </div>
             </div>
           ) : (
@@ -1083,7 +1139,12 @@ export const POSRegister: React.FC = () => {
             <div className="void-note">Every correction is traceable.</div>
             <div className="receipt-actions">
               <button className="btn-primary" onClick={() => setShowModal(null)}>Back to Register</button>
-              <button className="btn-secondary" onClick={() => setShowModal(null)}>View Audit Log</button>
+              <button className="btn-secondary" onClick={() => {
+                if (lastTicket) {
+                  fetchReceipt(lastTicket.ticket_id);
+                  setShowModal('receipt_preview');
+                }
+              }}>View Receipt</button>
             </div>
           </div>
         </div>
@@ -1167,6 +1228,72 @@ export const POSRegister: React.FC = () => {
             )}
 
             <button className="btn-primary w-full mt-8" onClick={() => setShowModal(null)}>CLOSE SUMMARY</button>
+          </div>
+        </div>
+      )}
+
+      {showModal === 'receipt_preview' && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal receipt-preview-modal" onClick={e => e.stopPropagation()}>
+            <div className="receipt-print-area">
+              <div className="receipt-print-paper">
+                {receiptLoading && <div className="text-center py-10 text-slate-500">Loading receipt...</div>}
+                {receiptError && <div className="text-center py-10 text-red-500">{receiptError}</div>}
+                
+                {receiptData && (
+                  <>
+                    <div className="print-header">
+                      <h2 className="print-biz-name">{receiptData.business_name}</h2>
+                      <p>TAX INVOICE / RECEIPT</p>
+                      <p className="print-ticket-no">#{receiptData.ticket_no}</p>
+                    </div>
+
+                    <div className="print-meta">
+                      <div className="flex justify-between"><span>Date:</span> <span>{new Date(receiptData.created_at).toLocaleString()}</span></div>
+                      <div className="flex justify-between"><span>Cashier:</span> <span>{receiptData.employee_id}</span></div>
+                    </div>
+
+                    <div className="print-divider"></div>
+
+                    <div className="print-items">
+                      {receiptData.items.map((item, idx) => (
+                        <div key={idx} className="print-item">
+                          <div className="print-item-name">{item.name}</div>
+                          <div className="flex justify-between text-[10px]">
+                            <span>{item.qty} x {formatCurrency(parseFloat(item.unit_price))}</span>
+                            <span>{formatCurrency(parseFloat(item.line_total))}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="print-divider"></div>
+
+                    <div className="print-summary">
+                      <div className="flex justify-between"><span>Subtotal:</span> <span>{formatCurrency(parseFloat(receiptData.subtotal))}</span></div>
+                      <div className="flex justify-between"><span>VAT (7%):</span> <span>{formatCurrency(parseFloat(receiptData.vat_amount))}</span></div>
+                      <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t border-black/5">
+                        <span>TOTAL:</span> 
+                        <span>{formatCurrency(parseFloat(receiptData.total_amount))}</span>
+                      </div>
+                    </div>
+
+                    <div className="print-footer">
+                      <p>Payment: {receiptData.payment.method}</p>
+                      {receiptData.is_voided && (
+                        <div className="print-void-stamp">VOIDED</div>
+                      )}
+                      <p className="mt-4 text-[8px]">Thank you for your business</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-4 mt-8 print-hidden">
+              <button className="btn-secondary" style={{flex: 1}} onClick={() => setShowModal(null)}>CLOSE</button>
+              <button className="btn-primary" style={{flex: 2}} onClick={handlePrint}>PRINT RECEIPT</button>
+            </div>
           </div>
         </div>
       )}
