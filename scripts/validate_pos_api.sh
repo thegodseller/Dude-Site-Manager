@@ -646,4 +646,97 @@ else
     exit 1
 fi
 
+# 15. Product Catalog Management Tests
+echo "--- Product Catalog Management Tests ---"
+NEW_PROD_SKU="TEST-PROD-$(date +%s)"
+echo -n "Create Product: "
+CREATE_PROD_RESP=$(curl -s -X POST "$POS_URL/api/pos/products" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"sku\": \"$NEW_PROD_SKU\",
+        \"name\": \"Test Admin Product\",
+        \"category_name\": \"Test\",
+        \"uom\": \"unit\",
+        \"unit_price\": 99.0,
+        \"on_hand_qty\": 100.0,
+        \"allow_negative_stock\": false
+    }")
+NEW_PROD_ID=$(echo "$CREATE_PROD_RESP" | jq -r '.product_id')
+if [ "$NEW_PROD_ID" != "null" ] && [ -n "$NEW_PROD_ID" ]; then
+    echo "PASS (ID: $NEW_PROD_ID)"
+else
+    echo "FAIL: $CREATE_PROD_RESP"
+    exit 1
+fi
+
+echo -n "Reject Duplicate SKU: "
+DUP_SKU_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/products" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"sku\": \"$NEW_PROD_SKU\",
+        \"name\": \"Another Name\",
+        \"category_name\": \"Test\",
+        \"uom\": \"unit\",
+        \"unit_price\": 50.0
+    }")
+if [ "$DUP_SKU_RESP" = "500" ]; then
+    echo "PASS"
+else
+    echo "FAIL: Got $DUP_SKU_RESP, Expected 500"
+    exit 1
+fi
+
+echo -n "Update Product Name/Price: "
+UPDATE_RESP=$(curl -s -X PATCH "$POS_URL/api/pos/products/$NEW_PROD_ID" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"name\": \"Updated Admin Product\",
+        \"unit_price\": 120.0
+    }")
+if echo "$UPDATE_RESP" | grep -q '"success":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $UPDATE_RESP"
+    exit 1
+fi
+
+echo -n "Verify Update: "
+VERIFY_PROD=$(curl -s "$POS_URL/api/pos/products/$NEW_PROD_ID")
+if echo "$VERIFY_PROD" | grep -q "Updated Admin Product" && echo "$VERIFY_PROD" | grep -q "120.00"; then
+    echo "PASS"
+else
+    echo "FAIL: $VERIFY_PROD"
+    exit 1
+fi
+
+echo -n "Deactivate Product: "
+DEACT_RESP=$(curl -s -X POST "$POS_URL/api/pos/products/$NEW_PROD_ID/deactivate")
+if echo "$DEACT_RESP" | grep -q '"success":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $DEACT_RESP"
+    exit 1
+fi
+
+echo -n "Verify Inactive Product (Search should filter): "
+SEARCH_INACT=$(curl -s -G --data-urlencode "q=$NEW_PROD_SKU" "$POS_URL/api/pos/products/search")
+if echo "$SEARCH_INACT" | grep -q '"items":\[\]'; then
+    echo "PASS"
+else
+    echo "FAIL: Product still visible in search"
+    exit 1
+fi
+
+echo -n "Verify Audit Log (PRODUCT_CREATED, UPDATED, PRICE_CHANGED, DEACTIVATED): "
+AUDIT_PROD_RESP=$(curl -s -X GET "$POS_URL/api/pos/audit-log?limit=20")
+if echo "$AUDIT_PROD_RESP" | grep -q 'PRODUCT_CREATED' && \
+   echo "$AUDIT_PROD_RESP" | grep -q 'PRODUCT_UPDATED' && \
+   echo "$AUDIT_PROD_RESP" | grep -q 'PRODUCT_PRICE_CHANGED' && \
+   echo "$AUDIT_PROD_RESP" | grep -q 'PRODUCT_DEACTIVATED'; then
+    echo "PASS"
+else
+    echo "FAIL"
+    exit 1
+fi
+
 echo "--- ALL POS API TESTS PASSED ---"
