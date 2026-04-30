@@ -30,6 +30,25 @@ interface ShiftData {
   closed_at?: string | null;
 }
 
+interface ShiftSummary {
+  status: string;
+  opened_at: string;
+  closed_at: string | null;
+  opening_cash: string;
+  expected_cash: string;
+  actual_cash: string | null;
+  variance: string | null;
+  confirmed_ticket_count: number;
+  voided_ticket_count: number;
+  gross_sales: string;
+  voided_sales: string;
+  net_sales: string;
+  cash_sales: string;
+  qr_sales: string;
+  credit_sales: string;
+  top_items: Array<{ name: string; quantity: number; total: string }>;
+}
+
 const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true, on_hand_qty: 10, allow_negative_stock: false },
   { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true, on_hand_qty: 2, allow_negative_stock: false },
@@ -218,6 +237,11 @@ export const POSRegister: React.FC = () => {
   const [voidReason, setVoidReason] = useState('Cashier correction');
   const [voidLoading, setVoidLoading] = useState(false);
 
+  // Shift Summary State
+  const [shiftSummary, setShiftSummary] = useState<ShiftSummary | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+
   // Health check
   const checkHealth = async () => {
     try {
@@ -249,6 +273,7 @@ export const POSRegister: React.FC = () => {
       if (data.success && data.shift) {
         setCurrentShift(normalizeShift(data.shift));
         setActualCashInput(data.shift.opening_cash); // Default actual cash to opening for convenience
+        fetchShiftSummary(data.shift.shift_id || data.shift.id);
       } else {
         setCurrentShift(null);
       }
@@ -284,6 +309,29 @@ export const POSRegister: React.FC = () => {
         setCart(buildStockDemoCart());
         setCartWarning({ product_id: lowStockItem.product_id, message: DEMO_STOCK_WARNING });
       }
+
+      setShiftSummary({
+        status: 'OPEN',
+        opened_at: DEMO_SHIFT.opened_at,
+        closed_at: null,
+        opening_cash: '1000.00',
+        expected_cash: '1120.00',
+        actual_cash: null,
+        variance: null,
+        confirmed_ticket_count: 3,
+        voided_ticket_count: 1,
+        gross_sales: '155.00',
+        voided_sales: '35.00',
+        net_sales: '120.00',
+        cash_sales: '0.00',
+        qr_sales: '120.00',
+        credit_sales: '0.00',
+        top_items: [
+          { name: 'น้ำแข็งหลอดเล็ก 5kg', quantity: 2, total: '50.00' },
+          { name: 'น้ำดื่ม Dude Pure 1500ml', quantity: 2, total: '40.00' },
+          { name: 'น้ำดื่ม Dude Pure 600ml', quantity: 3, total: '30.00' },
+        ]
+      });
       return;
     }
 
@@ -309,6 +357,7 @@ export const POSRegister: React.FC = () => {
       const data = await res.json();
       if (data.success) {
         setCurrentShift(normalizeShift(data.shift));
+        fetchShiftSummary(data.shift.shift_id || data.shift.id);
         setShowModal(null);
       } else {
         setShiftError(data.message || 'Failed to open shift.');
@@ -488,6 +537,7 @@ export const POSRegister: React.FC = () => {
         });
         setCart([]);
         setShowModal('ticket_success');
+        if (currentShift) fetchShiftSummary(currentShift.shift_id);
       } else {
         // Detailed error handling
         const detail = Array.isArray(data.detail)
@@ -512,6 +562,25 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchShiftSummary = async (shiftId: string) => {
+    if (isScreenshotMode) return;
+    setSummaryLoading(true);
+    setSummaryError(null);
+    try {
+      const res = await fetch(`/ag_pos_api/shifts/${shiftId}/summary`);
+      const data = await res.json();
+      if (data.success) {
+        setShiftSummary(data.summary);
+      } else {
+        setSummaryError(data.message || 'Failed to fetch summary');
+      }
+    } catch (err) {
+      setSummaryError('Network error');
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
   const handleVoid = async () => {
     if (!lastTicket || !currentShift || isScreenshotMode) return;
     if (lastTicket.status === 'VOIDED') return;
@@ -528,6 +597,7 @@ export const POSRegister: React.FC = () => {
       if (data.success) {
         setLastTicket(prev => prev ? { ...prev, status: 'VOIDED' } : null);
         setShowModal('void_success_real');
+        if (currentShift) fetchShiftSummary(currentShift.shift_id);
       } else {
         alert(`Void Failed: ${data.message || 'Unknown error'}`);
       }
@@ -587,6 +657,7 @@ export const POSRegister: React.FC = () => {
               <span>Counter 01</span>
               <strong>Live cashier session</strong>
             </div>
+            <button className="payment-btn" onClick={() => setShowModal('summary')}>SHIFT SUMMARY</button>
             <button className="payment-btn active">SHIFT CONTROL</button>
             <button className="payment-btn">VOID / REFUND</button>
           </div>
@@ -660,6 +731,14 @@ export const POSRegister: React.FC = () => {
         </div>
 
         {!isScreenshotMode && <div className="mt-auto pt-10 flex gap-4">
+          <button className="payment-btn" style={{flex: 1}} onClick={() => {
+            if (currentShift) {
+              fetchShiftSummary(currentShift.shift_id);
+              setShowModal('summary');
+            } else {
+              alert('No active shift. Open shift to view summary.');
+            }
+          }}>SHIFT SUMMARY</button>
           <button className="payment-btn" style={{flex: 1}} onClick={() => setShowModal('shift')}>SHIFT CONTROL</button>
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
             if (!lastTicket) {
@@ -1006,6 +1085,88 @@ export const POSRegister: React.FC = () => {
               <button className="btn-primary" onClick={() => setShowModal(null)}>Back to Register</button>
               <button className="btn-secondary" onClick={() => setShowModal(null)}>View Audit Log</button>
             </div>
+          </div>
+        </div>
+      )}
+      {showModal === 'summary' && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" style={{width: '600px'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-xl text-glow uppercase">Shift Summary</h3>
+              <div className={`px-3 py-1 rounded text-[10px] font-bold ${shiftSummary?.status === 'OPEN' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                {shiftSummary?.status || 'UNKNOWN'}
+              </div>
+            </div>
+
+            {summaryLoading && <div className="text-center py-10 text-slate-500">Loading metrics...</div>}
+            {summaryError && <div className="bg-red-500/10 border border-red-500/20 p-4 text-red-500 text-sm rounded mb-6">{summaryError}</div>}
+
+            {shiftSummary && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-800/40 p-3 rounded border border-white/5">
+                    <div className="status-label">Opening Cash</div>
+                    <div className="text-lg font-bold font-mono">{formatCurrency(parseFloat(shiftSummary.opening_cash))}</div>
+                  </div>
+                  <div className="bg-slate-800/40 p-3 rounded border border-white/5">
+                    <div className="status-label">Expected Cash</div>
+                    <div className="text-lg font-bold font-mono text-orange-500">{formatCurrency(parseFloat(shiftSummary.expected_cash))}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center">
+                    <div className="status-label">Net Sales</div>
+                    <div className="text-md font-bold text-green-400">{formatCurrency(parseFloat(shiftSummary.net_sales))}</div>
+                  </div>
+                  <div className="text-center border-x border-white/10">
+                    <div className="status-label">Voided</div>
+                    <div className="text-md font-bold text-red-400">{formatCurrency(parseFloat(shiftSummary.voided_sales))}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="status-label">Tickets</div>
+                    <div className="text-md font-bold text-blue-400">{shiftSummary.confirmed_ticket_count}</div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-900/50 rounded-lg p-4 border border-white/5">
+                  <div className="status-label mb-3">Revenue Mix</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-400">Cash Sales</span>
+                      <span className="font-mono">{formatCurrency(parseFloat(shiftSummary.cash_sales))}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-400">PromptPay / QR</span>
+                      <span className="font-mono">{formatCurrency(parseFloat(shiftSummary.qr_sales))}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-400">Credit Card</span>
+                      <span className="font-mono">{formatCurrency(parseFloat(shiftSummary.credit_sales))}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {shiftSummary.top_items.length > 0 && (
+                  <div>
+                    <div className="status-label mb-3">Top Products</div>
+                    <div className="space-y-2">
+                      {shiftSummary.top_items.map(item => (
+                        <div key={item.name} className="flex justify-between items-center bg-white/5 p-2 rounded text-[11px]">
+                          <div className="flex flex-col">
+                            <span className="font-bold">{item.name}</span>
+                            <span className="text-slate-500">Qty: {item.quantity}</span>
+                          </div>
+                          <span className="font-mono text-gold-500">{formatCurrency(parseFloat(item.total))}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button className="btn-primary w-full mt-8" onClick={() => setShowModal(null)}>CLOSE SUMMARY</button>
           </div>
         </div>
       )}
