@@ -1240,7 +1240,7 @@ export const POSRegister: React.FC = () => {
               <button 
                 className="btn-primary" 
                 style={{flex: 2, background: 'linear-gradient(135deg, #ff3e3e, #8b0000)'}}
-                onClick={handleVoid}
+                onClick={() => handleVoid()}
                 disabled={voidLoading}
               >
                 {voidLoading ? 'VOIDING...' : 'CONFIRM VOID'}
@@ -1460,6 +1460,54 @@ export const POSRegister: React.FC = () => {
               <button className="btn-secondary" style={{flex: 1}} onClick={() => setShowModal(null)}>CLOSE</button>
               <button className="btn-primary" style={{flex: 2}} onClick={handlePrint}>PRINT RECEIPT</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cashier Login Overlay */}
+      {!currentCashier && !isScreenshotMode && (
+        <div className="cashier-login-overlay">
+          <div className="login-card">
+            <h2 className="font-tech text-2xl text-orange-500 mb-2">POS SYSTEM</h2>
+            <p className="text-slate-400 text-xs mb-8 tracking-widest">SECURE ACCESS REQUIRED</p>
+            
+            {loginError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{loginError}</div>}
+
+            <div className="cashier-select-grid">
+              {employees.map(emp => (
+                <div 
+                  key={emp.id} 
+                  className={`cashier-option ${selectedCashierId === emp.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedCashierId(emp.id)}
+                >
+                  <span className="cashier-name">{emp.display_name}</span>
+                  <span className="cashier-role">{emp.role}</span>
+                </div>
+              ))}
+              {employees.length === 0 && <div className="text-slate-600 text-xs py-10">No active employees found</div>}
+            </div>
+
+            {selectedCashierId && (
+              <div className="pin-input-container">
+                <div className="pin-display">
+                  {pin.split('').map((_, i) => <span key={i}>*</span>)}
+                </div>
+                <div className="pin-pad">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                    <button key={n} className="pin-btn" onClick={() => setPin(p => (p + n).slice(0, 6))}>{n}</button>
+                  ))}
+                  <button className="pin-btn clear" onClick={() => setPin('')}>C</button>
+                  <button className="pin-btn" onClick={() => setPin(p => (p + '0').slice(0, 6))}>0</button>
+                  <button 
+                    className="pin-btn submit" 
+                    onClick={handleCashierLogin}
+                    disabled={loginLoading || pin.length < 4}
+                  >
+                    {loginLoading ? '...' : 'ENTER'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
