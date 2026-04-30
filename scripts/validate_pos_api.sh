@@ -73,11 +73,39 @@ fi
 
 # 7. Shift Management Tests
 echo "--- Shift Management Tests ---"
-TS=$(date +%s)
-# Generate a valid-looking UUID by padding the timestamp to 12 hex digits
-# e.g. 00000000-0000-0000-0000-001777486017
-TEST_EMPLOYEE_ID=$(printf "00000000-0000-0000-0000-%012d" "$TS")
-echo "Test Employee ID: $TEST_EMPLOYEE_ID"
+
+# 7.0 Cashier Identity Tests
+echo -n "List Employees: "
+EMP_LIST_RESP=$(curl -s -X GET "$POS_URL/api/pos/employees")
+if echo "$EMP_LIST_RESP" | grep -q '"success":true' && echo "$EMP_LIST_RESP" | grep -q 'Demo Cashier'; then
+    TEST_EMPLOYEE_ID=$(echo "$EMP_LIST_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['employees'][0]['id'])")
+    echo "PASS (Test Employee: $TEST_EMPLOYEE_ID)"
+else
+    echo "FAIL: $EMP_LIST_RESP"
+    exit 1
+fi
+
+echo -n "Start Employee Session (Invalid PIN): "
+BAD_PIN_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/employees/session/start" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$TEST_EMPLOYEE_ID\", \"pin_code\": \"0000\"}")
+if [ "$BAD_PIN_RESP" = "401" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 401, got $BAD_PIN_RESP)"
+    exit 1
+fi
+
+echo -n "Start Employee Session (Valid PIN 1234): "
+SESSION_RESP=$(curl -s -X POST "$POS_URL/api/pos/employees/session/start" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$TEST_EMPLOYEE_ID\", \"pin_code\": \"1234\"}")
+if echo "$SESSION_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $SESSION_RESP"
+    exit 1
+fi
 
 # 7.1 Open Shift
 echo -n "Open Shift: "
@@ -89,6 +117,18 @@ if echo "$OPEN_RESP" | grep -q '"status":"ok"'; then
     echo "PASS (Shift ID: $SHIFT_ID)"
 else
     echo "FAIL: $OPEN_RESP"
+    exit 1
+fi
+
+echo -n "Open Shift (Invalid Employee): "
+INVALID_EMP_ID="00000000-0000-0000-0000-000000000000"
+INV_OPEN_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/shifts/open" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$INVALID_EMP_ID\", \"opening_cash\": 100.00}")
+if [ "$INV_OPEN_RESP" = "404" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 404, got $INV_OPEN_RESP)"
     exit 1
 fi
 
