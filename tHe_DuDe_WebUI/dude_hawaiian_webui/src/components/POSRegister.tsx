@@ -92,6 +92,17 @@ interface AuditLogEntry {
   created_at: string;
 }
 
+interface TicketHistoryEntry {
+  id: string;
+  ticket_no: string;
+  shift_id: string;
+  status: string;
+  total_amount: string;
+  payment_method: string | null;
+  created_at: string;
+  created_by: string | null;
+}
+
 const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true, on_hand_qty: 10, allow_negative_stock: false },
   { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true, on_hand_qty: 2, allow_negative_stock: false },
@@ -325,6 +336,14 @@ export const POSRegister: React.FC = () => {
   const [isAuditLoading, setIsAuditLoading] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
+
+  // Ticket History State
+  const [ticketHistory, setTicketHistory] = useState<TicketHistoryEntry[]>([]);
+  const [historyLimit, setHistoryLimit] = useState(50);
+  const [historyStatus, setHistoryStatus] = useState('ALL');
+  const [historySearch, setHistorySearch] = useState('');
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   // Health check
   const checkHealth = async () => {
@@ -975,6 +994,28 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchTicketHistory = async (limit = historyLimit, status = historyStatus, q = historySearch) => {
+    setIsHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      let url = `/ag_pos_api/tickets?limit=${limit}`;
+      if (status !== 'ALL') url += `&status=${status}`;
+      if (q) url += `&q=${encodeURIComponent(q)}`;
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        setTicketHistory(data.tickets);
+      } else {
+        setHistoryError(data.message || 'Failed to fetch ticket history');
+      }
+    } catch (err) {
+      setHistoryError('Network error while fetching ticket history');
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  };
+
   const getEventColor = (type: string) => {
     if (type.includes('VOID')) return 'inactive';
     if (type.includes('DEACTIVATED')) return 'inactive';
@@ -1139,6 +1180,10 @@ export const POSRegister: React.FC = () => {
                 fetchAuditLogs();
                 setShowModal('audit');
               }}>AUDIT</button>
+              <button className="payment-btn" style={{flex: 1}} onClick={() => {
+                fetchTicketHistory();
+                setShowModal('history');
+              }}>TICKETS</button>
             </>
           )}
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
@@ -1991,6 +2036,116 @@ export const POSRegister: React.FC = () => {
               </table>
             </div>
             <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE LOG</button>
+          </div>
+        </div>
+      )}
+      {showModal === 'history' && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" style={{maxWidth: '1200px', width: '95%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-lg uppercase tracking-wider">Ticket & Sales History</h3>
+              <div className="flex gap-4 items-center">
+                <input 
+                  type="text" 
+                  placeholder="SEARCH TICKET NO..." 
+                  className="input-glow text-xs py-1 px-3 w-48"
+                  value={historySearch}
+                  onChange={e => setHistorySearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && fetchTicketHistory()}
+                />
+                <select 
+                  className="input-glow text-xs"
+                  value={historyStatus}
+                  onChange={e => {
+                    const newStatus = e.target.value;
+                    setHistoryStatus(newStatus);
+                    fetchTicketHistory(historyLimit, newStatus);
+                  }}
+                >
+                  <option value="ALL">ALL STATUS</option>
+                  <option value="CONFIRMED">CONFIRMED</option>
+                  <option value="VOIDED">VOIDED</option>
+                </select>
+                <select 
+                  className="input-glow text-xs"
+                  value={historyLimit}
+                  onChange={e => {
+                    const newLimit = Number(e.target.value);
+                    setHistoryLimit(newLimit);
+                    fetchTicketHistory(newLimit);
+                  }}
+                >
+                  <option value={25}>25 ROWS</option>
+                  <option value={50}>50 ROWS</option>
+                  <option value={100}>100 ROWS</option>
+                </select>
+                <button className="action-btn-sm" onClick={() => fetchTicketHistory()}>REFRESH</button>
+              </div>
+            </div>
+
+            {historyError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{historyError}</div>}
+
+            <div className="overflow-x-auto max-h-[65vh]">
+              <table className="staff-table">
+                <thead>
+                  <tr>
+                    <th>Date / Time</th>
+                    <th>Ticket No</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Cashier</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isHistoryLoading && (
+                    <tr>
+                      <td colSpan={7} className="text-center py-10 text-slate-500">LOADING HISTORY...</td>
+                    </tr>
+                  )}
+                  {!isHistoryLoading && ticketHistory.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="text-center py-10 text-slate-500">NO TICKETS FOUND</td>
+                    </tr>
+                  )}
+                  {ticketHistory.map(ticket => (
+                    <tr key={ticket.id} className="hover:bg-white/5">
+                      <td className="text-[10px] text-slate-500">{new Date(ticket.created_at).toLocaleString()}</td>
+                      <td className="font-mono text-xs">{ticket.ticket_no}</td>
+                      <td>
+                        <span className={`status-pill ${ticket.status === 'CONFIRMED' ? 'active' : 'inactive'}`}>
+                          {ticket.status}
+                        </span>
+                      </td>
+                      <td className="font-bold">{formatCurrency(parseFloat(ticket.total_amount))}</td>
+                      <td className="text-[10px]">{ticket.payment_method || '-'}</td>
+                      <td className="text-[10px]">{employees.find(e => e.id === ticket.created_by)?.display_name || ticket.created_by?.slice(0,8) || 'System'}</td>
+                      <td>
+                        <div className="flex gap-2">
+                          <button className="text-[9px] underline text-orange-500" onClick={() => {
+                            fetchReceiptData(ticket.id);
+                            setShowModal('receipt');
+                          }}>VIEW</button>
+                          {ticket.status === 'CONFIRMED' && AUTHORIZED_VOID_ROLES.includes(currentCashier?.role.toUpperCase() || '') && (
+                            <button className="text-[9px] underline text-red-500" onClick={() => {
+                              setLastTicket({
+                                ticket_id: ticket.id,
+                                ticket_no: ticket.ticket_no,
+                                total_amount: ticket.total_amount,
+                                status: ticket.status
+                              });
+                              setShowModal('void_confirm');
+                            }}>VOID</button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE HISTORY</button>
           </div>
         </div>
       )}
