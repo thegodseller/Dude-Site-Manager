@@ -198,13 +198,48 @@ else
     exit 1
 fi
 
-# 9. Close Shift with Sales
-echo "--- Re-testing Close Shift with Sales ---"
-echo -n "Close Shift (Expected 60.00 sales): "
+# 8.6 Void Ticket
+echo -n "Void Ticket: "
+VOID_RESP=$(curl -s -X POST "$POS_URL/api/pos/tickets/$TICKET_ID/void" \
+    -H "Content-Type: application/json" \
+    -d "{\"reason\": \"test void\", \"employee_id\": \"$TEST_EMPLOYEE_ID\"}")
+
+if echo "$VOID_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $VOID_RESP"
+    exit 1
+fi
+
+# 8.7 Verify Stock Restored
+echo -n "Verify Stock Restored: "
+STOCK_RESTORED=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
+if [ "$STOCK_RESTORED" = "$STOCK_BEFORE" ] || [ "$(printf \"%.0f\" \"$STOCK_RESTORED\")" = "$(printf \"%.0f\" \"$STOCK_BEFORE\")" ]; then
+    echo "PASS (Restored to: $STOCK_RESTORED)"
+else
+    echo "FAIL (Expected: $STOCK_BEFORE, Got: $STOCK_RESTORED)"
+    exit 1
+fi
+
+# 8.8 Verify Second Void Rejected
+echo -n "Duplicate Void Rejection: "
+DUP_VOID_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/tickets/$TICKET_ID/void" \
+    -H "Content-Type: application/json" \
+    -d "{\"reason\": \"second void\", \"employee_id\": \"$TEST_EMPLOYEE_ID\"}")
+if [ "$DUP_VOID_RESP" = "409" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 409, got $DUP_VOID_RESP)"
+    exit 1
+fi
+
+# 9. Close Shift with Sales (Adjusted for Void)
+echo "--- Re-testing Close Shift (After Void) ---"
+echo -n "Close Shift (Expected 0.00 sales after void): "
+# Opening 500 + Sale 60 - Void 60 = 500
 CLOSE_RESP=$(curl -s -X POST "$POS_URL/api/pos/shifts/close" \
     -H "Content-Type: application/json" \
-    -d "{\"shift_id\": \"$SHIFT_ID\", \"actual_cash\": 560.00}")
-# Expected: 500 (opening) + 60 (sales) = 560. Variance should be 0.
+    -d "{\"shift_id\": \"$SHIFT_ID\", \"actual_cash\": 500.00}")
 VARIANCE=$(echo "$CLOSE_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['shift']['variance'])")
 if [ "$VARIANCE" = "0.0" ] || [ "$VARIANCE" = "0.00" ] || [ "$VARIANCE" = "0" ]; then
     echo "PASS"
