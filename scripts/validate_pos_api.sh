@@ -107,6 +107,17 @@ else
     exit 1
 fi
 
+echo -n "End Employee Session: "
+END_SESSION_RESP=$(curl -s -X POST "$POS_URL/api/pos/employees/session/end" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$TEST_EMPLOYEE_ID\"}")
+if echo "$END_SESSION_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $END_SESSION_RESP"
+    exit 1
+fi
+
 # 7.1 Open Shift
 echo -n "Open Shift: "
 OPEN_RESP=$(curl -s -X POST "$POS_URL/api/pos/shifts/open" \
