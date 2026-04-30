@@ -103,6 +103,33 @@ interface TicketHistoryEntry {
   created_by: string | null;
 }
 
+interface DailyReportData {
+  success: boolean;
+  status: string;
+  date: string;
+  confirmed_ticket_count: number;
+  voided_ticket_count: number;
+  gross_sales: string;
+  voided_sales: string;
+  net_sales: string;
+  cash_sales: string;
+  qr_sales: string;
+  credit_sales: string;
+  total_payments: string;
+  top_items: {
+    name: string;
+    quantity: number;
+    total: string;
+  }[];
+  shifts_included: number;
+  cashier_summary: {
+    employee_id: string;
+    display_name: string;
+    ticket_count: number;
+    net_sales: string;
+  }[];
+}
+
 const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true, on_hand_qty: 10, allow_negative_stock: false },
   { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true, on_hand_qty: 2, allow_negative_stock: false },
@@ -344,6 +371,12 @@ export const POSRegister: React.FC = () => {
   const [historySearch, setHistorySearch] = useState('');
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+
+  // Daily Report State
+  const [dailyReportDate, setDailyReportDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dailyReport, setDailyReport] = useState<DailyReportData | null>(null);
+  const [isReportLoading, setIsReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
 
   // Health check
   const checkHealth = async () => {
@@ -1016,6 +1049,24 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchDailyReport = async (date = dailyReportDate) => {
+    setIsReportLoading(true);
+    setReportError(null);
+    try {
+      const res = await fetch(`/ag_pos_api/reports/daily?date=${date}`);
+      const data = await res.json();
+      if (data.success) {
+        setDailyReport(data);
+      } else {
+        setReportError(data.message || 'Failed to fetch daily report');
+      }
+    } catch (err) {
+      setReportError('Network error while fetching daily report');
+    } finally {
+      setIsReportLoading(false);
+    }
+  };
+
   const getEventColor = (type: string) => {
     if (type.includes('VOID')) return 'inactive';
     if (type.includes('DEACTIVATED')) return 'inactive';
@@ -1184,6 +1235,10 @@ export const POSRegister: React.FC = () => {
                 fetchTicketHistory();
                 setShowModal('history');
               }}>TICKETS</button>
+              <button className="payment-btn" style={{flex: 1}} onClick={() => {
+                fetchDailyReport();
+                setShowModal('daily_report');
+              }}>REPORT</button>
             </>
           )}
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
@@ -2146,6 +2201,137 @@ export const POSRegister: React.FC = () => {
               </table>
             </div>
             <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE HISTORY</button>
+          </div>
+        </div>
+      )}
+      {showModal === 'daily_report' && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" style={{maxWidth: '1200px', width: '95%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-lg uppercase tracking-wider">Daily Sales Report</h3>
+              <div className="flex gap-4 items-center">
+                <input 
+                  type="date" 
+                  className="input-glow text-xs py-1 px-3"
+                  value={dailyReportDate}
+                  onChange={e => {
+                    setDailyReportDate(e.target.value);
+                    fetchDailyReport(e.target.value);
+                  }}
+                />
+                <button className="action-btn-sm" onClick={() => fetchDailyReport()}>REFRESH</button>
+              </div>
+            </div>
+
+            {reportError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{reportError}</div>}
+
+            {isReportLoading ? (
+              <div className="py-20 text-center text-slate-500">GENERATING REPORT...</div>
+            ) : dailyReport ? (
+              <div className="space-y-6 overflow-y-auto max-h-[70vh] pr-2">
+                {/* Summary Grid */}
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="bg-white/5 p-4 rounded border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase mb-1">Confirmed Tickets</div>
+                    <div className="text-xl font-bold">{dailyReport.confirmed_ticket_count}</div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase mb-1">Gross Sales</div>
+                    <div className="text-xl font-bold text-orange-500">{formatCurrency(parseFloat(dailyReport.gross_sales))}</div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase mb-1">Voided Sales</div>
+                    <div className="text-xl font-bold text-red-500">{formatCurrency(parseFloat(dailyReport.voided_sales))}</div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded border border-white/10">
+                    <div className="text-[10px] text-slate-400 uppercase mb-1">Net Sales</div>
+                    <div className="text-xl font-bold text-green-500">{formatCurrency(parseFloat(dailyReport.net_sales))}</div>
+                  </div>
+                </div>
+
+                {/* Payment Breakdown */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-xs uppercase tracking-widest text-slate-400">Payment Breakdown</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between p-2 bg-white/5 rounded border border-white/5">
+                        <span className="text-xs">CASH</span>
+                        <span className="text-xs font-mono">{formatCurrency(parseFloat(dailyReport.cash_sales))}</span>
+                      </div>
+                      <div className="flex justify-between p-2 bg-white/5 rounded border border-white/5">
+                        <span className="text-xs">PROMPTPAY / QR</span>
+                        <span className="text-xs font-mono">{formatCurrency(parseFloat(dailyReport.qr_sales))}</span>
+                      </div>
+                      <div className="flex justify-between p-2 bg-white/5 rounded border border-white/5">
+                        <span className="text-xs">CREDIT CARD</span>
+                        <span className="text-xs font-mono">{formatCurrency(parseFloat(dailyReport.credit_sales))}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-xs uppercase tracking-widest text-slate-400">Inventory Top Items</h4>
+                    <div className="overflow-x-auto">
+                      <table className="staff-table">
+                        <thead>
+                          <tr>
+                            <th>Item Name</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {dailyReport.top_items.map((item, idx) => (
+                            <tr key={idx}>
+                              <td className="text-[10px]">{item.name}</td>
+                              <td className="text-[10px]">{item.quantity}</td>
+                              <td className="text-[10px] font-mono">{formatCurrency(parseFloat(item.total))}</td>
+                            </tr>
+                          ))}
+                          {dailyReport.top_items.length === 0 && (
+                            <tr><td colSpan={3} className="text-center py-4 text-slate-500 text-[10px]">NO ITEMS SOLD</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cashier Performance */}
+                <div className="space-y-4">
+                  <h4 className="text-xs uppercase tracking-widest text-slate-400">Cashier Summary</h4>
+                  <table className="staff-table">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Ticket Count</th>
+                        <th>Net Sales</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dailyReport.cashier_summary.map(cashier => (
+                        <tr key={cashier.employee_id}>
+                          <td className="text-xs">{cashier.display_name}</td>
+                          <td className="text-xs">{cashier.ticket_count}</td>
+                          <td className="text-xs font-bold">{formatCurrency(parseFloat(cashier.net_sales))}</td>
+                        </tr>
+                      ))}
+                      {dailyReport.cashier_summary.length === 0 && (
+                        <tr><td colSpan={3} className="text-center py-4 text-slate-500 text-[10px]">NO CASHIER DATA</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="text-[9px] text-slate-600 italic">
+                  Report generated for {dailyReport.date}. Includes {dailyReport.shifts_included} shifts.
+                </div>
+              </div>
+            ) : (
+              <div className="py-20 text-center text-slate-500 uppercase tracking-widest">Select a date to view report</div>
+            )}
+
+            <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE REPORT</button>
           </div>
         </div>
       )}
