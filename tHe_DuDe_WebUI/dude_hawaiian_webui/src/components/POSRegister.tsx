@@ -10,8 +10,8 @@ interface Product {
   is_active: boolean;
   category_name?: string | null;
   uom?: string | null;
-  on_hand_qty?: number;
-  allow_negative_stock?: boolean;
+  on_hand_qty?: number | string | null;
+  allow_negative_stock?: boolean | string | null;
 }
 
 interface CartItem extends Product {
@@ -19,6 +19,7 @@ interface CartItem extends Product {
 }
 
 interface ShiftData {
+  id?: string;
   shift_id: string;
   employee_id: string;
   status: 'OPEN' | 'CLOSED';
@@ -36,6 +37,51 @@ const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm4', name: 'น้ำแข็งป่นถุงกลาง (MOCK)', sku: 'ICE-P-08', barcode: '885004', unit_price: '35.00', is_active: true, on_hand_qty: 0, allow_negative_stock: false },
 ];
 
+const LOW_STOCK_THRESHOLD = 5;
+
+const parseStockQty = (value: Product['on_hand_qty']): number | null => {
+  if (value === undefined || value === null || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const allowsNegativeStock = (product: Product): boolean => {
+  return product.allow_negative_stock === true || product.allow_negative_stock === 'true';
+};
+
+const normalizeProduct = (product: Product): Product => {
+  const stockQty = parseStockQty(product.on_hand_qty);
+  return {
+    ...product,
+    on_hand_qty: stockQty ?? undefined,
+    allow_negative_stock: allowsNegativeStock(product)
+  };
+};
+
+const getStockBadge = (stockQty: number) => {
+  if (stockQty <= 0) return { label: 'Out of stock', className: 'out-of-stock' };
+  if (stockQty <= LOW_STOCK_THRESHOLD) return { label: 'Low stock', className: 'low-stock' };
+  return { label: 'In stock', className: 'in-stock' };
+};
+
+const canUseQuantity = (product: Product, quantity: number): boolean => {
+  if (allowsNegativeStock(product)) return true;
+  const stockQty = parseStockQty(product.on_hand_qty);
+  return stockQty === null || quantity <= stockQty;
+};
+
+const getStockLimitMessage = (product: Product): string => {
+  const stockQty = parseStockQty(product.on_hand_qty);
+  if (stockQty === null) return 'Stock availability is unknown. Please refresh product search.';
+  if (stockQty <= 0) return 'Out of stock. Please restock product before adding it.';
+  return `Only ${stockQty} in stock. Please reduce quantity or restock product.`;
+};
+
+const normalizeShift = (shift: ShiftData): ShiftData => ({
+  ...shift,
+  shift_id: shift.shift_id || shift.id || ''
+});
+
 export const POSRegister: React.FC = () => {
   const [query, setQuery] = useState('');
   const [barcode, setBarcode] = useState('');
@@ -50,6 +96,7 @@ export const POSRegister: React.FC = () => {
   });
   const [isMock, setIsMock] = useState(true);
   const [showModal, setShowModal] = useState<string | null>(null);
+  const [cartWarning, setCartWarning] = useState<{ product_id: string; message: string } | null>(null);
 
   // Shift Management State
   const [currentShift, setCurrentShift] = useState<ShiftData | null>(null);
@@ -106,7 +153,7 @@ export const POSRegister: React.FC = () => {
       const res = await fetch(`/ag_pos_api/shifts/current?employee_id=${employeeId}`);
       const data = await res.json();
       if (data.success && data.shift) {
-        setCurrentShift(data.shift);
+        setCurrentShift(normalizeShift(data.shift));
         setActualCashInput(data.shift.opening_cash); // Default actual cash to opening for convenience
       } else {
         setCurrentShift(null);
@@ -140,7 +187,7 @@ export const POSRegister: React.FC = () => {
       });
       const data = await res.json();
       if (data.success) {
-        setCurrentShift(data.shift);
+        setCurrentShift(normalizeShift(data.shift));
         setShowModal(null);
       } else {
         setShiftError(data.message || 'Failed to open shift.');
@@ -200,7 +247,7 @@ export const POSRegister: React.FC = () => {
       const data = await res.json();
       
       if (data.success) {
-        setProducts(data.items);
+        setProducts((data.items || []).map((item: Product) => normalizeProduct(item)));
         setIsMock(false);
       } else if (data.status === 'product_source_missing' || !data.success) {
         setIsMock(true);
@@ -210,11 +257,11 @@ export const POSRegister: React.FC = () => {
           (bc && p.barcode === bc) ||
           (!q && !bc)
         );
-        setProducts(filteredMock);
+        setProducts(filteredMock.map(product => normalizeProduct(product)));
       }
     } catch {
       setIsMock(true);
-      setProducts(MOCK_PRODUCTS);
+      setProducts(MOCK_PRODUCTS.map(product => normalizeProduct(product)));
     }
   }, []);
 
@@ -225,41 +272,55 @@ export const POSRegister: React.FC = () => {
 
   // Cart operations
   const addToCart = (product: Product) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.product_id === product.product_id);
-      if (existing) {
-        const canIncrease = (product.allow_negative_stock ?? false) || (existing.quantity < (product.on_hand_qty ?? 0));
-        if (!canIncrease) return prev;
-        
-        return prev.map(item => 
-          item.product_id === product.product_id 
-            ? { ...item, quantity: item.quantity + 1 } 
-            : item
-        );
-      }
-      
-      const initialCanAdd = (product.allow_negative_stock ?? false) || ((product.on_hand_qty ?? 0) > 0);
-      if (!initialCanAdd) return prev;
+    const normalizedProduct = normalizeProduct(product);
+    const existing = cart.find(item => item.product_id === normalizedProduct.product_id);
 
-      return [...prev, { ...product, quantity: 1 }];
-    });
+    if (existing) {
+      const nextQuantity = existing.quantity + 1;
+      const nextItem = { ...existing, ...normalizedProduct, quantity: existing.quantity };
+      if (!canUseQuantity(nextItem, nextQuantity)) {
+        setCartWarning({ product_id: existing.product_id, message: getStockLimitMessage(nextItem) });
+        return;
+      }
+
+      setCartWarning(null);
+      setCart(cart.map(item =>
+        item.product_id === normalizedProduct.product_id
+          ? { ...item, ...normalizedProduct, quantity: nextQuantity }
+          : item
+      ));
+      return;
+    }
+
+    if (!canUseQuantity(normalizedProduct, 1)) {
+      setCartWarning({ product_id: normalizedProduct.product_id, message: getStockLimitMessage(normalizedProduct) });
+      return;
+    }
+
+    setCartWarning(null);
+    setCart([...cart, { ...normalizedProduct, quantity: 1 }]);
   };
 
   const updateQuantity = (id: string, delta: number) => {
-    setCart(prev => prev.map(item => {
-      if (item.product_id === id) {
-        const newQty = Math.max(1, item.quantity + delta);
-        const canUpdate = delta < 0 || (item.allow_negative_stock ?? false) || (newQty <= (item.on_hand_qty ?? 0));
-        
-        if (!canUpdate) return item;
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }));
+    const item = cart.find(cartItem => cartItem.product_id === id);
+    if (!item) return;
+
+    const newQty = Math.max(1, item.quantity + delta);
+    if (delta > 0 && !canUseQuantity(item, newQty)) {
+      setCartWarning({ product_id: item.product_id, message: getStockLimitMessage(item) });
+      return;
+    }
+
+    setCartWarning(null);
+    setCart(cart.map(cartItem =>
+      cartItem.product_id === id
+        ? { ...cartItem, quantity: newQty }
+        : cartItem
+    ));
   };
 
   const handleCheckout = async () => {
-    if (!currentShift || cart.length === 0) return;
+    if (!currentShift?.shift_id || cart.length === 0) return;
     
     setCheckoutLoading(true);
     setCheckoutError(null);
@@ -311,7 +372,11 @@ export const POSRegister: React.FC = () => {
         let msg = data.message || detail || 'Checkout failed';
         if (res.status === 400) msg = `Invalid Data: ${msg}`;
         if (res.status === 404) msg = `Not Found: ${msg}`;
-        if (res.status === 409) msg = `Insufficient stock. Please reduce quantity or restock product. (${msg})`;
+        if (res.status === 409) {
+          msg = String(msg).toLowerCase().includes('insufficient stock')
+            ? 'Insufficient stock. Please reduce quantity or restock product.'
+            : `Conflict: ${msg}`;
+        }
         setCheckoutError(msg);
         setShowModal('error');
       }
@@ -388,25 +453,23 @@ export const POSRegister: React.FC = () => {
 
         <div className="product-grid">
           {products.map(product => {
-            const stock = product.on_hand_qty ?? 0;
-            const isLow = stock > 0 && stock <= 5;
-            const isOut = stock <= 0 && !(product.allow_negative_stock);
+            const stockQty = parseStockQty(product.on_hand_qty);
+            const stockBadge = stockQty === null ? null : getStockBadge(stockQty);
+            const isUnavailable = stockBadge?.className === 'out-of-stock' && !allowsNegativeStock(product);
             
             return (
-              <div key={product.product_id} className={`product-card ${isOut ? 'opacity-50' : ''}`} onClick={() => addToCart(product)}>
-                <div className="flex justify-between items-start gap-2">
+              <div key={product.product_id} className={`product-card ${isUnavailable ? 'stock-unavailable' : ''}`} onClick={() => addToCart(product)}>
+                <div className="product-card-header">
                   <div className="text-sm font-bold truncate">{product.name}</div>
-                  {product.on_hand_qty !== undefined && (
-                    <div className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase ${isOut ? 'bg-red-500/20 text-red-500' : isLow ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}`}>
-                      {isOut ? 'Out' : isLow ? 'Low' : 'In Stock'}
-                    </div>
+                  {stockBadge && (
+                    <div className={`stock-badge ${stockBadge.className}`}>{stockBadge.label}</div>
                   )}
                 </div>
                 <div className="text-[10px] text-slate-500">{product.sku} {product.category_name ? `| ${product.category_name}` : ''}</div>
-                <div className="flex justify-between items-center mt-auto">
+                <div className="product-card-footer">
                   <div className="product-price">{formatCurrency(parseFloat(product.unit_price))}{product.uom ? ` / ${product.uom}` : ''}</div>
-                  {product.on_hand_qty !== undefined && (
-                    <div className="text-[9px] text-slate-400 font-mono">Qty: {product.on_hand_qty}</div>
+                  {stockQty !== null && (
+                    <div className="stock-qty">Stock: {stockQty}</div>
                   )}
                 </div>
               </div>
@@ -437,6 +500,9 @@ export const POSRegister: React.FC = () => {
         </div>
 
         <div className="cart-items">
+          {cartWarning && !cart.some(item => item.product_id === cartWarning.product_id) && (
+            <div className="cart-warning">{cartWarning.message}</div>
+          )}
           {cart.map(item => (
             <div key={item.product_id} className="cart-item">
               <div>
@@ -444,19 +510,21 @@ export const POSRegister: React.FC = () => {
                 <div className="text-[10px] text-slate-400">
                   {formatCurrency(parseFloat(item.unit_price))} x {item.quantity} {item.uom || ''}
                 </div>
+                {cartWarning?.product_id === item.product_id && (
+                  <div className="cart-line-warning">{cartWarning.message}</div>
+                )}
               </div>
               <div className="quantity-ctrl">
                 <button className="btn-icon" onClick={() => updateQuantity(item.product_id, -1)} disabled={item.quantity <= 1}>-</button>
                 <div className="flex flex-col items-center">
                   <span className="text-xs w-4 text-center">{item.quantity}</span>
-                  {!(item.allow_negative_stock) && item.on_hand_qty !== undefined && item.quantity >= item.on_hand_qty && (
+                  {!allowsNegativeStock(item) && parseStockQty(item.on_hand_qty) !== null && item.quantity >= (parseStockQty(item.on_hand_qty) ?? 0) && (
                     <span className="text-[8px] text-red-500 font-bold leading-none mt-1">MAX</span>
                   )}
                 </div>
                 <button 
                   className="btn-icon" 
                   onClick={() => updateQuantity(item.product_id, 1)}
-                  disabled={!(item.allow_negative_stock) && item.quantity >= (item.on_hand_qty ?? 0)}
                 >+</button>
               </div>
             </div>
