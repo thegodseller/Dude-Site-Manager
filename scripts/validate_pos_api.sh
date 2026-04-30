@@ -825,4 +825,82 @@ else
     exit 1
 fi
 
+# 17. Purchase Order MVP Tests
+echo "--- Purchase Order MVP Tests ---"
+echo -n "Create Purchase Order: "
+PO_CREATE_RESP=$(curl -s -X POST "$POS_URL/api/pos/purchase-orders" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"supplier_name\": \"Ice Wholesaler Inc.\",
+        \"notes\": \"Monthly restock\",
+        \"employee_id\": \"$TEST_MANAGER_ID\",
+        \"items\": [
+            {\"product_id\": \"$REORDER_PROD_ID\", \"qty_ordered\": 200.0, \"unit_cost\": 8.50}
+        ]
+    }")
+PO_ID=$(echo "$PO_CREATE_RESP" | jq -r '.po_id')
+if [ "$PO_ID" != "null" ] && [ -n "$PO_ID" ]; then
+    echo "PASS (ID: $PO_ID)"
+else
+    echo "FAIL: $PO_CREATE_RESP"
+    exit 1
+fi
+
+echo -n "Verify PO in List: "
+PO_LIST_RESP=$(curl -s "$POS_URL/api/pos/purchase-orders?status=ORDERED")
+if echo "$PO_LIST_RESP" | grep -q "$PO_ID"; then
+    echo "PASS"
+else
+    echo "FAIL: PO not in list"
+    exit 1
+fi
+
+echo -n "Receive Purchase Order: "
+STOCK_BEFORE_PO=$(curl -s "$POS_URL/api/pos/products/$REORDER_PROD_ID" | jq -r '.on_hand_qty')
+RECEIVE_RESP=$(curl -s -X POST "$POS_URL/api/pos/purchase-orders/$PO_ID/receive?employee_id=$TEST_MANAGER_ID")
+if echo "$RECEIVE_RESP" | grep -q '"success":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $RECEIVE_RESP"
+    exit 1
+fi
+
+echo -n "Verify Stock Increased (+200): "
+STOCK_AFTER_PO=$(curl -s "$POS_URL/api/pos/products/$REORDER_PROD_ID" | jq -r '.on_hand_qty')
+EXPECTED_STOCK_PO=$(python3 -c "print(float('$STOCK_BEFORE_PO') + 200.0)")
+if [ "$STOCK_AFTER_PO" = "$EXPECTED_STOCK_PO" ] || [ "$(printf \"%.0f\" \"$STOCK_AFTER_PO\")" = "$(printf \"%.0f\" \"$EXPECTED_STOCK_PO\")" ]; then
+    echo "PASS (Before: $STOCK_BEFORE_PO, After: $STOCK_AFTER_PO)"
+else
+    echo "FAIL (Expected: $EXPECTED_STOCK_PO, Got: $STOCK_AFTER_PO)"
+    exit 1
+fi
+
+echo -n "Verify Second Receive Rejected: "
+REC2_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/purchase-orders/$PO_ID/receive?employee_id=$TEST_MANAGER_ID")
+if [ "$REC2_RESP" = "500" ]; then
+    echo "PASS"
+else
+    echo "FAIL: Got $REC2_RESP, Expected 500"
+    exit 1
+fi
+
+echo -n "Verify Stock Ledger Entry: "
+LEDGER_PO_RESP=$(curl -s "$POS_URL/api/pos/inventory/ledger?product_id=$REORDER_PROD_ID&limit=5")
+if echo "$LEDGER_PO_RESP" | grep -q "PO Receive"; then
+    echo "PASS"
+else
+    echo "FAIL"
+    exit 1
+fi
+
+echo -n "Verify Audit Log (PURCHASE_ORDER_CREATED, RECEIVED): "
+AUDIT_PO_FINAL_RESP=$(curl -s -X GET "$POS_URL/api/pos/audit-log?limit=20")
+if echo "$AUDIT_PO_FINAL_RESP" | grep -q 'PURCHASE_ORDER_CREATED' && \
+   echo "$AUDIT_PO_FINAL_RESP" | grep -q 'PURCHASE_ORDER_RECEIVED'; then
+    echo "PASS"
+else
+    echo "FAIL"
+    exit 1
+fi
+
 echo "--- ALL POS API TESTS PASSED ---"
