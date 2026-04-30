@@ -120,6 +120,84 @@ else
     exit 1
 fi
 
+# 7.0.1 Employee Management Admin Tests
+echo "--- Employee Management Admin Tests ---"
+echo -n "Create Employee: "
+CREATE_EMP_RESP=$(curl -s -X POST "$POS_URL/api/pos/employees" \
+    -H "Content-Type: application/json" \
+    -d "{\"display_name\": \"Admin Test User\", \"role\": \"CASHIER\", \"pin_code\": \"7777\"}")
+if echo "$CREATE_EMP_RESP" | grep -q '"status":"ok"'; then
+    ADMIN_TEST_EMP_ID=$(echo "$CREATE_EMP_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['employee']['id'])")
+    echo "PASS (ID: $ADMIN_TEST_EMP_ID)"
+else
+    echo "FAIL: $CREATE_EMP_RESP"
+    exit 1
+fi
+
+echo -n "Login with New Employee: "
+LOGIN_NEW_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/employees/session/start" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$ADMIN_TEST_EMP_ID\", \"pin_code\": \"7777\"}")
+if [ "$LOGIN_NEW_RESP" = "200" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 200, got $LOGIN_NEW_RESP)"
+    exit 1
+fi
+
+echo -n "Reset Employee PIN: "
+RESET_PIN_RESP=$(curl -s -X POST "$POS_URL/api/pos/employees/$ADMIN_TEST_EMP_ID/reset-pin" \
+    -H "Content-Type: application/json" \
+    -d "{\"new_pin\": \"8888\"}")
+if echo "$RESET_PIN_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $RESET_PIN_RESP"
+    exit 1
+fi
+
+echo -n "Login with Old PIN (Should Fail): "
+LOGIN_OLD_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/employees/session/start" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$ADMIN_TEST_EMP_ID\", \"pin_code\": \"7777\"}")
+if [ "$LOGIN_OLD_RESP" = "401" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 401, got $LOGIN_OLD_RESP)"
+    exit 1
+fi
+
+echo -n "Login with New PIN: "
+LOGIN_NEW_PIN_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/employees/session/start" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$ADMIN_TEST_EMP_ID\", \"pin_code\": \"8888\"}")
+if [ "$LOGIN_NEW_PIN_RESP" = "200" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 200, got $LOGIN_NEW_PIN_RESP)"
+    exit 1
+fi
+
+echo -n "Deactivate Employee: "
+DEACTIVATE_RESP=$(curl -s -X POST "$POS_URL/api/pos/employees/$ADMIN_TEST_EMP_ID/deactivate")
+if echo "$DEACTIVATE_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $DEACTIVATE_RESP"
+    exit 1
+fi
+
+echo -n "Login with Deactivated Employee (Should Fail): "
+LOGIN_DEACT_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/employees/session/start" \
+    -H "Content-Type: application/json" \
+    -d "{\"employee_id\": \"$ADMIN_TEST_EMP_ID\", \"pin_code\": \"8888\"}")
+if [ "$LOGIN_DEACT_RESP" = "403" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 403, got $LOGIN_DEACT_RESP)"
+    exit 1
+fi
+
 # 7.1 Open Shift
 echo -n "Open Shift: "
 OPEN_RESP=$(curl -s -X POST "$POS_URL/api/pos/shifts/open" \
