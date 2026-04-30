@@ -78,8 +78,10 @@ echo "--- Shift Management Tests ---"
 echo -n "List Employees: "
 EMP_LIST_RESP=$(curl -s -X GET "$POS_URL/api/pos/employees")
 if echo "$EMP_LIST_RESP" | grep -q '"success":true' && echo "$EMP_LIST_RESP" | grep -q 'Demo Cashier'; then
-    TEST_EMPLOYEE_ID=$(echo "$EMP_LIST_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['employees'][0]['id'])")
-    echo "PASS (Test Employee: $TEST_EMPLOYEE_ID)"
+    TEST_CASHIER_ID=$(echo "$EMP_LIST_RESP" | python3 -c "import sys, json; data=json.load(sys.stdin); print(next(e['id'] for e in data['employees'] if 'Cashier' in e['display_name']))")
+    TEST_MANAGER_ID=$(echo "$EMP_LIST_RESP" | python3 -c "import sys, json; data=json.load(sys.stdin); print(next(e['id'] for e in data['employees'] if 'Manager' in e['display_name']))")
+    TEST_EMPLOYEE_ID="$TEST_CASHIER_ID"
+    echo "PASS (Cashier: $TEST_CASHIER_ID, Manager: $TEST_MANAGER_ID)"
 else
     echo "FAIL: $EMP_LIST_RESP"
     exit 1
@@ -277,16 +279,28 @@ else
     exit 1
 fi
 
-# 8.6 Void Ticket
-echo -n "Void Ticket: "
-VOID_RESP=$(curl -s -X POST "$POS_URL/api/pos/tickets/$TICKET_ID/void" \
+# 8.6 RBAC Void Test (Cashier - Unauthorized)
+echo -n "RBAC Void Test (Cashier - Unauthorized): "
+VOID_UNAUTH_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/tickets/$TICKET_ID/void" \
     -H "Content-Type: application/json" \
-    -d "{\"reason\": \"test void\", \"employee_id\": \"$TEST_EMPLOYEE_ID\"}")
-
-if echo "$VOID_RESP" | grep -q '"status":"ok"'; then
+    -d "{\"reason\": \"unauthorized void attempt\", \"employee_id\": \"$TEST_CASHIER_ID\"}")
+if [ "$VOID_UNAUTH_RESP" = "403" ]; then
     echo "PASS"
 else
-    echo "FAIL: $VOID_RESP"
+    echo "FAIL (Expected 403, got $VOID_UNAUTH_RESP)"
+    exit 1
+fi
+
+# 8.6.1 RBAC Void Test (Manager - Authorized)
+echo -n "RBAC Void Test (Manager - Authorized): "
+VOID_AUTH_RESP=$(curl -s -X POST "$POS_URL/api/pos/tickets/$TICKET_ID/void" \
+    -H "Content-Type: application/json" \
+    -d "{\"reason\": \"manager void\", \"employee_id\": \"$TEST_MANAGER_ID\"}")
+
+if echo "$VOID_AUTH_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+else
+    echo "FAIL: $VOID_AUTH_RESP"
     exit 1
 fi
 
