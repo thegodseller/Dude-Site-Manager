@@ -215,6 +215,9 @@ export const POSRegister: React.FC = () => {
   });
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
+  const [voidReason, setVoidReason] = useState('Cashier correction');
+  const [voidLoading, setVoidLoading] = useState(false);
+
   // Health check
   const checkHealth = async () => {
     try {
@@ -509,6 +512,32 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const handleVoid = async () => {
+    if (!lastTicket || !currentShift || isScreenshotMode) return;
+    if (lastTicket.status === 'VOIDED') return;
+
+    setVoidLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/tickets/${lastTicket.ticket_id}/void`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: voidReason })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setLastTicket(prev => prev ? { ...prev, status: 'VOIDED' } : null);
+        setShowModal('void_success_real');
+      } else {
+        alert(`Void Failed: ${data.message || 'Unknown error'}`);
+      }
+    } catch (err) {
+      alert('Network error during void request.');
+    } finally {
+      setVoidLoading(false);
+    }
+  };
+
   // Calculations with formatting
   const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.unit_price) * item.quantity), 0);
   const vatAmount = isVat ? subtotal * 0.07 : 0;
@@ -632,7 +661,15 @@ export const POSRegister: React.FC = () => {
 
         {!isScreenshotMode && <div className="mt-auto pt-10 flex gap-4">
           <button className="payment-btn" style={{flex: 1}} onClick={() => setShowModal('shift')}>SHIFT CONTROL</button>
-          <button className="payment-btn" style={{flex: 1}} onClick={() => setShowModal('void')}>VOID / REFUND</button>
+          <button className="payment-btn" style={{flex: 1}} onClick={() => {
+            if (!lastTicket) {
+              alert('No completed ticket available to void.');
+            } else if (lastTicket.status === 'VOIDED') {
+              alert('This ticket has already been voided.');
+            } else {
+              setShowModal('void_confirm');
+            }
+          }}>VOID / REFUND</button>
         </div>}
       </div>
 
@@ -872,6 +909,63 @@ export const POSRegister: React.FC = () => {
               <button className="btn-primary w-full" onClick={() => setShowModal(null)}>NEW ORDER</button>
             </div>
           )}
+        </div>
+      )}
+
+      {showModal === 'void_confirm' && lastTicket && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3 className="font-tech text-lg mb-6 uppercase tracking-wider">Void Ticket Confirmation</h3>
+            <div className="grid grid-cols-2 gap-2 text-xs mb-6 bg-slate-800/50 p-4 rounded border border-white/5">
+              <div className="text-slate-400">Ticket No:</div>
+              <div className="text-right font-mono font-bold text-orange-500">{lastTicket.ticket_no}</div>
+              <div className="text-slate-400">Amount:</div>
+              <div className="text-right font-bold">{formatCurrency(parseFloat(lastTicket.total_amount))}</div>
+              <div className="text-slate-400">Status:</div>
+              <div className="text-right text-green-500 font-bold">{lastTicket.status}</div>
+            </div>
+
+            <div className="status-label">Reason for Void</div>
+            <input 
+              type="text" 
+              className="input-glow w-full mb-6" 
+              value={voidReason}
+              onChange={(e) => setVoidReason(e.target.value)}
+              placeholder="e.g. Cashier correction"
+            />
+
+            <div className="flex gap-4">
+              <button className="payment-btn" style={{flex: 1}} onClick={() => setShowModal(null)}>CANCEL</button>
+              <button 
+                className="btn-primary" 
+                style={{flex: 2, background: 'linear-gradient(135deg, #ff3e3e, #8b0000)'}}
+                onClick={handleVoid}
+                disabled={voidLoading}
+              >
+                {voidLoading ? 'VOIDING...' : 'CONFIRM VOID'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showModal === 'void_success_real' && lastTicket && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-500/20 border border-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-6 h-6 bg-red-500 rounded-full shadow-[0_0_15px_#ff3e3e]"></div>
+              </div>
+              <h3 className="font-tech text-xl text-red-500">TICKET VOIDED</h3>
+            </div>
+            
+            <div className="text-sm text-center text-slate-300 mb-6 bg-slate-800/50 p-4 rounded border border-white/5">
+              Ticket <strong>{lastTicket.ticket_no}</strong> has been successfully voided. 
+              Inventory has been restored and the ledger has been updated.
+            </div>
+
+            <button className="btn-primary w-full" onClick={() => setShowModal(null)}>DISMISS</button>
+          </div>
         </div>
       )}
 
