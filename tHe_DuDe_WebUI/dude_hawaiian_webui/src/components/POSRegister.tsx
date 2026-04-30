@@ -130,6 +130,16 @@ interface DailyReportData {
   }[];
 }
 
+interface StockLedgerEntry {
+  id: string;
+  product_id: string;
+  product_name: string;
+  qty_change: string;
+  reason: string;
+  created_at: string;
+  actor_name: string | null;
+}
+
 const MOCK_PRODUCTS: Product[] = [
   { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true, on_hand_qty: 10, allow_negative_stock: false },
   { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true, on_hand_qty: 2, allow_negative_stock: false },
@@ -377,6 +387,15 @@ export const POSRegister: React.FC = () => {
   const [dailyReport, setDailyReport] = useState<DailyReportData | null>(null);
   const [isReportLoading, setIsReportLoading] = useState(false);
   const [reportError, setReportError] = useState<string | null>(null);
+
+  // Inventory State
+  const [inventorySearch, setInventorySearch] = useState('');
+  const [selectedInventoryProduct, setSelectedInventoryProduct] = useState<Product | null>(null);
+  const [inventoryLedger, setInventoryLedger] = useState<StockLedgerEntry[]>([]);
+  const [adjustQtyDelta, setAdjustQtyDelta] = useState('');
+  const [adjustReason, setAdjustReason] = useState('Restock');
+  const [isInventoryLoading, setIsInventoryLoading] = useState(false);
+  const [inventoryError, setInventoryError] = useState<string | null>(null);
 
   // Health check
   const checkHealth = async () => {
@@ -1067,6 +1086,59 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  const fetchStockLedger = async (productId: string) => {
+    try {
+      const res = await fetch(`/ag_pos_api/inventory/ledger?product_id=${productId}&limit=20`);
+      const data = await res.json();
+      if (data.success) {
+        setInventoryLedger(data.ledger);
+      }
+    } catch (err) {
+      console.error('Failed to fetch ledger:', err);
+    }
+  };
+
+  const handleAdjustInventory = async () => {
+    if (!selectedInventoryProduct || !currentCashier) return;
+    
+    const delta = parseFloat(adjustQtyDelta);
+    if (isNaN(delta) || delta === 0) {
+      setInventoryError('Please enter a valid non-zero quantity');
+      return;
+    }
+
+    setIsInventoryLoading(true);
+    setInventoryError(null);
+    try {
+      const res = await fetch('/ag_pos_api/inventory/adjust', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: selectedInventoryProduct.product_id,
+          qty_delta: delta,
+          reason: adjustReason,
+          employee_id: currentCashier.id
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSelectedInventoryProduct({
+          ...selectedInventoryProduct,
+          on_hand_qty: data.new_qty
+        });
+        setAdjustQtyDelta('');
+        fetchProducts(inventorySearch);
+        fetchStockLedger(selectedInventoryProduct.product_id);
+      } else {
+        setInventoryError(data.detail || data.message || 'Adjustment failed');
+      }
+    } catch (err) {
+      setInventoryError('Network error during adjustment');
+    } finally {
+      setIsInventoryLoading(false);
+    }
+  };
+
   const getEventColor = (type: string) => {
     if (type.includes('VOID')) return 'inactive';
     if (type.includes('DEACTIVATED')) return 'inactive';
@@ -1239,6 +1311,9 @@ export const POSRegister: React.FC = () => {
                 fetchDailyReport();
                 setShowModal('daily_report');
               }}>REPORT</button>
+              <button className="payment-btn" style={{flex: 1}} onClick={() => {
+                setShowModal('inventory');
+              }}>INVENTORY</button>
             </>
           )}
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
@@ -2332,6 +2407,147 @@ export const POSRegister: React.FC = () => {
             )}
 
             <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE REPORT</button>
+          </div>
+        </div>
+      )}
+      {showModal === 'inventory' && (
+        <div className="modal-overlay" onClick={() => { setShowModal(null); setSelectedInventoryProduct(null); }}>
+          <div className="modal" style={{maxWidth: '1200px', width: '95%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-lg uppercase tracking-wider">Inventory Management</h3>
+              <div className="flex gap-4 w-1/3">
+                <input 
+                  type="text" 
+                  className="input-glow text-xs" 
+                  placeholder="SEARCH PRODUCT..." 
+                  value={inventorySearch}
+                  onChange={e => setInventorySearch(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') fetchProducts(inventorySearch); }}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 h-[70vh]">
+              {/* Product Info & Adjust */}
+              <div className="space-y-6 flex flex-col">
+                <div className="bg-white/5 p-6 rounded border border-white/10 flex-1 overflow-y-auto">
+                  {selectedInventoryProduct ? (
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-sm font-bold text-orange-500 mb-1">{selectedInventoryProduct.name}</h4>
+                        <div className="text-[10px] text-slate-500 font-mono">{selectedInventoryProduct.sku} | {selectedInventoryProduct.barcode}</div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-black/20 p-3 rounded">
+                          <div className="text-[9px] text-slate-500 uppercase mb-1">On Hand</div>
+                          <div className="text-xl font-bold">{parseStockQty(selectedInventoryProduct.on_hand_qty) ?? '0'}</div>
+                          {selectedInventoryProduct.on_hand_qty !== undefined && (
+                            <div className={`text-[9px] mt-1 ${getStockBadge(Number(selectedInventoryProduct.on_hand_qty)).className}`}>
+                              {getStockBadge(Number(selectedInventoryProduct.on_hand_qty)).label}
+                            </div>
+                          )}
+                        </div>
+                        <div className="bg-black/20 p-3 rounded">
+                          <div className="text-[9px] text-slate-500 uppercase mb-1">Price</div>
+                          <div className="text-xl font-bold font-mono">{formatCurrency(parseFloat(selectedInventoryProduct.unit_price))}</div>
+                        </div>
+                      </div>
+
+                      <div className="pt-6 border-t border-white/5">
+                        <h5 className="text-[10px] uppercase tracking-widest text-slate-400 mb-4">Stock Adjustment</h5>
+                        <div className="space-y-4">
+                          <div className="flex gap-4">
+                            <div className="flex-1">
+                              <label className="text-[9px] text-slate-500 block mb-1">QUANTITY DELTA (+/-)</label>
+                              <input 
+                                type="number" 
+                                className="input-glow text-xs"
+                                value={adjustQtyDelta}
+                                onChange={e => setAdjustQtyDelta(e.target.value)}
+                                placeholder="e.g. 10 or -5"
+                              />
+                            </div>
+                            <div className="flex-[2]">
+                              <label className="text-[9px] text-slate-500 block mb-1">REASON</label>
+                              <input 
+                                type="text" 
+                                className="input-glow text-xs"
+                                value={adjustReason}
+                                onChange={e => setAdjustReason(e.target.value)}
+                                placeholder="Restock, Damage, Correction..."
+                              />
+                            </div>
+                          </div>
+                          
+                          {inventoryError && <div className="text-[10px] text-red-500 italic">{inventoryError}</div>}
+                          
+                          <button 
+                            className="payment-btn w-full" 
+                            disabled={isInventoryLoading}
+                            onClick={handleAdjustInventory}
+                          >
+                            {isInventoryLoading ? 'PROCESSING...' : 'APPLY ADJUSTMENT'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-slate-600 text-xs text-center space-y-4">
+                      <div className="opacity-50">Select a product to adjust inventory levels.</div>
+                      <div className="grid grid-cols-2 gap-2 w-full">
+                        {products.map(p => (
+                          <div 
+                            key={p.product_id} 
+                            className="p-2 bg-white/5 border border-white/5 rounded cursor-pointer hover:bg-white/10 text-[10px] truncate"
+                            onClick={() => {
+                              setSelectedInventoryProduct(p);
+                              fetchStockLedger(p.product_id);
+                            }}
+                          >
+                            {p.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Stock Ledger */}
+              <div className="flex flex-col space-y-4">
+                <h4 className="text-xs uppercase tracking-widest text-slate-400">Stock History (Ledger)</h4>
+                <div className="flex-1 overflow-y-auto bg-black/20 rounded border border-white/5">
+                  <table className="staff-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Delta</th>
+                        <th>Reason</th>
+                        <th>Actor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventoryLedger.map(entry => (
+                        <tr key={entry.id}>
+                          <td className="text-[9px] font-mono whitespace-nowrap">{new Date(entry.created_at).toLocaleString()}</td>
+                          <td className={`text-[9px] font-bold ${parseFloat(entry.qty_change) > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            {parseFloat(entry.qty_change) > 0 ? '+' : ''}{entry.qty_change}
+                          </td>
+                          <td className="text-[9px] max-w-[150px] truncate">{entry.reason}</td>
+                          <td className="text-[9px] text-slate-400">{entry.actor_name || 'SYSTEM'}</td>
+                        </tr>
+                      ))}
+                      {inventoryLedger.length === 0 && (
+                        <tr><td colSpan={4} className="text-center py-20 text-slate-600 text-[10px] uppercase">No history available</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <button className="mt-6 text-xs text-slate-500 underline block w-full text-center" onClick={() => { setShowModal(null); setSelectedInventoryProduct(null); }}>CLOSE INVENTORY</button>
           </div>
         </div>
       )}
