@@ -463,4 +463,34 @@ else
     exit 1
 fi
 
+# 11. Audit Log Tests
+echo "--- Audit Log Tests ---"
+echo -n "Fetch Audit Log: "
+AUDIT_RESP=$(curl -s -X GET "$POS_URL/api/pos/audit-log?limit=50")
+if echo "$AUDIT_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+    
+    # Verify expected event types
+    echo -n "  Verify EMPLOYEE_CREATED: "
+    if echo "$AUDIT_RESP" | grep -q 'EMPLOYEE_CREATED'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+    
+    echo -n "  Verify EMPLOYEE_PIN_RESET: "
+    if echo "$AUDIT_RESP" | grep -q 'EMPLOYEE_PIN_RESET'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+
+    echo -n "  Verify EMPLOYEE_DEACTIVATED: "
+    if echo "$AUDIT_RESP" | grep -q 'EMPLOYEE_DEACTIVATED'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+
+    echo -n "  Verify SHIFT_OPENED: "
+    if echo "$AUDIT_RESP" | grep -q 'SHIFT_OPENED'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+    
+    echo -n "  Verify MANAGER_OVERRIDE_VOID: "
+    if echo "$AUDIT_RESP" | grep -q 'MANAGER_OVERRIDE_VOID'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+
+    echo -n "  Verify SHIFT_CLOSED: "
+    if echo "$AUDIT_RESP" | grep -q 'SHIFT_CLOSED'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+else
+    echo "FAIL: $AUDIT_RESP"
+    exit 1
+fi
+
 echo "--- ALL POS API TESTS PASSED ---"
