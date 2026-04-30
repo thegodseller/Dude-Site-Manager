@@ -65,6 +65,16 @@ export const POSRegister: React.FC = () => {
   const [openingCashInput, setOpeningCashInput] = useState('0');
   const [actualCashInput, setActualCashInput] = useState('0');
 
+  // Checkout State
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [lastTicket, setLastTicket] = useState<{
+    ticket_id: string;
+    ticket_no: string;
+    total_amount: string;
+    status: string;
+  } | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
   // Health check
   const checkHealth = async () => {
     try {
@@ -236,6 +246,50 @@ export const POSRegister: React.FC = () => {
     }).filter(item => item.quantity > 0));
   };
 
+  const handleCheckout = async () => {
+    if (!currentShift || cart.length === 0) return;
+    
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+    try {
+      const res = await fetch('/ag_pos_api/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shift_id: currentShift.shift_id,
+          items: cart.map(item => ({
+            product_id: item.product_id,
+            sku: item.sku,
+            name: item.name,
+            quantity: item.quantity,
+            unit_price: item.unit_price
+          })),
+          payment_method: paymentMethod,
+          is_tax_invoice: isVat
+        })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        setLastTicket(data.ticket);
+        setCart([]);
+        setShowModal('ticket_success');
+      } else {
+        // Detailed error handling
+        let msg = data.message || 'Checkout failed';
+        if (res.status === 409) msg = `Conflict: ${msg}`;
+        if (res.status === 400) msg = `Invalid Data: ${msg}`;
+        setCheckoutError(msg);
+        setShowModal('error');
+      }
+    } catch (err) {
+      setCheckoutError('Network error. Check server connectivity.');
+      setShowModal('error');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
   // Calculations with formatting
   const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.unit_price) * item.quantity), 0);
   const vatAmount = isVat ? subtotal * 0.07 : 0;
@@ -373,14 +427,14 @@ export const POSRegister: React.FC = () => {
           </div>
 
           <button 
-            className={`btn-primary ${(!currentShift || cart.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`} 
-            onClick={() => alert('Checkout is NOT IMPLEMENTED (Infrastructure Only)')}
-            disabled={!currentShift || cart.length === 0}
+            className={`btn-primary ${(checkoutLoading || !currentShift || cart.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`} 
+            onClick={handleCheckout}
+            disabled={checkoutLoading || !currentShift || cart.length === 0}
           >
-            {currentShift ? 'COMPLETE ORDER' : 'OPEN SHIFT TO START'}
+            {checkoutLoading ? 'COMMITTING...' : (currentShift ? `CHECKOUT ${formatCurrency(total)}` : 'OPEN SHIFT TO START')}
           </button>
           <div className="text-[9px] text-center text-slate-600 mt-2">
-            Real ticket commitment requires POS-010 implementation.
+            Real ticket commitment enabled. All sales are logged to ag_pos database.
           </div>
         </div>
       </div>
@@ -473,6 +527,47 @@ export const POSRegister: React.FC = () => {
               <div className="text-[10px] text-slate-500 text-center italic">Void requests require owner approval flow (Nakarin ERP).</div>
               <button className="mt-4 text-xs text-slate-500 underline" onClick={() => setShowModal(null)}>CANCEL</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showModal === 'ticket_success' && lastTicket && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-6 h-6 bg-green-500 rounded-full shadow-[0_0_15px_#22c55e]"></div>
+              </div>
+              <h3 className="font-tech text-xl text-green-500">TICKET COMMITTED</h3>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 text-sm bg-slate-800/50 p-4 rounded border border-white/5 mb-6">
+              <div className="text-slate-400">Ticket No:</div>
+              <div className="text-right font-mono font-bold text-orange-500">{lastTicket.ticket_no}</div>
+              <div className="text-slate-400">Total Amount:</div>
+              <div className="text-right font-bold">{formatCurrency(parseFloat(lastTicket.total_amount))}</div>
+              <div className="text-slate-400">Status:</div>
+              <div className="text-right"><span className="px-2 py-0.5 bg-green-500/20 text-green-500 rounded text-[10px]">{lastTicket.status}</span></div>
+              <div className="text-slate-400">ID:</div>
+              <div className="text-right text-[10px] font-mono text-slate-500">{lastTicket.ticket_id}</div>
+            </div>
+
+            <button className="btn-primary w-full" onClick={() => setShowModal(null)}>NEW ORDER</button>
+          </div>
+        </div>
+      )}
+
+      {showModal === 'error' && (
+        <div className="modal-overlay" onClick={() => setShowModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-500/20 border border-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 font-bold text-2xl">!</div>
+              <h3 className="font-tech text-xl text-red-500">CHECKOUT ERROR</h3>
+            </div>
+            <div className="text-center text-slate-300 text-sm mb-6 bg-red-500/10 p-4 rounded border border-red-500/20">
+              {checkoutError}
+            </div>
+            <button className="btn-primary w-full" onClick={() => setShowModal(null)}>DISMISS</button>
           </div>
         </div>
       )}
