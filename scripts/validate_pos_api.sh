@@ -153,6 +153,23 @@ else
     exit 1
 fi
 
+# 8.2.1 Get Shift Summary (After Create)
+echo -n "Shift Summary (After Create): "
+SUMM_RESP=$(curl -s -X GET "$POS_URL/api/pos/shifts/$SHIFT_ID/summary")
+CHECK_CREATE=$(echo "$SUMM_RESP" | python3 -c "
+import sys, json; 
+data = json.load(sys.stdin); 
+s = data.get('summary', {}); 
+ok = s.get('confirmed_ticket_count') == 1 and float(s.get('net_sales', 0)) == 60.0;
+print('PASS' if ok else f'FAIL: {json.dumps(data)}');
+")
+if [ "$CHECK_CREATE" = "PASS" ]; then
+    echo "PASS"
+else
+    echo "$CHECK_CREATE"
+    exit 1
+fi
+
 # 8.3 Verify Stock Deduction
 echo -n "Verify Stock Deduction: "
 STOCK_AFTER=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
@@ -211,6 +228,23 @@ else
     exit 1
 fi
 
+# 8.6.1 Get Shift Summary (After Void)
+echo -n "Shift Summary (After Void): "
+SUMM_VOID_RESP=$(curl -s -X GET "$POS_URL/api/pos/shifts/$SHIFT_ID/summary")
+CHECK_VOID=$(echo "$SUMM_VOID_RESP" | python3 -c "
+import sys, json; 
+data = json.load(sys.stdin); 
+s = data.get('summary', {}); 
+ok = s.get('confirmed_ticket_count') == 0 and s.get('voided_ticket_count') == 1 and float(s.get('net_sales', 0)) == 0.0;
+print('PASS' if ok else f'FAIL: {json.dumps(data)}');
+")
+if [ "$CHECK_VOID" = "PASS" ]; then
+    echo "PASS"
+else
+    echo "$CHECK_VOID"
+    exit 1
+fi
+
 # 8.7 Verify Stock Restored
 echo -n "Verify Stock Restored: "
 STOCK_RESTORED=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
@@ -245,6 +279,23 @@ if [ "$VARIANCE" = "0.0" ] || [ "$VARIANCE" = "0.00" ] || [ "$VARIANCE" = "0" ];
     echo "PASS"
 else
     echo "FAIL: $CLOSE_RESP"
+    exit 1
+fi
+
+# 9.1 Get Shift Summary (After Close)
+echo -n "Shift Summary (After Close): "
+SUMM_CLOSE_RESP=$(curl -s -X GET "$POS_URL/api/pos/shifts/$SHIFT_ID/summary")
+CHECK_CLOSE=$(echo "$SUMM_CLOSE_RESP" | python3 -c "
+import sys, json; 
+data = json.load(sys.stdin); 
+s = data.get('summary', {}); 
+ok = s.get('status') == 'CLOSED' and float(s.get('net_sales', 0)) == 0.0;
+print('PASS' if ok else f'FAIL: {json.dumps(data)}');
+")
+if [ "$CHECK_CLOSE" = "PASS" ]; then
+    echo "PASS"
+else
+    echo "$CHECK_CLOSE"
     exit 1
 fi
 
