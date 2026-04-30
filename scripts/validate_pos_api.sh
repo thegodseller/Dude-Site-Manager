@@ -493,4 +493,28 @@ else
     exit 1
 fi
 
+# 12. Ticket History Tests
+echo "--- Ticket History Tests ---"
+echo -n "Fetch Ticket History: "
+HISTORY_RESP=$(curl -s -X GET "$POS_URL/api/pos/tickets?limit=10")
+if echo "$HISTORY_RESP" | grep -q '"status":"ok"'; then
+    echo "PASS"
+    
+    echo -n "  Verify Ticket in History: "
+    if echo "$HISTORY_RESP" | grep -q "$TICKET_ID"; then echo "PASS"; else echo "FAIL"; exit 1; fi
+    
+    echo -n "  Filter by CONFIRMED: "
+    if curl -s -X GET "$POS_URL/api/pos/tickets?status=CONFIRMED" | grep -q '"status":"ok"'; then echo "PASS"; else echo "FAIL"; exit 1; fi
+    
+    echo -n "  Filter by VOIDED: "
+    if curl -s -X GET "$POS_URL/api/pos/tickets?status=VOIDED" | grep -q "$TICKET_ID"; then echo "PASS"; else echo "FAIL"; exit 1; fi
+    
+    echo -n "  Search by Ticket No: "
+    TICKET_NO=$(echo "$HISTORY_RESP" | jq -r '.tickets[0].ticket_no')
+    if curl -s -X GET "$POS_URL/api/pos/tickets?q=$TICKET_NO" | grep -q "$TICKET_NO"; then echo "PASS"; else echo "FAIL"; exit 1; fi
+else
+    echo "FAIL: $HISTORY_RESP"
+    exit 1
+fi
+
 echo "--- ALL POS API TESTS PASSED ---"
