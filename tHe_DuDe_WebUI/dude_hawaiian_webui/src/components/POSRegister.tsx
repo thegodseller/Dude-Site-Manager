@@ -93,28 +93,97 @@ const DEMO_PRODUCTS: Product[] = [
   { product_id: 'd8', name: 'คูลเลอร์เก็บความเย็น', sku: 'ACC-CLR', barcode: '885008', unit_price: '450.00', is_active: true, on_hand_qty: 3, allow_negative_stock: false, category_name: 'Accessory' },
 ];
 
+const DEMO_SHIFT: ShiftData = {
+  shift_id: 'demo-shift-2026',
+  employee_id: 'demo-admin',
+  status: 'OPEN',
+  opening_cash: '1000.00',
+  opened_at: '2026-04-30T09:00:00.000Z'
+};
+
+const DEMO_CART_MAIN: CartItem[] = [
+  { ...DEMO_PRODUCTS[4], quantity: 2 },
+  { ...DEMO_PRODUCTS[1], quantity: 2 },
+  { ...DEMO_PRODUCTS[3], quantity: 3 },
+];
+
+const DEMO_STOCK_WARNING = 'Stock limit reached. Reduce quantity or restock product.';
+
+const DEMO_PROOF_PANELS = [
+  { label: 'Today Sales', value: '฿8,420', tone: 'orange' },
+  { label: 'Tickets', value: '128', tone: 'green' },
+  { label: 'Inventory Sync', value: 'Live', tone: 'green' },
+  { label: 'Shift Cash', value: 'Balanced', tone: 'green' },
+];
+
+const RECEIPT_LINE_ITEMS = [
+  { name: 'น้ำดื่ม Dude Pure 1500ml', qty: 2, total: '฿40.00' },
+  { name: 'น้ำแข็งหลอดเล็ก 5kg', qty: 2, total: '฿50.00' },
+  { name: 'น้ำดื่ม Dude Pure 600ml', qty: 3, total: '฿30.00' },
+];
+
+const DEMO_SUCCESS_TICKET = {
+  ticket_id: 'demo-tk-128',
+  ticket_no: 'POS-2026-000128',
+  total_amount: '120.00',
+  status: 'COMPLETED'
+};
+
+const DEMO_VOID_TICKET = {
+  ...DEMO_SUCCESS_TICKET,
+  status: 'VOIDED'
+};
+
+const buildDemoCart = (items: CartItem[]): CartItem[] => (
+  items.map(item => ({ ...normalizeProduct(item), quantity: item.quantity }))
+);
+
+const buildStockDemoCart = (): CartItem[] => {
+  const lowStockItem = DEMO_PRODUCTS[4];
+  return [{ ...normalizeProduct(lowStockItem), quantity: 4 }];
+};
+
 export const POSRegister: React.FC = () => {
   const [params] = useState(() => new URLSearchParams(window.location.search));
   const isScreenshotMode = params.get('screenshot') === '1';
+  const isCleanCapture = isScreenshotMode && params.get('clean') === '1';
   const shotMode = params.get('shot') || 'main';
 
   const [query, setQuery] = useState('');
   const [barcode, setBarcode] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isVat, setIsVat] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'PROMPTPAY' | 'CREDIT'>('CASH');
-  const [serviceStatus, setServiceStatus] = useState({ 
-    backend: 'checking', 
-    db: 'checking', 
-    catalog: 'unknown' 
+  const [products, setProducts] = useState<Product[]>(() => (
+    isScreenshotMode ? DEMO_PRODUCTS.map(product => normalizeProduct(product)) : []
+  ));
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (!isScreenshotMode) return [];
+    return shotMode === 'stock' ? buildStockDemoCart() : buildDemoCart(DEMO_CART_MAIN);
   });
-  const [isMock, setIsMock] = useState(true);
-  const [showModal, setShowModal] = useState<string | null>(null);
-  const [cartWarning, setCartWarning] = useState<{ product_id: string; message: string } | null>(null);
+  const [isVat, setIsVat] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'PROMPTPAY' | 'CREDIT'>(() => (
+    isScreenshotMode && shotMode === 'success' ? 'PROMPTPAY' : 'CASH'
+  ));
+  const [serviceStatus, setServiceStatus] = useState({ 
+    backend: isScreenshotMode ? 'ok' : 'checking',
+    db: isScreenshotMode ? 'ok' : 'checking',
+    catalog: isScreenshotMode ? 'ready' : 'unknown'
+  });
+  const [isMock, setIsMock] = useState(!isScreenshotMode);
+  const [showModal, setShowModal] = useState<string | null>(() => {
+    if (!isScreenshotMode) return null;
+    if (shotMode === 'success') return 'ticket_success';
+    if (shotMode === 'void') return 'void_success';
+    return null;
+  });
+  const [cartWarning, setCartWarning] = useState<{ product_id: string; message: string } | null>(() => (
+    isScreenshotMode && shotMode === 'stock'
+      ? { product_id: DEMO_PRODUCTS[4].product_id, message: DEMO_STOCK_WARNING }
+      : null
+  ));
 
   // Shift Management State
-  const [currentShift, setCurrentShift] = useState<ShiftData | null>(null);
+  const [currentShift, setCurrentShift] = useState<ShiftData | null>(() => (
+    isScreenshotMode ? DEMO_SHIFT : null
+  ));
   const [shiftLoading, setShiftLoading] = useState(false);
   const [shiftError, setShiftError] = useState<string | null>(null);
   const [employeeId] = useState(() => {
@@ -127,7 +196,9 @@ export const POSRegister: React.FC = () => {
   }); // TODO: Replace with real auth/user management
 
   const [openingCashInput, setOpeningCashInput] = useState('0');
-  const [actualCashInput, setActualCashInput] = useState('0');
+  const [actualCashInput, setActualCashInput] = useState(() => (
+    isScreenshotMode ? DEMO_SHIFT.opening_cash : '0'
+  ));
 
   // Checkout State
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -136,7 +207,12 @@ export const POSRegister: React.FC = () => {
     ticket_no: string;
     total_amount: string;
     status: string;
-  } | null>(null);
+  } | null>(() => {
+    if (!isScreenshotMode) return null;
+    if (shotMode === 'success') return DEMO_SUCCESS_TICKET;
+    if (shotMode === 'void') return DEMO_VOID_TICKET;
+    return null;
+  });
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   // Health check
@@ -184,44 +260,26 @@ export const POSRegister: React.FC = () => {
   useEffect(() => {
     if (isScreenshotMode) {
       setServiceStatus({ backend: 'ok', db: 'ok', catalog: 'ready' });
-      setCurrentShift({
-        shift_id: 'demo-shift-2026',
-        employee_id: 'demo-admin',
-        status: 'OPEN',
-        opening_cash: '1000.00',
-        opened_at: new Date().toISOString()
-      });
+      setIsMock(false);
+      setPaymentMethod(shotMode === 'success' ? 'PROMPTPAY' : 'CASH');
+      setCurrentShift(DEMO_SHIFT);
 
       if (shotMode === 'main' || shotMode === 'success' || shotMode === 'void') {
-        setProducts(DEMO_PRODUCTS);
-        setCart([
-          { ...DEMO_PRODUCTS[0], quantity: 2 },
-          { ...DEMO_PRODUCTS[1], quantity: 1 },
-          { ...DEMO_PRODUCTS[3], quantity: 6 },
-        ]);
+        setProducts(DEMO_PRODUCTS.map(product => normalizeProduct(product)));
+        setCart(buildDemoCart(DEMO_CART_MAIN));
         if (shotMode === 'success') {
-          setLastTicket({
-            ticket_id: 'demo-tk-128',
-            ticket_no: 'POS-2026-000128',
-            total_amount: '120.00',
-            status: 'COMPLETED'
-          });
+          setLastTicket(DEMO_SUCCESS_TICKET);
           setShowModal('ticket_success');
         }
         if (shotMode === 'void') {
-          setLastTicket({
-            ticket_id: 'demo-tk-128',
-            ticket_no: 'POS-2026-000128',
-            total_amount: '120.00',
-            status: 'VOIDED'
-          });
+          setLastTicket(DEMO_VOID_TICKET);
           setShowModal('void_success');
         }
       } else if (shotMode === 'stock') {
-        setProducts(DEMO_PRODUCTS);
+        setProducts(DEMO_PRODUCTS.map(product => normalizeProduct(product)));
         const lowStockItem = DEMO_PRODUCTS[4]; // WAT-1500 (Qty 4)
-        setCart([{ ...lowStockItem, quantity: 4 }]);
-        setCartWarning({ product_id: lowStockItem.product_id, message: 'Stock limit reached. Reduce quantity or restock product.' });
+        setCart(buildStockDemoCart());
+        setCartWarning({ product_id: lowStockItem.product_id, message: DEMO_STOCK_WARNING });
       }
       return;
     }
@@ -327,9 +385,10 @@ export const POSRegister: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (isScreenshotMode) return;
     const timer = setTimeout(() => searchProducts(query, barcode), 300);
     return () => clearTimeout(timer);
-  }, [query, barcode, searchProducts]);
+  }, [query, barcode, searchProducts, isScreenshotMode]);
 
   // Cart operations
   const addToCart = (product: Product) => {
@@ -464,27 +523,27 @@ export const POSRegister: React.FC = () => {
   };
 
   return (
-    <div className="pos-container">
+    <div className={`pos-container ${isScreenshotMode ? `screenshot-mode shot-${shotMode}` : ''} ${isCleanCapture ? 'clean-capture' : ''}`}>
       {/* Main Panel */}
       <div className="main-panel">
-        {isScreenshotMode && (
+        {isScreenshotMode && !isCleanCapture && (
           <div className="demo-badge">DEMO CAPTURE MODE: {shotMode.toUpperCase()}</div>
         )}
         <div className="pos-header">
           <div className="flex flex-col">
             <h2 className="font-tech text-xl text-glow text-orange-500">POS REGISTER v0.2</h2>
-            <div className={`text-[9px] font-bold tracking-widest mt-1 ${isMock ? 'text-yellow-500' : 'text-green-500'}`}>
+            {!isCleanCapture && <div className={`text-[9px] font-bold tracking-widest mt-1 ${isMock ? 'text-yellow-500' : 'text-green-500'}`}>
               {isMock ? '● MOCK CATALOG MODE' : '● LIVE PRODUCT CATALOG MODE'}
-            </div>
+            </div>}
           </div>
           <div className="status-group">
             <div className={`status-badge ${serviceStatus.backend}`} title="ag_pos service status">
               <div className="status-dot"></div>
-              Backend: {serviceStatus.backend}
+              {isCleanCapture ? 'System: Live' : `Backend: ${serviceStatus.backend}`}
             </div>
             <div className={`status-badge ${serviceStatus.db}`} title="PostgreSQL connection status">
               <div className="status-dot"></div>
-              DB: {serviceStatus.db}
+              {isCleanCapture ? 'Ledger: Synced' : `DB: ${serviceStatus.db}`}
             </div>
             <div className={`status-badge ${currentShift ? 'ok' : 'error'}`} title="Current shift status">
               <div className="status-dot"></div>
@@ -492,6 +551,17 @@ export const POSRegister: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {isScreenshotMode && (
+          <div className="capture-action-row">
+            <div className="capture-action-copy">
+              <span>Counter 01</span>
+              <strong>Live cashier session</strong>
+            </div>
+            <button className="payment-btn active">SHIFT CONTROL</button>
+            <button className="payment-btn">VOID / REFUND</button>
+          </div>
+        )}
 
         <div className="search-bar">
           <input 
@@ -515,6 +585,17 @@ export const POSRegister: React.FC = () => {
             }}
           />
         </div>
+
+        {isScreenshotMode && shotMode === 'main' && (
+          <div className="capture-proof-grid">
+            {DEMO_PROOF_PANELS.map(panel => (
+              <div key={panel.label} className={`capture-proof-card ${panel.tone}`}>
+                <span>{panel.label}</span>
+                <strong>{panel.value}</strong>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="product-grid">
           {products.map(product => {
@@ -549,10 +630,10 @@ export const POSRegister: React.FC = () => {
           )}
         </div>
 
-        <div className="mt-auto pt-10 flex gap-4">
+        {!isScreenshotMode && <div className="mt-auto pt-10 flex gap-4">
           <button className="payment-btn" style={{flex: 1}} onClick={() => setShowModal('shift')}>SHIFT CONTROL</button>
           <button className="payment-btn" style={{flex: 1}} onClick={() => setShowModal('void')}>VOID / REFUND</button>
-        </div>
+        </div>}
       </div>
 
       {/* Cart Panel */}
@@ -569,30 +650,38 @@ export const POSRegister: React.FC = () => {
             <div className="cart-warning">{cartWarning.message}</div>
           )}
           {cart.map(item => (
-            <div key={item.product_id} className="cart-item">
-              <div>
-                <div className="text-xs font-bold">{item.name}</div>
-                <div className="text-[10px] text-slate-400">
-                  {formatCurrency(parseFloat(item.unit_price))} x {item.quantity} {item.uom || ''}
+            (() => {
+              const stockQty = parseStockQty(item.on_hand_qty);
+              const atStockLimit = !allowsNegativeStock(item) && stockQty !== null && item.quantity >= stockQty;
+              return (
+                <div key={item.product_id} className="cart-item">
+                  <div>
+                    <div className="text-xs font-bold">{item.name}</div>
+                    <div className="text-[10px] text-slate-400">
+                      {formatCurrency(parseFloat(item.unit_price))} x {item.quantity} {item.uom || ''}
+                    </div>
+                    {cartWarning?.product_id === item.product_id && (
+                      <div className="cart-line-warning">{cartWarning.message}</div>
+                    )}
+                  </div>
+                  <div className="quantity-ctrl">
+                    <button className="btn-icon" onClick={() => updateQuantity(item.product_id, -1)} disabled={item.quantity <= 1}>-</button>
+                    <div className="cart-qty-stack">
+                      <span className={`cart-qty-value ${isScreenshotMode && atStockLimit ? 'at-limit' : ''}`}>
+                        {isScreenshotMode && atStockLimit ? `MAX ${item.quantity}` : item.quantity}
+                      </span>
+                      {!isScreenshotMode && atStockLimit && (
+                        <span className="text-[8px] text-red-500 font-bold leading-none mt-1">MAX</span>
+                      )}
+                    </div>
+                    <button 
+                      className="btn-icon" 
+                      onClick={() => updateQuantity(item.product_id, 1)}
+                    >+</button>
+                  </div>
                 </div>
-                {cartWarning?.product_id === item.product_id && (
-                  <div className="cart-line-warning">{cartWarning.message}</div>
-                )}
-              </div>
-              <div className="quantity-ctrl">
-                <button className="btn-icon" onClick={() => updateQuantity(item.product_id, -1)} disabled={item.quantity <= 1}>-</button>
-                <div className="flex flex-col items-center">
-                  <span className="text-xs w-4 text-center">{item.quantity}</span>
-                  {!allowsNegativeStock(item) && parseStockQty(item.on_hand_qty) !== null && item.quantity >= (parseStockQty(item.on_hand_qty) ?? 0) && (
-                    <span className="text-[8px] text-red-500 font-bold leading-none mt-1">MAX</span>
-                  )}
-                </div>
-                <button 
-                  className="btn-icon" 
-                  onClick={() => updateQuantity(item.product_id, 1)}
-                >+</button>
-              </div>
-            </div>
+              );
+            })()
           ))}
           {cart.length === 0 && <div className="empty-state">Cart is empty</div>}
         </div>
@@ -626,9 +715,9 @@ export const POSRegister: React.FC = () => {
           >
             {checkoutLoading ? 'COMMITTING...' : (currentShift ? `CHECKOUT ${formatCurrency(total)}` : 'OPEN SHIFT TO START')}
           </button>
-          <div className="text-[9px] text-center text-slate-600 mt-2">
+          {!isCleanCapture && <div className="text-[9px] text-center text-slate-600 mt-2">
             Real ticket commitment enabled. All sales are logged to ag_pos database.
-          </div>
+          </div>}
         </div>
       </div>
 
@@ -725,28 +814,64 @@ export const POSRegister: React.FC = () => {
       )}
 
       {showModal === 'ticket_success' && lastTicket && (
-        <div className="modal-overlay" onClick={() => setShowModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-green-500 rounded-full shadow-[0_0_15px_#22c55e]"></div>
+        <div className={`modal-overlay ${isScreenshotMode ? 'capture-modal-overlay' : ''}`} onClick={() => setShowModal(null)}>
+          {isScreenshotMode ? (
+            <div className="modal receipt-modal success-receipt" onClick={e => e.stopPropagation()}>
+              <div className="receipt-header">
+                <span className="receipt-kicker">Sale completed</span>
+                <h3>Ticket Committed</h3>
+                <p>Ticket No: <strong>{lastTicket.ticket_no}</strong></p>
               </div>
-              <h3 className="font-tech text-xl text-green-500">TICKET COMMITTED</h3>
+              <div className="receipt-total-row">
+                <span>Total</span>
+                <strong>{formatCurrency(parseFloat(lastTicket.total_amount))}</strong>
+              </div>
+              <div className="receipt-meta-grid">
+                <div><span>Payment</span><strong>QR Pay</strong></div>
+                <div><span>Shift</span><strong>Open</strong></div>
+              </div>
+              <div className="receipt-chip-row">
+                <span className="state-chip green">COMPLETED</span>
+                <span className="state-chip green">INVENTORY UPDATED</span>
+                <span className="state-chip green">SHIFT OPEN</span>
+                <span className="state-chip green">LEDGER RECORDED</span>
+              </div>
+              <div className="receipt-lines">
+                {RECEIPT_LINE_ITEMS.map(line => (
+                  <div key={line.name} className="receipt-line">
+                    <div><strong>{line.name}</strong><span>Qty {line.qty}</span></div>
+                    <span>{line.total}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="receipt-actions">
+                <button className="btn-primary" onClick={() => setShowModal(null)}>New Order</button>
+                <button className="btn-secondary" onClick={() => setShowModal(null)}>View Ticket</button>
+              </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-3 text-sm bg-slate-800/50 p-4 rounded border border-white/5 mb-6">
-              <div className="text-slate-400">Ticket No:</div>
-              <div className="text-right font-mono font-bold text-orange-500">{lastTicket.ticket_no}</div>
-              <div className="text-slate-400">Total Amount:</div>
-              <div className="text-right font-bold">{formatCurrency(parseFloat(lastTicket.total_amount))}</div>
-              <div className="text-slate-400">Status:</div>
-              <div className="text-right"><span className="px-2 py-0.5 bg-green-500/20 text-green-500 rounded text-[10px]">{lastTicket.status}</span></div>
-              <div className="text-slate-400">ID:</div>
-              <div className="text-right text-[10px] font-mono text-slate-500">{lastTicket.ticket_id}</div>
-            </div>
+          ) : (
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-500/20 border border-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-6 h-6 bg-green-500 rounded-full shadow-[0_0_15px_#22c55e]"></div>
+                </div>
+                <h3 className="font-tech text-xl text-green-500">TICKET COMMITTED</h3>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 text-sm bg-slate-800/50 p-4 rounded border border-white/5 mb-6">
+                <div className="text-slate-400">Ticket No:</div>
+                <div className="text-right font-mono font-bold text-orange-500">{lastTicket.ticket_no}</div>
+                <div className="text-slate-400">Total Amount:</div>
+                <div className="text-right font-bold">{formatCurrency(parseFloat(lastTicket.total_amount))}</div>
+                <div className="text-slate-400">Status:</div>
+                <div className="text-right"><span className="px-2 py-0.5 bg-green-500/20 text-green-500 rounded text-[10px]">{lastTicket.status}</span></div>
+                <div className="text-slate-400">ID:</div>
+                <div className="text-right text-[10px] font-mono text-slate-500">{lastTicket.ticket_id}</div>
+              </div>
 
-            <button className="btn-primary w-full" onClick={() => setShowModal(null)}>NEW ORDER</button>
-          </div>
+              <button className="btn-primary w-full" onClick={() => setShowModal(null)}>NEW ORDER</button>
+            </div>
+          )}
         </div>
       )}
 
@@ -766,27 +891,27 @@ export const POSRegister: React.FC = () => {
       )}
 
       {showModal === 'void_success' && lastTicket && (
-        <div className="modal-overlay" onClick={() => setShowModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-slate-500/20 border border-slate-500 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500 font-bold text-2xl">↺</div>
-              <h3 className="font-tech text-xl text-slate-400 uppercase">Void / Refund Ready</h3>
+        <div className={`modal-overlay ${isScreenshotMode ? 'capture-modal-overlay' : ''}`} onClick={() => setShowModal(null)}>
+          <div className="modal receipt-modal void-receipt" onClick={e => e.stopPropagation()}>
+            <div className="receipt-header">
+              <span className="receipt-kicker amber">Controlled correction</span>
+              <h3>Audit-Safe Void Flow</h3>
+              <p>Ticket: <strong>{lastTicket.ticket_no}</strong></p>
             </div>
-            
-            <div className="grid grid-cols-2 gap-3 text-sm bg-slate-800/50 p-4 rounded border border-white/5 mb-2">
-              <div className="text-slate-400">Ticket No:</div>
-              <div className="text-right font-mono font-bold text-slate-500">{lastTicket.ticket_no}</div>
-              <div className="text-slate-400">Status:</div>
-              <div className="text-right"><span className="px-2 py-0.5 bg-red-500/20 text-red-500 rounded text-[10px] uppercase">{lastTicket.status}</span></div>
-              <div className="text-slate-400">Reason:</div>
-              <div className="text-right text-slate-300">Cashier correction</div>
+            <div className="receipt-meta-grid void-meta-grid">
+              <div><span>Status</span><strong>VOIDED</strong></div>
+              <div><span>Reason</span><strong>Cashier correction</strong></div>
             </div>
-
-            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded mb-6 text-[10px] text-blue-400 text-center uppercase tracking-widest">
-              Stock Restored • Ledger Updated • Audit Logged
+            <div className="receipt-chip-row">
+              <span className="state-chip amber">STOCK RESTORED</span>
+              <span className="state-chip amber">LEDGER UPDATED</span>
+              <span className="state-chip amber">AUDIT LOGGED</span>
             </div>
-
-            <button className="btn-primary w-full" onClick={() => setShowModal(null)}>BACK TO REGISTER</button>
+            <div className="void-note">Every correction is traceable.</div>
+            <div className="receipt-actions">
+              <button className="btn-primary" onClick={() => setShowModal(null)}>Back to Register</button>
+              <button className="btn-secondary" onClick={() => setShowModal(null)}>View Audit Log</button>
+            </div>
           </div>
         </div>
       )}
