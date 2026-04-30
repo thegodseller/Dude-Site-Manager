@@ -130,6 +130,19 @@ interface DailyReportData {
   }[];
 }
 
+interface LowStockItem {
+  product_id: string;
+  sku: string;
+  barcode: string | null;
+  name: string;
+  category_name: string | null;
+  uom: string;
+  on_hand_qty: string;
+  reorder_point: string;
+  reorder_qty: string;
+  stock_status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+}
+
 interface StockLedgerEntry {
   id: string;
   product_id: string;
