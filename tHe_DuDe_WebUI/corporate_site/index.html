@@ -59,11 +59,23 @@
             align-items: center;
         }
 
-        .logo { font-size: 1.08rem; font-weight: 700; font-family: var(--font-heading); display: flex; align-items: center; gap: 12px; color: var(--primary); letter-spacing: -0.01em; }
-        .logo img { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.22); background: rgba(255,255,255,0.08); box-shadow: 0 0 24px rgba(255,255,255,0.14); }
+        .logo { font-size: 1.12rem; font-weight: 700; font-family: var(--font-heading); display: flex; align-items: center; gap: 12px; color: var(--primary); letter-spacing: -0.01em; }
+        .logo img { width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.24); background: rgba(255,255,255,0.08); box-shadow: 0 0 28px rgba(255,255,255,0.16); }
 
-        .nav-links { display: flex; gap: 40px; font-size: 0.75rem; font-weight: 500; color: var(--secondary); letter-spacing: 0.02em; }
+        .nav-links { display: flex; align-items: center; gap: 40px; font-size: 0.75rem; font-weight: 500; color: var(--secondary); letter-spacing: 0.02em; }
         .nav-links a:hover { color: var(--primary); }
+        .portal-menu { position: relative; }
+        .portal-menu summary { cursor: pointer; list-style: none; transition: color 0.3s ease; }
+        .portal-menu summary::-webkit-details-marker { display: none; }
+        .portal-menu summary:hover,
+        .portal-menu[open] summary { color: var(--primary); }
+        .portal-dropdown { position: absolute; top: calc(100% + 18px); right: 0; min-width: 220px; padding: 10px; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; background: rgba(5,5,5,0.96); backdrop-filter: blur(18px); box-shadow: 0 24px 70px rgba(0,0,0,0.45); opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 1100; }
+        .portal-menu:hover .portal-dropdown,
+        .portal-menu[open] .portal-dropdown,
+        .portal-menu:focus-within .portal-dropdown { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .portal-dropdown a { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; color: var(--primary); font-size: 0.82rem; letter-spacing: 0; }
+        .portal-dropdown a:hover { background: rgba(255,255,255,0.06); }
+        .portal-dropdown span { color: var(--secondary); font-size: 0.68rem; line-height: 1.3; }
 
         /* --- Hero --- */
         .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
@@ -82,11 +94,11 @@
         /* --- Trust Bar --- */
         .trust-bar { padding: 34px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); background: linear-gradient(90deg, rgba(212, 175, 55, 0.05), transparent 34%, rgba(0, 112, 243, 0.04)); }
         .trust-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 28px; color: var(--secondary); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
-        .dbd-registered-badge { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.46); border-radius: 14px; background: rgba(212, 175, 55, 0.08); padding: 10px 14px; box-shadow: 0 0 32px rgba(212, 175, 55, 0.1); }
+        .dbd-registered-badge { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.5); border-radius: 16px; background: rgba(212, 175, 55, 0.1); padding: 12px 18px; box-shadow: 0 0 38px rgba(212, 175, 55, 0.12); }
         .dbd-registered-badge:hover { transform: translateY(-1px); border-color: rgba(212, 175, 55, 0.7); box-shadow: 0 14px 36px rgba(212, 175, 55, 0.14); }
-        .dbd-registered-badge img { display: block; max-height: 48px; max-width: 210px; object-fit: contain; }
-        .trust-inner .dbd-registered-badge { padding: 10px 14px; background: rgba(255,255,255,0.04); }
-        .trust-inner .dbd-registered-badge img { max-height: 50px; max-width: 210px; }
+        .dbd-registered-badge img { display: block; max-height: 58px; max-width: 250px; object-fit: contain; }
+        .trust-inner .dbd-registered-badge { padding: 12px 18px; background: rgba(255,255,255,0.045); }
+        .trust-inner .dbd-registered-badge img { max-height: 64px; max-width: 260px; }
 
         /* --- Sections --- */
         .section-header { margin-bottom: 100px; text-align: center; }
@@ -184,7 +196,19 @@
                 <a href="#what-we-build">Overview</a>
                 <a href="#ecosystem">Ecosystem</a>
                 <a href="#use-cases">Use Cases</a>
-                <a href="https://ui.thegodseller.com">Portal</a>
+                <details class="portal-menu">
+                    <summary>Portal</summary>
+                    <div class="portal-dropdown">
+                        <a href="https://ui.thegodseller.com">
+                            Client Portal
+                            <span>Open the DuDe web portal</span>
+                        </a>
+                        <a href="/downloads/App-Discodroid-252.apk" download>
+                            Download Discodroid APK
+                            <span>Android installer package</span>
+                        </a>
+                    </div>
+                </details>
             </nav>
             <div class="nav-actions">
                 <a href="mailto:chanukrit@thegodseller.com" class="btn btn-primary">Book Consultation</a>
