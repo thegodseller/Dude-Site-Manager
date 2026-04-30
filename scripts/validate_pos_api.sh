@@ -147,9 +147,20 @@ TKT_RESP=$(curl -s -X POST "$POS_URL/api/pos/tickets" \
 
 if echo "$TKT_RESP" | grep -q '"status":"ok"' && echo "$TKT_RESP" | grep -q '"total_amount":"60.0"'; then
     TICKET_ID=$(echo "$TKT_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['ticket_id'])")
-    echo "PASS (Ticket ID: $TICKET_ID)"
+    TICKET_NO=$(echo "$TKT_RESP" | python3 -c "import sys, json; print(json.load(sys.stdin)['ticket_no'])")
+    echo "PASS (Ticket ID: $TICKET_ID, No: $TICKET_NO)"
 else
     echo "FAIL: $TKT_RESP"
+    exit 1
+fi
+
+# 8.2.0 Fetch Receipt (Confirmed)
+echo -n "Fetch Receipt (Confirmed): "
+REC_CONF_RESP=$(curl -s -X GET "$POS_URL/api/pos/tickets/$TICKET_ID/receipt")
+if echo "$REC_CONF_RESP" | grep -q "\"ticket_no\":\"$TICKET_NO\"" && echo "$REC_CONF_RESP" | grep -q '"is_voided":false' && echo "$REC_CONF_RESP" | grep -q '"total_amount":"60.00"'; then
+    echo "PASS"
+else
+    echo "FAIL: $REC_CONF_RESP"
     exit 1
 fi
 
@@ -242,6 +253,16 @@ if [ "$CHECK_VOID" = "PASS" ]; then
     echo "PASS"
 else
     echo "$CHECK_VOID"
+    exit 1
+fi
+
+# 8.6.2 Fetch Receipt (Voided)
+echo -n "Fetch Receipt (Voided): "
+REC_VOID_RESP=$(curl -s -X GET "$POS_URL/api/pos/tickets/$TICKET_ID/receipt")
+if echo "$REC_VOID_RESP" | grep -q "\"ticket_no\":\"$TICKET_NO\"" && echo "$REC_VOID_RESP" | grep -q '"is_voided":true'; then
+    echo "PASS"
+else
+    echo "FAIL: $REC_VOID_RESP"
     exit 1
 fi
 
