@@ -119,9 +119,14 @@ fi
 
 # 8. Sale Ticket Tests
 echo "--- Sale Ticket Tests ---"
-# 8.1 Get Product IDs for testing
-PROD_ICE_ID=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['product_id'])")
+# 8.1 Get Product IDs and Initial Stock
+PROD_SEARCH=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search")
+PROD_ICE_ID=$(echo "$PROD_SEARCH" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['product_id'])")
+STOCK_BEFORE=$(echo "$PROD_SEARCH" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
+
 PROD_WAT_ID=$(curl -s -G --data-urlencode "q=น้ำดื่ม Dude Pure 600ml" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['product_id'])")
+
+echo "Initial Stock for Ice: $STOCK_BEFORE"
 
 # 8.2 Create Ticket
 # 2x Ice (25.00) + 1x Water (10.00) = 60.00
@@ -148,7 +153,42 @@ else
     exit 1
 fi
 
-# 8.3 Get Ticket Details
+# 8.3 Verify Stock Deduction
+echo -n "Verify Stock Deduction: "
+STOCK_AFTER=$(curl -s -G --data-urlencode "q=น้ำแข็งหลอดเล็ก 5kg" "$POS_URL/api/pos/products/search" | python3 -c "import sys, json; print(json.load(sys.stdin)['items'][0]['on_hand_qty'])")
+EXPECTED_STOCK=$(python3 -c "print(float('$STOCK_BEFORE') - 2)")
+
+if [ "$STOCK_AFTER" = "$EXPECTED_STOCK" ] || [ "$(printf \"%.0f\" \"$STOCK_AFTER\")" = "$(printf \"%.0f\" \"$EXPECTED_STOCK\")" ]; then
+    echo "PASS (Before: $STOCK_BEFORE, After: $STOCK_AFTER)"
+else
+    echo "FAIL (Before: $STOCK_BEFORE, After: $STOCK_AFTER, Expected: $EXPECTED_STOCK)"
+    exit 1
+fi
+
+# 8.4 Insufficient Stock Rejection
+echo -n "Insufficient Stock Rejection: "
+LARGE_QTY=$(python3 -c "print(int(float('$STOCK_AFTER') + 100))")
+ERR_RESP=$(curl -s -w "%{http_code}" -o /dev/null -X POST "$POS_URL/api/pos/tickets" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"shift_id\": \"$SHIFT_ID\",
+        \"vat_mode\": \"NO_VAT\",
+        \"vat_calc_mode\": \"EXCLUSIVE\",
+        \"vat_rate\": 0,
+        \"items\": [
+            {\"product_id\": \"$PROD_ICE_ID\", \"qty\": $LARGE_QTY, \"unit_price\": 25.00, \"master_price\": 25.00}
+        ],
+        \"payment\": {\"method\": \"CASH\", \"amount\": 1000.00}
+    }")
+
+if [ "$ERR_RESP" = "409" ]; then
+    echo "PASS"
+else
+    echo "FAIL (Expected 409, got $ERR_RESP)"
+    exit 1
+fi
+
+# 8.5 Get Ticket Details
 echo -n "Get Ticket Details: "
 TKT_GET=$(curl -s "$POS_URL/api/pos/tickets/$TICKET_ID")
 if echo "$TKT_GET" | grep -q "\"id\":\"$TICKET_ID\"" && echo "$TKT_GET" | grep -q "น้ำแข็งหลอดเล็ก 5kg"; then
