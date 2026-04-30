@@ -10,6 +10,8 @@ interface Product {
   is_active: boolean;
   category_name?: string | null;
   uom?: string | null;
+  on_hand_qty?: number;
+  allow_negative_stock?: boolean;
 }
 
 interface CartItem extends Product {
@@ -28,10 +30,10 @@ interface ShiftData {
 }
 
 const MOCK_PRODUCTS: Product[] = [
-  { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true },
-  { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true },
-  { product_id: 'm3', name: 'น้ำดื่ม Dude Pure 600ml (MOCK)', sku: 'WAT-600', barcode: '885003', unit_price: '10.00', is_active: true },
-  { product_id: 'm4', name: 'น้ำแข็งป่นถุงกลาง (MOCK)', sku: 'ICE-P-08', barcode: '885004', unit_price: '35.00', is_active: true },
+  { product_id: 'm1', name: 'น้ำแข็งหลอดเล็ก 5kg (MOCK)', sku: 'ICE-S-05', barcode: '885001', unit_price: '25.00', is_active: true, on_hand_qty: 10, allow_negative_stock: false },
+  { product_id: 'm2', name: 'น้ำแข็งหลอดใหญ่ 10kg (MOCK)', sku: 'ICE-L-10', barcode: '885002', unit_price: '45.00', is_active: true, on_hand_qty: 2, allow_negative_stock: false },
+  { product_id: 'm3', name: 'น้ำดื่ม Dude Pure 600ml (MOCK)', sku: 'WAT-600', barcode: '885003', unit_price: '10.00', is_active: true, on_hand_qty: 50, allow_negative_stock: true },
+  { product_id: 'm4', name: 'น้ำแข็งป่นถุงกลาง (MOCK)', sku: 'ICE-P-08', barcode: '885004', unit_price: '35.00', is_active: true, on_hand_qty: 0, allow_negative_stock: false },
 ];
 
 export const POSRegister: React.FC = () => {
@@ -226,12 +228,19 @@ export const POSRegister: React.FC = () => {
     setCart(prev => {
       const existing = prev.find(item => item.product_id === product.product_id);
       if (existing) {
+        const canIncrease = (product.allow_negative_stock ?? false) || (existing.quantity < (product.on_hand_qty ?? 0));
+        if (!canIncrease) return prev;
+        
         return prev.map(item => 
           item.product_id === product.product_id 
             ? { ...item, quantity: item.quantity + 1 } 
             : item
         );
       }
+      
+      const initialCanAdd = (product.allow_negative_stock ?? false) || ((product.on_hand_qty ?? 0) > 0);
+      if (!initialCanAdd) return prev;
+
       return [...prev, { ...product, quantity: 1 }];
     });
   };
@@ -240,6 +249,9 @@ export const POSRegister: React.FC = () => {
     setCart(prev => prev.map(item => {
       if (item.product_id === id) {
         const newQty = Math.max(1, item.quantity + delta);
+        const canUpdate = delta < 0 || (item.allow_negative_stock ?? false) || (newQty <= (item.on_hand_qty ?? 0));
+        
+        if (!canUpdate) return item;
         return { ...item, quantity: newQty };
       }
       return item;
@@ -299,7 +311,7 @@ export const POSRegister: React.FC = () => {
         let msg = data.message || detail || 'Checkout failed';
         if (res.status === 400) msg = `Invalid Data: ${msg}`;
         if (res.status === 404) msg = `Not Found: ${msg}`;
-        if (res.status === 409) msg = `Conflict: ${msg}`;
+        if (res.status === 409) msg = `Insufficient stock. Please reduce quantity or restock product. (${msg})`;
         setCheckoutError(msg);
         setShowModal('error');
       }
@@ -375,13 +387,31 @@ export const POSRegister: React.FC = () => {
         </div>
 
         <div className="product-grid">
-          {products.map(product => (
-            <div key={product.product_id} className="product-card" onClick={() => addToCart(product)}>
-              <div className="text-sm font-bold truncate">{product.name}</div>
-              <div className="text-[10px] text-slate-500">{product.sku} {product.category_name ? `| ${product.category_name}` : ''}</div>
-              <div className="product-price">{formatCurrency(parseFloat(product.unit_price))}{product.uom ? ` / ${product.uom}` : ''}</div>
-            </div>
-          ))}
+          {products.map(product => {
+            const stock = product.on_hand_qty ?? 0;
+            const isLow = stock > 0 && stock <= 5;
+            const isOut = stock <= 0 && !(product.allow_negative_stock);
+            
+            return (
+              <div key={product.product_id} className={`product-card ${isOut ? 'opacity-50' : ''}`} onClick={() => addToCart(product)}>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="text-sm font-bold truncate">{product.name}</div>
+                  {product.on_hand_qty !== undefined && (
+                    <div className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase ${isOut ? 'bg-red-500/20 text-red-500' : isLow ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}`}>
+                      {isOut ? 'Out' : isLow ? 'Low' : 'In Stock'}
+                    </div>
+                  )}
+                </div>
+                <div className="text-[10px] text-slate-500">{product.sku} {product.category_name ? `| ${product.category_name}` : ''}</div>
+                <div className="flex justify-between items-center mt-auto">
+                  <div className="product-price">{formatCurrency(parseFloat(product.unit_price))}{product.uom ? ` / ${product.uom}` : ''}</div>
+                  {product.on_hand_qty !== undefined && (
+                    <div className="text-[9px] text-slate-400 font-mono">Qty: {product.on_hand_qty}</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
           {products.length === 0 && (
             <div className="empty-state">
               {serviceStatus.backend === 'error' 
@@ -417,8 +447,17 @@ export const POSRegister: React.FC = () => {
               </div>
               <div className="quantity-ctrl">
                 <button className="btn-icon" onClick={() => updateQuantity(item.product_id, -1)} disabled={item.quantity <= 1}>-</button>
-                <span className="text-xs w-4 text-center">{item.quantity}</span>
-                <button className="btn-icon" onClick={() => updateQuantity(item.product_id, 1)}>+</button>
+                <div className="flex flex-col items-center">
+                  <span className="text-xs w-4 text-center">{item.quantity}</span>
+                  {!(item.allow_negative_stock) && item.on_hand_qty !== undefined && item.quantity >= item.on_hand_qty && (
+                    <span className="text-[8px] text-red-500 font-bold leading-none mt-1">MAX</span>
+                  )}
+                </div>
+                <button 
+                  className="btn-icon" 
+                  onClick={() => updateQuantity(item.product_id, 1)}
+                  disabled={!(item.allow_negative_stock) && item.quantity >= (item.on_hand_qty ?? 0)}
+                >+</button>
               </div>
             </div>
           ))}
