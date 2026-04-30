@@ -296,6 +296,15 @@ export const POSRegister: React.FC = () => {
   const [overrideLoading, setOverrideLoading] = useState(false);
   const [overrideError, setOverrideError] = useState<string | null>(null);
 
+  // Staff Management State
+  const [managementLoading, setManagementLoading] = useState(false);
+  const [managementError, setManagementError] = useState<string | null>(null);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [isAddingEmployee, setIsAddingEmployee] = useState(false);
+  const [staffForm, setStaffForm] = useState({ display_name: '', role: 'CASHIER', pin_code: '' });
+  const [isResettingPin, setIsResettingPin] = useState(false);
+  const [newPinInput, setNewPinInput] = useState('');
+
   // Health check
   const checkHealth = async () => {
     try {
@@ -813,6 +822,119 @@ export const POSRegister: React.FC = () => {
     }
   };
 
+  // Staff Management Functions
+  const fetchStaff = async () => {
+    setManagementLoading(true);
+    try {
+      const res = await fetch('/ag_pos_api/employees');
+      const data = await res.json();
+      if (data.success) {
+        setEmployees(data.employees);
+      }
+    } catch (err) {
+      setManagementError('Failed to fetch staff list');
+    } finally {
+      setManagementLoading(false);
+    }
+  };
+
+  const handleCreateEmployee = async () => {
+    if (!staffForm.display_name || !staffForm.pin_code) {
+      setManagementError('Name and PIN are required');
+      return;
+    }
+    setManagementLoading(true);
+    try {
+      const res = await fetch('/ag_pos_api/employees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(staffForm)
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchStaff();
+        setIsAddingEmployee(false);
+        setStaffForm({ display_name: '', role: 'CASHIER', pin_code: '' });
+      } else {
+        setManagementError(data.message || 'Failed to create employee');
+      }
+    } catch (err) {
+      setManagementError('Network error during employee creation');
+    } finally {
+      setManagementLoading(false);
+    }
+  };
+
+  const handleUpdateEmployee = async () => {
+    if (!editingEmployee) return;
+    setManagementLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/employees/${editingEmployee.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          display_name: staffForm.display_name,
+          role: staffForm.role
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchStaff();
+        setEditingEmployee(null);
+      } else {
+        setManagementError(data.message || 'Failed to update employee');
+      }
+    } catch (err) {
+      setManagementError('Network error during update');
+    } finally {
+      setManagementLoading(false);
+    }
+  };
+
+  const handleDeactivateEmployee = async (id: string) => {
+    if (!confirm('Are you sure you want to deactivate this employee?')) return;
+    setManagementLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/employees/${id}/deactivate`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        await fetchStaff();
+      }
+    } catch (err) {
+      setManagementError('Failed to deactivate employee');
+    } finally {
+      setManagementLoading(false);
+    }
+  };
+
+  const handleResetPin = async (id: string) => {
+    if (!newPinInput || newPinInput.length < 4) {
+      setManagementError('Valid new PIN required');
+      return;
+    }
+    setManagementLoading(true);
+    try {
+      const res = await fetch(`/ag_pos_api/employees/${id}/reset-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ new_pin: newPinInput })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('PIN reset successful');
+        setIsResettingPin(false);
+        setNewPinInput('');
+        await fetchStaff();
+      } else {
+        setManagementError(data.message || 'Failed to reset PIN');
+      }
+    } catch (err) {
+      setManagementError('Network error during PIN reset');
+    } finally {
+      setManagementLoading(false);
+    }
+  };
+
   // Calculations with formatting
   const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.unit_price) * item.quantity), 0);
   const vatAmount = isVat ? subtotal * 0.07 : 0;
@@ -948,6 +1070,12 @@ export const POSRegister: React.FC = () => {
         </div>
 
         {!isScreenshotMode && <div className="mt-auto pt-10 flex gap-4">
+          {AUTHORIZED_VOID_ROLES.includes(currentCashier?.role.toUpperCase() || '') && (
+            <button className="payment-btn" style={{flex: 1}} onClick={() => {
+              fetchStaff();
+              setShowModal('staff');
+            }}>STAFF</button>
+          )}
           <button className="payment-btn" style={{flex: 1}} onClick={() => {
             if (currentShift) {
               fetchShiftSummary(currentShift.shift_id);
@@ -1578,6 +1706,137 @@ export const POSRegister: React.FC = () => {
             >
               CANCEL OVERRIDE
             </button>
+          </div>
+        </div>
+      )}
+      {showModal === 'staff' && (
+        <div className="modal-overlay" onClick={() => {
+          setShowModal(null);
+          setEditingEmployee(null);
+          setIsAddingEmployee(false);
+          setIsResettingPin(false);
+          setManagementError(null);
+        }}>
+          <div className="modal" style={{maxWidth: '800px', width: '90%'}} onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-tech text-lg uppercase tracking-wider">Staff Management</h3>
+              {!isAddingEmployee && !editingEmployee && (
+                <button className="action-btn-sm" onClick={() => {
+                  setIsAddingEmployee(true);
+                  setStaffForm({ display_name: '', role: 'CASHIER', pin_code: '' });
+                }}>+ NEW EMPLOYEE</button>
+              )}
+            </div>
+
+            {managementError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{managementError}</div>}
+
+            {isAddingEmployee || (editingEmployee && !isResettingPin) ? (
+              <div className="staff-form-grid">
+                <div className="meta-label">Display Name</div>
+                <input 
+                  type="text" 
+                  className="input-glow" 
+                  value={staffForm.display_name}
+                  onChange={e => setStaffForm({...staffForm, display_name: e.target.value})}
+                  placeholder="Employee Full Name"
+                />
+                <div className="meta-label">Role</div>
+                <select 
+                  className="input-glow"
+                  value={staffForm.role}
+                  onChange={e => setStaffForm({...staffForm, role: e.target.value})}
+                >
+                  <option value="CASHIER">CASHIER</option>
+                  <option value="OPERATOR">OPERATOR</option>
+                  <option value="SUPERVISOR">SUPERVISOR</option>
+                  <option value="MANAGER">MANAGER</option>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="OWNER">OWNER</option>
+                </select>
+                {isAddingEmployee && (
+                  <>
+                    <div className="meta-label">Initial PIN</div>
+                    <input 
+                      type="password" 
+                      className="input-glow" 
+                      value={staffForm.pin_code}
+                      onChange={e => setStaffForm({...staffForm, pin_code: e.target.value})}
+                      placeholder="4-6 digits"
+                    />
+                  </>
+                )}
+                <div className="flex gap-4 mt-4">
+                  <button className="btn-secondary flex-1" onClick={() => {
+                    setIsAddingEmployee(false);
+                    setEditingEmployee(null);
+                  }}>CANCEL</button>
+                  <button className="btn-primary flex-1" onClick={isAddingEmployee ? handleCreateEmployee : handleUpdateEmployee} disabled={managementLoading}>
+                    {managementLoading ? 'SAVING...' : 'SAVE EMPLOYEE'}
+                  </button>
+                </div>
+              </div>
+            ) : isResettingPin && editingEmployee ? (
+              <div className="staff-form-grid">
+                <div className="meta-label">New PIN for {editingEmployee.display_name}</div>
+                <input 
+                  type="password" 
+                  className="input-glow" 
+                  value={newPinInput}
+                  onChange={e => setNewPinInput(e.target.value)}
+                  placeholder="4-6 digits"
+                />
+                <div className="flex gap-4 mt-4">
+                  <button className="btn-secondary flex-1" onClick={() => {
+                    setIsResettingPin(false);
+                    setEditingEmployee(null);
+                    setNewPinInput('');
+                  }}>CANCEL</button>
+                  <button className="btn-primary flex-1" onClick={() => handleResetPin(editingEmployee.id)} disabled={managementLoading}>
+                    {managementLoading ? 'RESETTING...' : 'CONFIRM RESET'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="staff-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {employees.map(emp => (
+                      <tr key={emp.id}>
+                        <td>{emp.display_name}</td>
+                        <td><span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded border border-white/5">{emp.role}</span></td>
+                        <td>
+                          <span className={`status-pill ${emp.is_active ? 'active' : 'inactive'}`}>
+                            {emp.is_active ? 'ACTIVE' : 'INACTIVE'}
+                          </span>
+                        </td>
+                        <td>
+                          <button className="action-btn-sm" onClick={() => {
+                            setEditingEmployee(emp);
+                            setStaffForm({ display_name: emp.display_name, role: emp.role, pin_code: '' });
+                          }}>EDIT</button>
+                          <button className="action-btn-sm" onClick={() => {
+                            setEditingEmployee(emp);
+                            setIsResettingPin(true);
+                          }}>PIN</button>
+                          {emp.is_active && emp.id !== currentCashier?.id && (
+                            <button className="action-btn-sm danger" onClick={() => handleDeactivateEmployee(emp.id)}>OFF</button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <button className="mt-8 text-xs text-slate-500 underline block w-full text-center" onClick={() => setShowModal(null)}>CLOSE MANAGEMENT</button>
           </div>
         </div>
       )}
