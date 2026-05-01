@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MissionRide — Mission Support Intelligence</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0e1a;--card:#141a2e;--border:#1e2a45;--accent:#38bdf8;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--dim:#64748b;--text:#e2e8f0}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:16px;padding:0 24px;background:rgba(5,8,18,0.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);height:48px;z-index:100}
+.topbar h1{font-size:16px;color:var(--accent);flex-shrink:0;font-family:'Outfit','Inter',sans-serif;font-weight:700;letter-spacing:-0.02em}
+.topbar-controls{display:flex;align-items:center;gap:12px;opacity:0.2;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);flex:1}
+.topbar:hover .topbar-controls{opacity:1}
+.topbar input{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;width:180px;outline:none}
+.topbar button{padding:4px 10px;border:none;border-radius:4px;font-size:11px;cursor:pointer;font-weight:600;opacity:0.8;transition:opacity .2s}
+.topbar button:hover{opacity:1}
+.btn-connect{background:var(--accent);color:#0a0e1a}
+.btn-demo{background:var(--orange);color:#0a0e1a}
+.btn-reset{background:var(--dim);color:white}
+.mode-badge{padding:4px 10px;border-radius:4px;font-size:12px;font-weight:700;margin-left:auto}
+.mode-live{background:var(--green);color:#0a0e1a}
+.mode-sim{background:var(--orange);color:#0a0e1a}
+.main{display:flex;flex:1;overflow:hidden}
+/* Premium typography */
+.section-title{font-family:'Outfit','Inter',sans-serif;letter-spacing:-0.01em}
+.stat .val{font-family:'Outfit','Inter',sans-serif}
+.v-name{font-family:'Outfit','Inter',sans-serif}
+/* Premium card treatment */
+.stat{background:linear-gradient(135deg,#141a2e 0%,#0f1528 100%);border:1px solid var(--border);border-radius:12px;padding:18px}
+.v-card{border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.v-head{border-radius:14px 14px 0 0}
+/* Showcase mode — hides dev chrome */
+body.showcase .topbar{display:none}
+body.showcase .panel-label{display:none}
+body.showcase .main{height:100vh}
+.driver-panel{width:420px;min-width:380px;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:24px 16px;overflow-y:auto;background:linear-gradient(180deg,#0d1225 0%,#080c18 100%)}
+.office-panel{flex:1;padding:28px 32px;overflow-y:auto;background:linear-gradient(180deg,#0a0e1a 0%,#060a14 100%)}
+.phone{width:380px;background:#050505;border-radius:48px;padding:12px;box-shadow:0 24px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.1)}
+.phone-screen{background:#0a0e1a;border-radius:36px;overflow:hidden;min-height:640px;display:flex;flex-direction:column;border:1px solid var(--border)}
+.phone-header{background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);color:white;padding:16px;text-align:center;font-family:'Outfit','Inter',sans-serif}
+.phone-header h2{font-size:20px;letter-spacing:-0.01em;background:linear-gradient(135deg,#fff 0%,#94a3b8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gps-bar{background:#082f49;color:#7dd3fc;font-size:11px;padding:6px;text-align:center;letter-spacing:0.02em}
+.tracking-notice{background:rgba(245,158,11,0.15);color:#fcd34d;font-size:12px;padding:8px;text-align:center;border-bottom:1px solid rgba(245,158,11,0.3)}
+.phone-body{padding:16px;flex:1;color:var(--text)}
+.p-card{background:linear-gradient(135deg,#141a2e 0%,#0f1528 100%);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.p-card h3{font-size:15px;margin-bottom:8px;color:white;font-family:'Outfit','Inter',sans-serif}
+.p-label{font-size:11px;color:var(--dim)}
+.p-value{font-size:15px;font-weight:600;color:white}
+.stop-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:var(--text)}
+.stop-row:last-child{border:none}
+.stop-num{width:24px;height:24px;background:#334155;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;margin-right:10px;flex-shrink:0;font-weight:600}
+.stop-num.done{background:var(--green)}
+.stop-num.active{background:var(--accent);box-shadow:0 0 12px rgba(56,189,248,.6)}
+.stop-name{flex:1;color:var(--text)}
+.stop-status{font-size:11px;color:var(--dim)}
+.phone-actions{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.p-btn{border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Outfit','Inter',sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.p-btn:active{opacity:.7}
+.p-btn:disabled{opacity:.4;cursor:not-allowed}
+.p-btn-start{background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);color:white;grid-column:span 2}
+.p-btn-arrive{background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);color:white}
+.p-btn-problem{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:white}
+.p-btn-sos{background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);color:white;grid-column:span 2;font-size:16px}
+.p-btn-finish{background:linear-gradient(135deg,#64748b 0%,#475569 100%);color:white;grid-column:span 2}
+.battery-bar{padding:8px 12px;background:#0d1225;border-top:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between;color:var(--dim)}
+.section-title{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--accent);font-family:'Outfit','Inter',sans-serif}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat .label{font-size:12px;color:var(--dim)}
+.stat .val{font-size:22px;font-weight:700;margin-top:4px}
+.alert-card{background:rgba(239,68,68,.1);border:1px solid var(--red);border-radius:10px;padding:14px;margin-bottom:16px;display:none;align-items:center;gap:12px}
+.alert-card.show{display:flex}
+.alert-icon{font-size:28px}
+.alert-body{flex:1}
+.alert-title{font-weight:700;color:var(--red)}
+.alert-sub{font-size:13px;color:var(--dim);margin-top:2px}
+.alert-ack{background:var(--red);color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:600}
+.fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.v-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.v-card:hover{border-color:var(--accent)}
+.v-head{padding:12px;background:#1a2340;display:flex;justify-content:space-between;align-items:center}
+.v-name{font-weight:700;font-size:14px}
+.v-driver{font-size:12px;color:var(--dim)}
+.pill{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.pill-moving{background:var(--green);color:white}
+.pill-stopped{background:var(--orange);color:white}
+.pill-sos{background:var(--red);color:white;animation:blink 1s infinite}
+.pill-idle{background:var(--dim);color:white}
+.pill-done{background:var(--accent);color:#0a0e1a}
+@keyframes blink{50%{opacity:.4}}
+.v-body{padding:12px}
+.v-info{font-size:13px;margin-bottom:8px}
+.progress{height:6px;background:#1e2a45;border-radius:3px;margin:8px 0;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);transition:width .5s}
+.v-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--dim)}
+.score-row{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px}
+.score-bar{flex:1;height:4px;background:#1e2a45;border-radius:2px;overflow:hidden}
+.score-fill{height:100%;border-radius:2px}
+.timeline{margin-top:20px}
+.tl-item{display:flex;gap:10px;padding:6px 0;font-size:13px;border-left:2px solid var(--border);padding-left:14px;margin-left:6px}
+.tl-time{color:var(--dim);min-width:50px}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px;display:none}
+.summary-card.show{display:block}
+.summary-card h3{color:var(--accent);margin-bottom:12px}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.summary-item .s-label{font-size:12px;color:var(--dim)}
+.summary-item .s-val{font-size:18px;font-weight:700}
+.panel-label{writing-mode:vertical-rl;text-orientation:mixed;font-size:11px;color:var(--dim);letter-spacing:2px;padding:0 6px;text-transform:uppercase;display:flex;align-items:center}
+.route-map{background:linear-gradient(135deg,#141a2e 0%,#0f1528 100%);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;box-shadow:inset 0 2px 20px rgba(0,0,0,.5)}
+.route-map svg{width:100%;height:auto;display:block}
+.route-map-driver{background:#0a0e1a;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px;box-shadow:inset 0 2px 10px rgba(0,0,0,.5)}
+.route-map-driver svg{width:100%;height:auto}
+.map-label{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.eta-bar{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#1a2340;border-radius:6px;margin-top:8px;font-size:12px}
+.eta-bar .eta-next{color:var(--accent);font-weight:700}
+.eta-bar .eta-time{color:var(--dim)}
+.warn-banner{padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700;margin-bottom:10px;display:none;align-items:center;gap:8px}
+.warn-banner.show{display:flex}
+.warn-offroute{background:rgba(249,115,22,.15);border:1px solid #f97316;color:#f97316}
+.warn-stopped{background:rgba(239,68,68,.12);border:1px solid var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="topbar">
+<h1>🚀 MissionRide</h1>
+<div class="topbar-controls">
+<label style="font-size:12px;color:var(--dim)" title="Optional — demo works standalone">Optional API:</label>
+<input id="apiUrl" value="http://localhost:18081">
+<button class="btn-connect" onclick="tryConnect()">Connect</button>
+<button class="btn-demo" onclick="toggleDemo()">Demo Mode</button>
+<button class="btn-reset" onclick="resetDemo()">Reset</button>
+<span id="modeBadge" class="mode-badge mode-sim">DEMO SIMULATION MODE</span>
+</div>
+</div>
+<div class="main">
+<div class="panel-label">DRIVER PHONE</div>
+<div class="driver-panel">
+<div class="phone"><div class="phone-screen">
+<div class="phone-header"><h2>MissionRide</h2></div>
+<div class="gps-bar" id="gpsBar">🔵 GPS: รอเริ่มภารกิจ</div>
+<div class="tracking-notice">⚠️ ระบบจะส่งตำแหน่งเฉพาะระหว่างเริ่มภารกิจจนจบภารกิจ</div>
+<div class="phone-body">
+<div class="p-card">
+<div class="p-label">คนขับ / Driver</div>
+<div class="p-value">สมชาย ใจดี (Somchai)</div>
+</div>
+<div class="p-card">
+<div class="p-label">รถที่เลือก / Vehicle</div>
+<div class="p-value">🚛 Truck 01 (82-5541)</div>
+</div>
+<div class="p-card" id="missionCard">
+<h3>📋 ภารกิจวันนี้</h3>
+<div id="stopsList"></div>
+</div>
+<div class="p-card route-map-driver" id="driverMapCard">
+<h3>🗺️ เส้นทางภารกิจ</h3>
+<svg id="driverMapSvg" viewBox="0 0 300 180"></svg>
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-top:4px"><span id="driverEtaLabel">ถัดไป: —</span><span id="driverEtaTime">ETA: —</span></div>
+</div>
+<div class="p-card" id="scoreCard" style="display:none">
+<h3>🏆 Mission Score</h3>
+<div id="scoreContent"></div>
+</div>
+</div>
+<div class="battery-bar" id="batteryBar">
+<span>🔋 Battery: 87%</span>
+<span id="batteryMode">Mode: Balanced</span>
+</div>
+<div class="phone-actions" id="driverActions">
+<button class="p-btn p-btn-start" id="btnStart" onclick="doStart()">🚀 เริ่มภารกิจ</button>
+<button class="p-btn p-btn-arrive" id="btnArrive" onclick="doArrive()" disabled>📍 ถึงแล้ว</button>
+<button class="p-btn p-btn-problem" id="btnProblem" onclick="doProblem()" disabled>📦 สินค้ามีปัญหา</button>
+<button class="p-btn p-btn-sos" id="btnSos" onclick="doSos()" disabled>🆘 SOS</button>
+<button class="p-btn p-btn-finish" id="btnFinish" onclick="doFinish()" disabled>🏁 จบภารกิจ</button>
+</div>
+</div></div>
+</div>
+<div class="panel-label">OFFICE COMMAND</div>
+<div class="office-panel">
+<div class="section-title">Fleet Overview</div>
+<div class="stats-row">
+<div class="stat"><div class="label">Active Missions</div><div class="val" id="statActive">0 / 4</div></div>
+<div class="stat"><div class="label">On-Time Rate</div><div class="val" id="statOntime" style="color:var(--green)">—</div></div>
+<div class="stat"><div class="label">Alerts (24h)</div><div class="val" id="statAlerts" style="color:var(--red)">0</div></div>
+<div class="stat"><div class="label">Fleet Battery Avg</div><div class="val" id="statBattery">—</div></div>
+</div>
+<div class="alert-card" id="sosAlert">
+<span class="alert-icon">🚨</span>
+<div class="alert-body">
+<div class="alert-title">SOS ALERT: <span id="sosDriver">—</span></div>
+<div class="alert-sub" id="sosSub">—</div>
+</div>
+<button class="alert-ack" onclick="ackSos()">Acknowledge</button>
+</div>
+<div class="section-title">Vehicle Status</div>
+<div class="warn-banner warn-offroute" id="warnOffroute">⚠️ Truck 01 is OFF-ROUTE — driver may need assistance</div>
+<div class="warn-banner warn-stopped" id="warnStopped">⏱️ Truck 01 stopped for 15+ minutes — check driver status</div>
+<div class="fleet" id="fleetGrid"></div>
+<div class="section-title" style="margin-top:20px">Fleet Route Map</div>
+<div class="route-map" id="officeMapCard">
+<svg id="officeMapSvg" viewBox="0 0 600 260"></svg>
+<div class="eta-bar"><span class="eta-next" id="officeEtaNext">Next Stop: —</span><span class="eta-time" id="officeEtaTime">ETA: —</span></div>
+</div>
+<div class="section-title" style="margin-top:20px">Route Timeline</div>
+<div id="timeline" class="timeline" style="color:var(--dim);font-size:13px">Waiting for mission start...</div>
+<div class="summary-card" id="summaryCard">
+<h3>📊 Mission Summary</h3>
+<div class="summary-grid" id="summaryGrid"></div>
+</div>
+</div>
+</div>
+<script>
+const STOPS=[
+{name:'คลังสินค้าหลัก (Warehouse)',eta:'08:00',lat:13.7563,lng:100.5018},
+{name:'จุดกระจายสินค้า บางนา',eta:'09:30',lat:13.6615,lng:100.6442},
+{name:'7-Eleven สาขาหน้า ม.เกษตร',eta:'11:00',lat:13.8476,lng:100.5696},
+{name:'ร้านค้าย่อย รามอินทรา',eta:'13:00',lat:13.8614,lng:100.6422},
+{name:'คลังสินค้าหลัก (กลับฐาน)',eta:'15:00',lat:13.7563,lng:100.5018}
+];
+const VEHICLES=[
+{id:'t01',plate:'82-5541',name:'Truck 01',driver:'Somchai',primary:true},
+{id:'t02',plate:'82-9902',name:'Truck 02',driver:'Wichai'},
+{id:'t03',plate:'82-3347',name:'Truck 03',driver:'Anucha'},
+{id:'t04',plate:'82-1155',name:'Truck 04',driver:'Prasit'}
+];
+let state={mode:'demo',missionStatus:'idle',currentStop:0,sosActive:false,battery:87,
+startTime:null,events:[],stopsCompleted:[],problemCount:0,offRoute:false,stoppedLong:false};
+const params=new URLSearchParams(location.search);
+if(params.get('demo')==='1') state.mode='demo';
+const MAP_PTS=[
+{x:30,y:150},{x:120,y:40},{x:200,y:130},{x:270,y:50},{x:270,y:150}
+];
+const OMAP_PTS=[
+{x:50,y:220},{x:180,y:40},{x:320,y:180},{x:460,y:50},{x:550,y:220}
+];
+function drawRouteMap(svgId,pts,isOffice){
+const svg=document.getElementById(svgId);if(!svg)return;
+const bg='#0a0e1a';
+const routeColor=isOffice?'#334155':'#1e2a45';
+const activeColor=isOffice?'#38bdf8':'#0ea5e9';
+const stopColor=isOffice?'#475569':'#334155';
+const doneColor='#22c55e';
+const sosColor='#ef4444';
+let html='';
+// route line (planned)
+let pathD='M'+pts.map(p=>p.x+' '+p.y).join(' L ');
+html+=`<path d="${pathD}" fill="none" stroke="${routeColor}" stroke-width="3" stroke-dasharray="8,4"/>`;
+// traveled line — build from completed stops only, then append midpoint
+if(state.stopsCompleted.length>0||state.missionStatus==='active'){
+let tPts=[pts[0]];
+state.stopsCompleted.forEach(si=>{if(pts[si])tPts.push(pts[si]);});
+if(state.missionStatus==='active'&&state.currentStop<pts.length){
+let lastPt=tPts[tPts.length-1];
+let tgt=pts[state.currentStop];
+let prog=0.5;
+tPts.push({x:lastPt.x+(tgt.x-lastPt.x)*prog,y:lastPt.y+(tgt.y-lastPt.y)*prog});
+}
+if(tPts.length>1){
+let tD='M'+tPts.map(p=>p.x+' '+p.y).join(' L ');
+html+=`<path d="${tD}" fill="none" stroke="${activeColor}" stroke-width="3"/>`;
+}
+}
+// stop markers
+pts.forEach((p,i)=>{
+let col=stopColor;
+if(state.stopsCompleted.includes(i))col=doneColor;
+else if(state.missionStatus==='active'&&i===state.currentStop)col=activeColor;
+let r=isOffice?8:6;
+html+=`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${col}" stroke="${bg}" stroke-width="2"/>`;
+html+=`<text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="${isOffice?9:8}" fill="${bg}" font-weight="700">${i+1}</text>`;
+});
+// vehicle marker
+if(state.missionStatus==='active'){
+let cur=state.currentStop<pts.length?state.currentStop:pts.length-1;
+let prev=cur>0?cur-1:0;
+let from=pts[prev],to=pts[cur];
+let prog=0.5;
+let vx=from.x+(to.x-from.x)*prog, vy=from.y+(to.y-from.y)*prog;
+let vCol=state.sosActive?sosColor:activeColor;
+let vR=isOffice?12:10;
+html+=`<circle cx="${vx}" cy="${vy}" r="${vR}" fill="${vCol}" opacity="0.3"><animate attributeName="r" values="${vR};${vR+6};${vR}" dur="2s" repeatCount="indefinite"/></circle>`;
+html+=`<circle cx="${vx}" cy="${vy}" r="${vR-3}" fill="${vCol}"/>`;
+html+=`<text x="${vx}" y="${vy+3}" text-anchor="middle" font-size="7" fill="white" font-weight="700">🚛</text>`;
+// SOS highlight
+if(state.sosActive){
+html+=`<circle cx="${vx}" cy="${vy}" r="${vR+10}" fill="none" stroke="${sosColor}" stroke-width="2" opacity="0.6"><animate attributeName="r" values="${vR+10};${vR+20};${vR+10}" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0.1;0.6" dur="1s" repeatCount="indefinite"/></circle>`;
+}
+// off-route indicator
+if(state.offRoute){
+let ox=vx+15,oy=vy-15;
+html+=`<line x1="${vx}" y1="${vy}" x2="${ox}" y2="${oy}" stroke="#f97316" stroke-width="2" stroke-dasharray="4,2"/>`;
+html+=`<circle cx="${ox}" cy="${oy}" r="${isOffice?10:8}" fill="#f97316" opacity="0.8"/>`;
+html+=`<text x="${ox}" y="${oy+3}" text-anchor="middle" font-size="8" fill="white" font-weight="700">!</text>`;
+}
+}
+// office: other vehicles
+if(isOffice&&state.missionStatus!=='idle'){
+let others=[{x:250,y:120,label:'T2'},{x:400,y:90,label:'T3'},{x:150,y:160,label:'T4'}];
+others.forEach(o=>{
+html+=`<circle cx="${o.x}" cy="${o.y}" r="7" fill="#475569" opacity="0.6"/>`;
+html+=`<text x="${o.x}" y="${o.y+3}" text-anchor="middle" font-size="7" fill="white">${o.label}</text>`;
+});
+}
+svg.innerHTML=html;
+}
+function updateEta(){
+let nextName='—',etaTime='—';
+if(state.missionStatus==='active'&&state.currentStop<STOPS.length){
+nextName=STOPS[state.currentStop].name;
+etaTime=STOPS[state.currentStop].eta;
+}
+const dn=document.getElementById('driverEtaLabel');
+const dt=document.getElementById('driverEtaTime');
+const on=document.getElementById('officeEtaNext');
+const ot=document.getElementById('officeEtaTime');
+if(dn)dn.textContent='ถัดไป: '+nextName;
+if(dt)dt.textContent='ETA: '+etaTime;
+if(on)on.textContent='Next Stop: '+nextName;
+if(ot)ot.textContent='ETA: '+etaTime;
+}
+function updateWarnings(){
+document.getElementById('warnOffroute').classList.toggle('show',state.offRoute);
+document.getElementById('warnStopped').classList.toggle('show',state.stoppedLong);
+}
+function renderMaps(){
+drawRouteMap('driverMapSvg',MAP_PTS,false);
+drawRouteMap('officeMapSvg',OMAP_PTS,true);
+updateEta();
+updateWarnings();
+}
+function init(){
+renderStops();renderFleet();updateStats();renderMaps();
+const shot=params.get('shot');
+if(shot==='sos'){doStart();setTimeout(()=>doArrive(),100);setTimeout(()=>doSos(),200);}
+else if(shot==='summary'){runFullDemo();}
+else if(shot==='driver'){document.querySelector('.office-panel').style.display='none';}
+else if(shot==='office'){document.querySelector('.driver-panel').style.display='none';}
+else if(shot==='reroute'){doStart();setTimeout(()=>doArrive(),150);setTimeout(()=>{state.offRoute=true;addEvent('⚠️ Off-route detected — driver deviated from planned path');renderMaps();updateWarnings();},300);}
+else if(shot==='offroute'){doStart();setTimeout(()=>{state.offRoute=true;state.stoppedLong=true;addEvent('⚠️ Off-route: driver left planned path');addEvent('⏱️ Stopped too long: 15+ min at unknown location');renderMaps();updateWarnings();},200);}
+}
+function renderStops(){
+const el=document.getElementById('stopsList');
+el.innerHTML=STOPS.map((s,i)=>{
+let cls='';let statusTxt='';
+if(state.stopsCompleted.includes(i)){cls='done';statusTxt='✅';}
+else if(state.missionStatus==='active'&&i===state.currentStop){cls='active';statusTxt='🔄';}
+return`<div class="stop-row"><div class="stop-num ${cls}">${i+1}</div><div class="stop-name">${s.name}<br><span style="font-size:11px;color:#94a3b8">ETA: ${s.eta}</span></div><div class="stop-status">${statusTxt}</div></div>`;
+}).join('');
+}
+function renderFleet(){
+const el=document.getElementById('fleetGrid');
+el.innerHTML=VEHICLES.map(v=>{
+let pill,pillCls,info,progress=0,score=0,scoreCls='var(--green)';
+if(v.primary){
+if(state.missionStatus==='idle'){pill='IDLE';pillCls='pill-idle';info='Waiting for mission start';score=0;}
+else if(state.missionStatus==='active'){
+if(state.sosActive){pill='SOS';pillCls='pill-sos';info='🚨 SOS ACTIVE';}
+else{pill='MOVING';pillCls='pill-moving';info=`Next: ${STOPS[state.currentStop]?.name||'—'}`;}
+progress=Math.round((state.stopsCompleted.length/STOPS.length)*100);
+score=calcScore();
+}else if(state.missionStatus==='finished'){pill='DONE';pillCls='pill-done';info='Mission complete';progress=100;score=calcScore();}
+}else{
+const r=Math.random();
+if(r<.5){pill='MOVING';pillCls='pill-moving';info='En route';progress=Math.round(30+r*60);score=(7+r*2.5).toFixed(1);}
+else if(r<.8){pill='STOPPED';pillCls='pill-stopped';info='⚠️ Stopped 12 min';progress=Math.round(r*80);score=(6+r*2).toFixed(1);scoreCls='var(--orange)';}
+else{pill='IDLE';pillCls='pill-idle';info='Not started';score=0;}
+}
+if(score>8.5)scoreCls='var(--green)';else if(score>6)scoreCls='var(--orange)';else if(score>0)scoreCls='var(--red)';
+return`<div class="v-card"><div class="v-head"><div><div class="v-name">${v.name} (${v.plate})</div><div class="v-driver">Driver: ${v.driver}</div></div><span class="pill ${pillCls}">${pill}</span></div><div class="v-body"><div class="v-info">${info}</div><div class="progress"><div class="progress-fill" style="width:${progress}%"></div></div><div class="v-meta"><span>${state.stopsCompleted.length}/${STOPS.length} stops</span><span>🔋 ${v.primary?state.battery:Math.round(60+Math.random()*30)}%</span></div><div class="score-row"><span>Score</span><div class="score-bar"><div class="score-fill" style="width:${score*10}%;background:${scoreCls}"></div></div><span>${score>0?score:'—'}</span></div></div></div>`;
+}).join('');
+}
+function calcScore(){
+let s=10;
+s-=state.problemCount*0.5;
+if(state.sosActive)s-=1;
+if(state.stopsCompleted.length>0)s+=0.2*state.stopsCompleted.length;
+return Math.max(0,Math.min(10,s)).toFixed(1);
+}
+function updateStats(){
+const active=state.missionStatus==='active'?1:0;
+const others=Math.floor(Math.random()*3)+1;
+document.getElementById('statActive').textContent=`${active+others} / 4`;
+document.getElementById('statOntime').textContent=state.problemCount>0?'88%':'96%';
+document.getElementById('statAlerts').textContent=state.sosActive?'1':'0';
+document.getElementById('statBattery').textContent=state.battery+'%';
+}
+function addEvent(text){
+state.events.push({time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),text});
+renderTimeline();
+}
+function renderTimeline(){
+const el=document.getElementById('timeline');
+el.innerHTML=state.events.map(e=>`<div class="tl-item"><span class="tl-time">${e.time}</span><span>${e.text}</span></div>`).join('');
+}
+function setButtons(s,a,p,sos,f){
+document.getElementById('btnStart').disabled=!s;
+document.getElementById('btnArrive').disabled=!a;
+document.getElementById('btnProblem').disabled=!p;
+document.getElementById('btnSos').disabled=!sos;
+document.getElementById('btnFinish').disabled=!f;
+}
+async function tryConnect(){
+const url=document.getElementById('apiUrl').value.replace(/\/$/,'');
+try{
+const r=await fetch(url+'/api/missionride/office/vehicles',{signal:AbortSignal.timeout(3000)});
+if(r.ok){state.mode='live';setBadge('live');addEvent('✅ Connected to live backend');}
+else throw new Error('not ok');
+}catch(e){state.mode='demo';setBadge('demo');addEvent('⚠️ Backend unreachable — using demo mode');}
+}
+function toggleDemo(){
+state.mode=state.mode==='demo'?'live':'demo';
+setBadge(state.mode);
+addEvent(state.mode==='demo'?'Switched to DEMO MODE':'Switched to LIVE MODE (verify backend)');
+}
+function setBadge(m){
+const b=document.getElementById('modeBadge');
+if(m==='live'){b.textContent='LIVE BACKEND MODE';b.className='mode-badge mode-live';}
+else{b.textContent='DEMO SIMULATION MODE';b.className='mode-badge mode-sim';}
+}
+function doStart(){
+state.missionStatus='active';state.currentStop=0;state.startTime=new Date();
+document.getElementById('gpsBar').innerHTML='🟢 GPS: กำลังส่งตำแหน่ง (Active)';
+document.getElementById('gpsBar').style.background='#166534';
+document.getElementById('gpsBar').style.color='#bbf7d0';
+document.getElementById('batteryMode').textContent='Mode: Balanced';
+setButtons(false,true,true,true,false);
+addEvent('🚀 Mission started — GPS tracking active');
+renderStops();renderFleet();updateStats();renderMaps();
+}
+function doArrive(){
+if(state.currentStop>=STOPS.length)return;
+state.stopsCompleted.push(state.currentStop);
+addEvent(`📍 Arrived at Stop ${state.currentStop+1}: ${STOPS[state.currentStop].name}`);
+state.currentStop++;
+if(state.currentStop<STOPS.length){
+document.getElementById('batteryMode').textContent='Mode: High Accuracy (near stop)';
+setTimeout(()=>{if(state.missionStatus==='active')document.getElementById('batteryMode').textContent='Mode: Balanced';},2000);
+}
+if(state.currentStop>=STOPS.length){
+setButtons(false,false,false,true,true);
+addEvent('✅ All stops completed — ready to finish');
+}
+state.battery=Math.max(10,state.battery-3);
+renderStops();renderFleet();updateStats();renderMaps();
+}
+function doProblem(){
+state.problemCount++;
+addEvent('📦 Problem reported: สินค้ามีปัญหา (Damaged goods)');
+renderFleet();updateStats();renderMaps();
+}
+function doSos(){
+state.sosActive=true;
+document.getElementById('sosAlert').classList.add('show');
+document.getElementById('sosDriver').textContent='Somchai (Truck 01)';
+document.getElementById('sosSub').textContent=`Location: ${STOPS[state.currentStop]?.name||'Unknown'} | ${new Date().toLocaleTimeString('th-TH')}`;
+document.getElementById('gpsBar').innerHTML='🔴 GPS: SOS — ส่งตำแหน่งความถี่สูง';
+document.getElementById('gpsBar').style.background='#991b1b';
+document.getElementById('batteryMode').textContent='Mode: SOS Priority';
+addEvent('🆘 SOS ALERT triggered by driver Somchai');
+setButtons(false,state.currentStop<STOPS.length,true,false,true);
+renderFleet();updateStats();renderMaps();
+}
+function ackSos(){
+state.sosActive=false;
+document.getElementById('sosAlert').classList.remove('show');
+document.getElementById('gpsBar').innerHTML='🟢 GPS: กำลังส่งตำแหน่ง (Active)';
+document.getElementById('gpsBar').style.background='#166534';
+document.getElementById('batteryMode').textContent='Mode: Balanced';
+addEvent('✅ SOS acknowledged by office');
+renderFleet();updateStats();renderMaps();
+}
+function doFinish(){
+state.missionStatus='finished';
+document.getElementById('gpsBar').innerHTML='⚪ GPS: ภารกิจจบแล้ว (Stopped)';
+document.getElementById('gpsBar').style.background='#334155';
+document.getElementById('gpsBar').style.color='#94a3b8';
+setButtons(false,false,false,false,false);
+addEvent('🏁 Mission finished — GPS tracking stopped');
+const score=calcScore();
+document.getElementById('scoreCard').style.display='block';
+document.getElementById('scoreContent').innerHTML=`<div style="font-size:36px;text-align:center;color:${score>8?'#22c55e':score>6?'#f59e0b':'#ef4444'}">${score}/10</div><div style="text-align:center;font-size:13px;color:#64748b;margin-top:4px">Stops: ${state.stopsCompleted.length}/${STOPS.length} | Problems: ${state.problemCount} | SOS: ${state.sosActive?'Yes':'No'}</div>`;
+const sc=document.getElementById('summaryCard');
+sc.classList.add('show');
+document.getElementById('summaryGrid').innerHTML=`<div class="summary-item"><div class="s-label">Duration</div><div class="s-val">${state.startTime?Math.round((Date.now()-state.startTime.getTime())/1000)+'s':'—'}</div></div><div class="summary-item"><div class="s-label">Stops Completed</div><div class="s-val">${state.stopsCompleted.length}/${STOPS.length}</div></div><div class="summary-item"><div class="s-label">Problems</div><div class="s-val">${state.problemCount}</div></div><div class="summary-item"><div class="s-label">Driver Score</div><div class="s-val" style="color:var(--accent)">${score}</div></div><div class="summary-item"><div class="s-label">Battery Used</div><div class="s-val">${87-state.battery}%</div></div><div class="summary-item"><div class="s-label">GPS Mode</div><div class="s-val" style="font-size:14px">Foreground Only</div></div>`;
+renderStops();renderFleet();updateStats();renderMaps();
+}
+function resetDemo(){
+state={mode:state.mode,missionStatus:'idle',currentStop:0,sosActive:false,battery:87,startTime:null,events:[],stopsCompleted:[],problemCount:0,offRoute:false,stoppedLong:false};
+document.getElementById('gpsBar').innerHTML='🔵 GPS: รอเริ่มภารกิจ';
+document.getElementById('gpsBar').style.background='#1e40af';
+document.getElementById('gpsBar').style.color='#93c5fd';
+document.getElementById('sosAlert').classList.remove('show');
+document.getElementById('scoreCard').style.display='none';
+document.getElementById('summaryCard').classList.remove('show');
+document.getElementById('batteryMode').textContent='Mode: Balanced';
+document.getElementById('timeline').innerHTML='Waiting for mission start...';
+setButtons(true,false,false,false,false);
+renderStops();renderFleet();updateStats();renderMaps();
+addEvent('🔄 Demo reset');
+}
+function runFullDemo(){
+doStart();
+setTimeout(()=>doArrive(),200);
+setTimeout(()=>doArrive(),400);
+setTimeout(()=>doProblem(),500);
+setTimeout(()=>doArrive(),600);
+setTimeout(()=>doArrive(),800);
+setTimeout(()=>doArrive(),1000);
+setTimeout(()=>doFinish(),1200);
+}
+init();
+// Showcase mode: ?showcase=1 hides dev chrome for premium presentation
+if(new URLSearchParams(location.search).get('showcase')==='1'){
+document.body.classList.add('showcase');
+}
+</script>
+</body>
+</html>
