@@ -49,3 +49,47 @@ All tools must follow the same source of truth.
 - Never push parent gitlink commits that reference nested commits not available on the nested remote.
 
 ---
+
+## DuDe Hawaiian Token-Saving Overlay
+
+### Current Project Boundaries
+- Parent repo: /home/thegodseller/DuDe_Hawaiian
+- Nested service repo: tHe_DuDe_Service
+- WebUI app: tHe_DuDe_WebUI/dude_hawaiian_webui
+- Corporate site: tHe_DuDe_WebUI/corporate_site
+- MissionRide path: tHe_DuDe_Service/customer_apps/ice_fac_aran/gps/
+
+### Critical Boundaries
+- corporate_site is a public marketing site. Do not touch it unless explicitly requested.
+- POS Season 1 MVP is closed. Do not touch POS unless explicitly requested.
+- MissionRide is the current GPS mission-app work.
+- Generated Pi5 watcher datasets are ignored and must not be committed.
+- Never inspect or print .env files.
+
+### Token-Saving Workflow
+- Scout only: inspect only named files and nearby entry points.
+- Plan only: write a short plan without editing.
+- Patch only: edit the smallest file set required.
+- Validate only: run named checks and summarize results.
+
+### Validation Commands
+- git status --short
+- git -C tHe_DuDe_Service status --short
+- git -C tHe_DuDe_WebUI/dude_hawaiian_webui status --short
+- bash scripts/rtk_snapshot.sh
+
+### Output Rules
+- Use git diff --stat before full diffs.
+- Cap long command output with sed -n.
+- Summarize logs only.
+- Never paste long build logs.
+- Never run git add .
+
+### Final Report Format
+- Files inspected
+- Files changed
+- Validation result
+- Risks
+- Child commit hash, if any
+- Parent commit hash, if any
+- Confirmation that corporate_site, POS, and .env files were untouched
