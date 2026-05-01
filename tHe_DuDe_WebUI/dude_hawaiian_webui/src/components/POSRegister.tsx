@@ -264,6 +264,57 @@ const DEMO_VOID_TICKET = {
   status: 'VOIDED'
 };
 
+const DEMO_SHIFT_SUMMARY: ShiftSummary = {
+  status: 'CLOSED',
+  opened_at: '2026-04-30T09:00:00.000Z',
+  closed_at: '2026-04-30T21:00:00.000Z',
+  opening_cash: '1000.00',
+  expected_cash: '9420.00',
+  actual_cash: '9420.00',
+  variance: '0.00',
+  confirmed_ticket_count: 128,
+  voided_ticket_count: 3,
+  gross_sales: '8560.00',
+  voided_sales: '140.00',
+  net_sales: '8420.00',
+  cash_sales: '4200.00',
+  qr_sales: '3800.00',
+  credit_sales: '420.00',
+  top_items: [
+    { name: 'น้ำแข็งหลอดเล็ก 5kg', quantity: 45, total: '1125.00' },
+    { name: 'น้ำดื่ม Dude Pure 600ml', quantity: 38, total: '380.00' },
+    { name: 'น้ำแข็งหลอดใหญ่ 10kg', quantity: 22, total: '990.00' }
+  ]
+};
+
+const DEMO_LOW_STOCK_ITEMS: LowStockItem[] = [
+  { product_id: 'd5', sku: 'WAT-1500', barcode: '885005', name: 'น้ำดื่ม Dude Pure 1500ml', category_name: 'Beverage', uom: 'pcs', on_hand_qty: '4.00', reorder_point: '10.00', reorder_qty: '50.00', stock_status: 'LOW_STOCK' },
+  { product_id: 'd3', sku: 'ICE-P-08', barcode: '885003', name: 'น้ำแข็งป่นถุงกลาง', category_name: 'Ice', uom: 'bags', on_hand_qty: '0.00', reorder_point: '5.00', reorder_qty: '20.00', stock_status: 'OUT_OF_STOCK' },
+];
+
+const DEMO_RECEIPT: ReceiptData = {
+  business_name: 'DUDE HAWAIIAN ICE - HQ',
+  ticket_id: 'demo-tk-128',
+  ticket_no: 'POS-2026-000128',
+  status: 'COMPLETED',
+  created_at: '2026-04-30T10:15:00.000Z',
+  shift_id: 'demo-shift-2026',
+  employee_id: 'demo-cashier-id',
+  items: [
+    { product_id: 'd5', name: 'น้ำดื่ม Dude Pure 1500ml', qty: 2, unit_price: '20.00', line_total: '40.00' },
+    { product_id: 'd2', name: 'น้ำแข็งหลอดเล็ก 5kg', qty: 2, unit_price: '25.00', line_total: '50.00' },
+    { product_id: 'd4', name: 'น้ำดื่ม Dude Pure 600ml', qty: 3, unit_price: '10.00', line_total: '30.00' }
+  ],
+  subtotal: '120.00',
+  vat_amount: '0.00',
+  total_amount: '120.00',
+  payment: {
+    method: 'PROMPTPAY',
+    amount: '120.00'
+  },
+  is_voided: false
+};
+
 const AUTHORIZED_VOID_ROLES = ['MANAGER', 'ADMIN', 'SUPERVISOR', 'OWNER'];
 
 const buildDemoCart = (items: CartItem[]): CartItem[] => (
@@ -304,6 +355,10 @@ export const POSRegister: React.FC = () => {
     if (!isScreenshotMode) return null;
     if (shotMode === 'success') return 'ticket_success';
     if (shotMode === 'void') return 'void_success';
+    if (shotMode === 'stock') return 'inventory';
+    if (shotMode === 'summary') return 'shift_summary';
+    if (shotMode === 'lowstock') return 'lowstock';
+    if (shotMode === 'receipt') return 'receipt';
     return null;
   });
   const [cartWarning, setCartWarning] = useState<{ product_id: string; message: string } | null>(() => (
@@ -315,6 +370,11 @@ export const POSRegister: React.FC = () => {
   // Shift Management State
   const [currentShift, setCurrentShift] = useState<ShiftData | null>(() => (
     isScreenshotMode ? DEMO_SHIFT : null
+  ));
+
+  // Receipt State
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(() => (
+    isScreenshotMode && shotMode === 'receipt' ? DEMO_RECEIPT : null
   ));
   const [shiftLoading, setShiftLoading] = useState(false);
   const [shiftError, setShiftError] = useState<string | null>(null);
@@ -355,12 +415,13 @@ export const POSRegister: React.FC = () => {
   const [voidLoading, setVoidLoading] = useState(false);
 
   // Shift Summary State
-  const [shiftSummary, setShiftSummary] = useState<ShiftSummary | null>(null);
+  const [shiftSummary, setShiftSummary] = useState<ShiftSummary | null>(() => (
+    isScreenshotMode ? DEMO_SHIFT_SUMMARY : null
+  ));
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
 
   // Receipt State
-  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [receiptLoading, setReceiptLoading] = useState(false);
   const [receiptError, setReceiptError] = useState<string | null>(null);
 
@@ -428,7 +489,9 @@ export const POSRegister: React.FC = () => {
   });
 
   // Low Stock Dashboard State
-  const [lowStockItems, setLowStockItems] = useState<LowStockItem[]>([]);
+  const [lowStockItems, setLowStockItems] = useState<LowStockItem[]>(() => (
+    isScreenshotMode ? DEMO_LOW_STOCK_ITEMS : []
+  ));
   const [isLowStockLoading, setIsLowStockLoading] = useState(false);
   const [lowStockError, setLowStockError] = useState<string | null>(null);
   const [editingReorderProduct, setEditingReorderProduct] = useState<LowStockItem | null>(null);
