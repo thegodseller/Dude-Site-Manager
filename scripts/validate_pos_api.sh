@@ -4,6 +4,11 @@
 set -u
 
 POS_URL="${POS_URL:-http://localhost:11116}"
+POS_CSV_DAILY_HEADERS=$(mktemp)
+POS_CSV_DAILY_BODY=$(mktemp)
+POS_CSV_TICKETS_HEADERS=$(mktemp)
+POS_CSV_TICKETS_BODY=$(mktemp)
+trap 'rm -f "$POS_CSV_DAILY_HEADERS" "$POS_CSV_DAILY_BODY" "$POS_CSV_TICKETS_HEADERS" "$POS_CSV_TICKETS_BODY"' EXIT
 
 echo "--- POS API Verification: $POS_URL ---"
 
@@ -560,6 +565,40 @@ if echo "$REPORT_RESP" | grep -q '"status":"ok"'; then
     if echo "$REPORT_RESP" | jq -e '.cashier_summary | length > 0' > /dev/null; then echo "PASS"; else echo "FAIL"; exit 1; fi
 else
     echo "FAIL: $REPORT_RESP"
+    exit 1
+fi
+
+# 13.1 CSV Export Tests
+echo "--- CSV Export Tests ---"
+DAILY_EXPORT_URL="$POS_URL/api/pos/reports/daily/export.csv?date=$TODAY"
+echo -n "Daily Report CSV Export: "
+DAILY_EXPORT_CODE=$(curl -s -D "$POS_CSV_DAILY_HEADERS" -o "$POS_CSV_DAILY_BODY" -w "%{http_code}" "$DAILY_EXPORT_URL")
+DAILY_EXPORT_CT=$(awk -F': ' 'tolower($1)=="content-type"{print tolower($2)}' "$POS_CSV_DAILY_HEADERS" | tail -n 1)
+DAILY_EXPORT_VALID=0
+if python3 -c 'import csv, sys; rows=list(csv.reader(open(sys.argv[1], newline=""))); assert rows and rows[0]' "$POS_CSV_DAILY_BODY"; then
+    DAILY_EXPORT_VALID=1
+fi
+if [ "$DAILY_EXPORT_CODE" = "200" ] && { echo "$DAILY_EXPORT_CT" | grep -qi "text/csv" || [ "$DAILY_EXPORT_VALID" = "1" ]; } && \
+   python3 -c 'import csv, sys; rows=list(csv.DictReader(open(sys.argv[1], newline=""))); assert rows and rows[0].get("date") == sys.argv[2] and "net_sales" in rows[0]' "$POS_CSV_DAILY_BODY" "$TODAY"; then
+    echo "PASS"
+else
+    echo "FAIL (status=$DAILY_EXPORT_CODE, content-type=$DAILY_EXPORT_CT)"
+    exit 1
+fi
+
+TICKETS_EXPORT_URL="$POS_URL/api/pos/tickets/export.csv?date=$TODAY"
+echo -n "Ticket CSV Export: "
+TICKETS_EXPORT_CODE=$(curl -s -D "$POS_CSV_TICKETS_HEADERS" -o "$POS_CSV_TICKETS_BODY" -w "%{http_code}" "$TICKETS_EXPORT_URL")
+TICKETS_EXPORT_CT=$(awk -F': ' 'tolower($1)=="content-type"{print tolower($2)}' "$POS_CSV_TICKETS_HEADERS" | tail -n 1)
+TICKETS_EXPORT_VALID=0
+if python3 -c 'import csv, sys; rows=list(csv.reader(open(sys.argv[1], newline=""))); assert rows and rows[0]' "$POS_CSV_TICKETS_BODY"; then
+    TICKETS_EXPORT_VALID=1
+fi
+if [ "$TICKETS_EXPORT_CODE" = "200" ] && { echo "$TICKETS_EXPORT_CT" | grep -qi "text/csv" || [ "$TICKETS_EXPORT_VALID" = "1" ]; } && \
+   python3 -c 'import csv, sys; rows=list(csv.DictReader(open(sys.argv[1], newline=""))); assert rows and "ticket_no" in rows[0]' "$POS_CSV_TICKETS_BODY"; then
+    echo "PASS"
+else
+    echo "FAIL (status=$TICKETS_EXPORT_CODE, content-type=$TICKETS_EXPORT_CT)"
     exit 1
 fi
 
