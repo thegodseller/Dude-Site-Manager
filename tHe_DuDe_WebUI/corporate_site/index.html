@@ -149,7 +149,30 @@
         .mr-value-card h4 { font-size: 1.08rem; margin-bottom: 8px; letter-spacing: -0.01em; }
         .mr-value-card p { color: var(--secondary); font-size: 0.86rem; line-height: 1.55; }
         .mr-cta-row { display: flex; gap: 16px; justify-content: center; }
-        @media (max-width: 768px) { .mr-showcase { padding: 24px; } .mr-showcase-main { grid-template-columns: 1fr; } .mr-showcase-copy h3 { font-size: 2.4rem; } .mr-shot-grid { grid-template-columns: 1fr; } }
+        .mr-trust-pack { margin-top: 48px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .mr-trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        .mr-trust-card { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 16px; padding: 28px; }
+        .mr-trust-card h4 { font-size: 1.15rem; margin-bottom: 16px; color: var(--accent); letter-spacing: -0.01em; }
+        .mr-trust-card ul { list-style: none; display: grid; gap: 12px; }
+        .mr-trust-card li { display: flex; align-items: start; gap: 10px; font-size: 0.95rem; color: var(--secondary); line-height: 1.4; }
+        .mr-trust-card li::before { content: '✓'; color: var(--green); font-weight: bold; flex: 0 0 auto; }
+        .mr-pilot-card { background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(10, 14, 26, 0.4) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 32px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+        .mr-pilot-card h4 { font-size: 1.4rem; color: var(--accent); margin-bottom: 12px; letter-spacing: -0.02em; }
+        .mr-pilot-card p { font-size: 1.05rem; color: var(--secondary); margin-bottom: 20px; max-width: 600px; margin-inline: auto; line-height: 1.6; }
+        .mr-pilot-list { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; list-style: none; }
+        .mr-pilot-list li { background: rgba(56, 189, 248, 0.1); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .mr-privacy { text-align: center; font-size: 0.95rem; color: var(--secondary); margin-bottom: 48px; padding: 20px; background: rgba(255,255,255,0.015); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); line-height: 1.6; }
+        .mr-privacy strong { color: var(--text); }
+        .mr-faq { max-width: 800px; margin: 0 auto 48px; }
+        .mr-faq h4 { font-size: 1.5rem; margin-bottom: 24px; text-align: center; letter-spacing: -0.02em; }
+        .mr-faq details { background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: background 0.2s; }
+        .mr-faq details:hover { background: rgba(255,255,255,0.02); }
+        .mr-faq summary { padding: 18px 24px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; font-size: 0.95rem; color: var(--text); }
+        .mr-faq summary::-webkit-details-marker { display: none; }
+        .mr-faq summary::after { content: '+'; font-size: 1.2rem; color: var(--dim); transition: transform 0.2s; font-weight: 400; }
+        .mr-faq details[open] summary::after { content: '−'; transform: rotate(180deg); }
+        .mr-faq p { padding: 0 24px 20px; color: var(--secondary); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+        @media (max-width: 768px) { .mr-showcase { padding: 24px; } .mr-showcase-main { grid-template-columns: 1fr; } .mr-showcase-copy h3 { font-size: 2.4rem; } .mr-shot-grid { grid-template-columns: 1fr; } .mr-trust-grid { grid-template-columns: 1fr; } }
 
         /* --- Agents --- */
         .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
@@ -395,6 +418,69 @@
                             <div class="mr-value-icon">📊</div>
                             <h4>Mission Scoring</h4>
                             <p>On-time delivery, stop completion, and problem resolution build transparent driver performance metrics.</p>
+                        </div>
+                    </div>
+
+                    <div class="mr-trust-pack">
+                        <div class="mr-trust-grid">
+                            <div class="mr-trust-card">
+                                <h4>Who it is for</h4>
+                                <ul>
+                                    <li>Delivery operations</li>
+                                    <li>Factory logistics</li>
+                                    <li>Recurring route businesses</li>
+                                    <li>Office teams coordinating drivers</li>
+                                </ul>
+                            </div>
+                            <div class="mr-trust-card">
+                                <h4>Problems it solves</h4>
+                                <ul>
+                                    <li>Planned route clarity</li>
+                                    <li>ETA visibility & delivery progress</li>
+                                    <li>Off-route assistance</li>
+                                    <li>Stopped-too-long awareness</li>
+                                    <li>SOS emergency escalation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mr-pilot-card">
+                            <h4>Start a Risk-Free Pilot</h4>
+                            <p>Test the full capability of MissionRide in your real operations before scaling up. Minimal setup, immediate visibility.</p>
+                            <ul class="mr-pilot-list">
+                                <li>Start with 1 route</li>
+                                <li>1–3 vehicles</li>
+                                <li>7–14 day pilot</li>
+                                <li>Measure ETA, route deviation, delay & SOS workflow</li>
+                            </ul>
+                        </div>
+
+                        <div class="mr-privacy">
+                            <strong>Privacy & Intent:</strong> MissionRide is built for route guidance, driver support, office assistance, and safety. <strong>It is not employee tracking and not surveillance.</strong> GPS is foreground-only and active only during assigned missions.
+                        </div>
+
+                        <div class="mr-faq">
+                            <h4>Frequently Asked Questions</h4>
+                            <details>
+                                <summary>Do drivers need special phones?</summary>
+                                <p>No. MissionRide runs efficiently on any standard smartphone. The interface is optimized to be readable even on older devices, ensuring no extra hardware costs for your operation.</p>
+                            </details>
+                            <details>
+                                <summary>Does it drain the driver's battery quickly?</summary>
+                                <p>No. MissionRide uses adaptive GPS modes that balance location accuracy with battery life. It only operates in the foreground during an active mission and never runs background location services.</p>
+                            </details>
+                            <details>
+                                <summary>How does the SOS escalation work?</summary>
+                                <p>If a driver encounters an emergency or breakdown, they press the SOS button. The office dashboard immediately flashes an alert with their precise location so support can be dispatched instantly.</p>
+                            </details>
+                            <details>
+                                <summary>What happens if a driver goes off-route?</summary>
+                                <p>The system detects the deviation and flags the vehicle on the office map. This allows dispatchers to proactively contact the driver to offer assistance, rather than waiting for a delayed delivery report.</p>
+                            </details>
+                            <details>
+                                <summary>Is this just an employee tracking app?</summary>
+                                <p>Absolutely not. MissionRide is built purely for mission support and safety. It provides clarity for the office and security for the driver, without relying on pervasive surveillance. It operates exclusively on trust and operational intelligence.</p>
+                            </details>
                         </div>
                     </div>
                     <div class="mr-cta-container" style="text-align: center; margin-top: 12px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05);">
