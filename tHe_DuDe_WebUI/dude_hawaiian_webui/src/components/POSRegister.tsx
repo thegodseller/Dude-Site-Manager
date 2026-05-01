@@ -317,6 +317,20 @@ const DEMO_RECEIPT: ReceiptData = {
 
 const AUTHORIZED_VOID_ROLES = ['MANAGER', 'ADMIN', 'SUPERVISOR', 'OWNER'];
 
+const extractEmployees = (payload: unknown): Employee[] => {
+  if (Array.isArray(payload)) return payload as Employee[];
+  if (!payload || typeof payload !== 'object') return [];
+
+  const data = payload as { employees?: unknown; items?: unknown };
+  if (Array.isArray(data.employees)) return data.employees as Employee[];
+  if (Array.isArray(data.items)) return data.items as Employee[];
+  return [];
+};
+
+const isActiveEmployee = (employee: Employee): boolean => (
+  employee.is_active === true || String(employee.is_active).toLowerCase() === 'true'
+);
+
 const buildDemoCart = (items: CartItem[]): CartItem[] => (
   items.map(item => ({ ...normalizeProduct(item), quantity: item.quantity }))
 );
@@ -526,12 +540,22 @@ export const POSRegister: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       const res = await fetch('/ag_pos_api/employees');
+      if (!res.ok) {
+        throw new Error(`Employee request failed with HTTP ${res.status}`);
+      }
       const data = await res.json();
-      if (data.success) {
-        setEmployees(data.items || []);
+      const employeeList = extractEmployees(data).filter(isActiveEmployee);
+      if (data.success || employeeList.length > 0 || Array.isArray(data)) {
+        setEmployees(employeeList);
+        setLoginError(null);
+      } else {
+        setEmployees([]);
+        setLoginError(data.message || 'Employee list response did not include employees.');
       }
     } catch (err) {
       console.error('Failed to fetch employees:', err);
+      setEmployees([]);
+      setLoginError('Failed to load active employees. Check POS API connection.');
     }
   };
 
@@ -1022,9 +1046,17 @@ export const POSRegister: React.FC = () => {
     setManagementLoading(true);
     try {
       const res = await fetch('/ag_pos_api/employees');
+      if (!res.ok) {
+        throw new Error(`Staff request failed with HTTP ${res.status}`);
+      }
       const data = await res.json();
-      if (data.success) {
-        setEmployees(data.employees);
+      const employeeList = extractEmployees(data);
+      if (data.success || employeeList.length > 0 || Array.isArray(data)) {
+        setEmployees(employeeList);
+        setManagementError(null);
+      } else {
+        setEmployees([]);
+        setManagementError(data.message || 'Staff list response did not include employees.');
       }
     } catch (err) {
       setManagementError('Failed to fetch staff list');
@@ -1392,6 +1424,7 @@ export const POSRegister: React.FC = () => {
   const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.unit_price) * item.quantity), 0);
   const vatAmount = isVat ? subtotal * 0.07 : 0;
   const total = subtotal + vatAmount;
+  const activeEmployees = employees.filter(isActiveEmployee);
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('th-TH', { 
@@ -2081,7 +2114,7 @@ export const POSRegister: React.FC = () => {
             {loginError && <div className="bg-red-500/10 border border-red-500/20 p-3 rounded text-red-500 text-xs mb-4">{loginError}</div>}
 
             <div className="cashier-select-grid">
-              {employees.map(emp => (
+              {activeEmployees.map(emp => (
                 <div 
                   key={emp.id} 
                   className={`cashier-option ${selectedCashierId === emp.id ? 'selected' : ''}`}
@@ -2091,7 +2124,7 @@ export const POSRegister: React.FC = () => {
                   <span className="cashier-role">{emp.role}</span>
                 </div>
               ))}
-              {employees.length === 0 && <div className="text-slate-600 text-xs py-10">No active employees found</div>}
+              {activeEmployees.length === 0 && <div className="text-slate-600 text-xs py-10">No active employees found</div>}
             </div>
 
             {selectedCashierId && (
