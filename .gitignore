@@ -38,3 +38,6 @@ build/
 
 # RackPeek local generated backups
 /ops/rackpeek/config/*.bak.*
+
+# Local Kilo Code workspace/cache
+.kilo/
