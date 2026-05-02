@@ -374,6 +374,41 @@ This section documents the future API contract. No runtime code is created yet.
 
 ---
 
+
+## IPTV Source Research Policy
+
+The following repositories may be used only as research/reference inputs:
+
+- `iptv-org/iptv`
+- `akkradet/IPTV-THAI`
+- `Free-TV/IPTV`
+- `wadekarg/Gazibo-TV`
+- `hanzoblackninja/IPTV-THAI`
+- `4gray/iptvnator`
+- `HerbertHe/iptv-sources`
+- `iptv-org/awesome-iptv`
+- `Guovin/iptv-api`
+- `fanmingming/live`
+- `imDazui/Tvlist-awesome-m3u-m3u8`
+- `lizongying/my-tv`
+
+Production rules:
+
+- Use Media3 ExoPlayer only for legal, verified streams.
+- Use VLC only as fallback/debug.
+- Add stream health-check and blocklist concept.
+
+Future admin workflow:
+
+1. Import candidate source.
+2. Normalize channel metadata.
+3. Run stream health check.
+4. Review legal/commercial-use status.
+5. Request owner approval.
+6. Publish approved channels to the room channel catalog.
+7. Monitor broken streams and block failed or unsafe sources.
+
+
 ## 11. MVP Roadmap
 
 | Phase | Code | Scope | Status |
