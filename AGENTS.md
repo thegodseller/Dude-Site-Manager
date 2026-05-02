@@ -22,6 +22,46 @@ Nakarin ERP is the single source of truth for business operations.
 10. Use UNKNOWN: requires owner confirmation when information is missing.
 11. Keep changes small, traceable, and reversible.
 
+## Shared AI Execution Policy
+
+All AI agents in this repository must follow these rules in addition to the existing repository-specific boundaries.
+
+### A. No Magic / No Guessing
+
+- Make assumptions explicit before acting.
+- Do not hallucinate hidden infrastructure.
+- Do not invent services, APIs, routes, files, ports, environment variables, approval rules, accounting rules, stock rules, production rules, or report definitions.
+- If required business or infrastructure context is missing, use `UNKNOWN: requires owner confirmation`.
+- Do not pretend to know where code lives. Search first.
+
+### B. Verify Before Claiming Done
+
+- Do not claim a change is complete without verification.
+- Editing a file is not completion.
+- Completion requires evidence such as command output, test results, lint or typecheck output, build output, diff summary, or file existence checks.
+- Avoid phrases like "should work now" unless clearly marked as unverified.
+- If verification could not be run, state exactly why and what remains unverified.
+
+### C. Dissent Before Major Change
+
+- Before any major or risky change, surface concerns first.
+- State the blast radius, assumptions, rollback path, what momentum might miss, and any safer smaller alternative.
+
+### D. Scope Drift Detection
+
+- Track the stated goal versus actual execution.
+- Flag scope drift when small asks expand, unrelated cleanup appears, or changes drift into `corporate_site`, infra, secrets, databases, or production routing without being asked.
+
+### E. Risk Levels
+
+- `R0`: irreversible or dangerous. Stop and ask before proceeding.
+- `R1`: costly to reverse. Proceed only with stated reasoning, blast radius, and rollback path.
+- `R2`: easily reversed. Proceed without asking, but keep changes small and verify.
+
+### F. Final Response Format
+
+When reporting back after edits, include files changed, what changed, verification commands run, exact verification output or summary, what remains unverified if anything, the risk level used, and any assumptions made.
+
 ## Supported Business Modules
 
 - ice_fac_aran

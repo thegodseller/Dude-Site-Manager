@@ -42,6 +42,10 @@ bash scripts/rtk_snapshot.sh
 - Patch only: edit the smallest file set that satisfies the task.
 - Validate only: run the named checks and summarize results.
 
+## Shared AI Safety Policy
+
+Follow the shared policy in `AGENTS.md`, especially the sections on no guessing, verification before claiming done, dissent before major change, scope drift detection, risk levels, and the final response format.
+
 ## Standard Final Report Format
 
 - Files inspected
